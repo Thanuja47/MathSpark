@@ -56,8 +56,8 @@ export default function Header() {
         setLoginError(data.error || 'Login failed. Please check your credentials.');
       } else {
         closeLogin();
-        // Redirect to admin dashboard if admin login, else to student dashboard
-        if (phone.includes('0712345678') || password === 'admin123') {
+        // Redirect based on role from API
+        if (data.user?.role === 'admin') {
           window.location.href = '/admin';
         } else {
           window.location.href = '/my-account';
@@ -65,9 +65,7 @@ export default function Header() {
       }
     } catch {
       setLoading(false);
-      // Fallback redirect for offline/demo mode
-      closeLogin();
-      window.location.href = '/admin';
+      setLoginError('Server error. Please try again.');
     }
   };
 

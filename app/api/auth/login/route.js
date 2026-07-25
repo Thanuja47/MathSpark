@@ -43,6 +43,7 @@ export async function POST(request) {
         phone: student.phone,
         grade: student.grade,
         medium: student.medium,
+        role: student.role || 'student',
         enrolledCourses: student.enrolledCourses,
       },
     });
