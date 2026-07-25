@@ -52,13 +52,32 @@ export default function StatsSection() {
         .stats-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 24px;
+          gap: 32px;
+          padding: 16px 0;
+        }
+        .stat-card {
+          text-align: center;
+          padding: 24px;
+          border-radius: var(--radius-lg);
+          background: rgba(255, 255, 255, 0.02);
+          border: 1px solid rgba(255, 255, 255, 0.03);
+          transition: var(--transition);
+        }
+        .stat-card:hover {
+          background: rgba(255, 255, 255, 0.04);
+          transform: translateY(-2px);
+          border-color: rgba(0, 82, 255, 0.2);
+        }
+        @media (max-width: 991px) {
+          .stats-grid { gap: 24px; }
+          .stat-card { padding: 16px; }
         }
         @media (max-width: 768px) {
-          .stats-grid { grid-template-columns: repeat(2, 1fr); }
+          .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
         }
         @media (max-width: 480px) {
-          .stats-grid { grid-template-columns: 1fr 1fr; gap: 16px; }
+          .stats-grid { grid-template-columns: 1fr; gap: 16px; }
+          .stat-card { padding: 20px 16px; }
         }
       `}</style>
     </section>

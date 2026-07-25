@@ -57,18 +57,18 @@ export default function WhyMatSpark() {
         .why-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
-          margin-bottom: 48px;
+          gap: 32px;
+          margin-bottom: 56px;
         }
         .why-bottom-banner {
           background: linear-gradient(135deg, rgba(0,82,255,0.1) 0%, rgba(123,47,255,0.06) 100%);
           border: 1px solid rgba(0,82,255,0.15);
           border-radius: var(--radius-xl);
-          padding: 32px 40px;
+          padding: 36px 44px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 32px;
+          gap: 40px;
           flex-wrap: wrap;
         }
         .why-banner-content { display: flex; align-items: center; gap: 20px; flex: 1; }
