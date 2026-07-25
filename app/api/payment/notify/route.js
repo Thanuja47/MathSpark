@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import crypto from 'crypto';
-
-const PAYHERE_MERCHANT_ID     = process.env.PAYHERE_MERCHANT_ID     || '1230017';
-const PAYHERE_MERCHANT_SECRET = process.env.PAYHERE_MERCHANT_SECRET || 'your_secret_here';
+import { verifyNotifySignature } from '@/utils/payhereSignature';
+import { PAYMENT_STATUS } from '@/utils/constants';
 
 // POST /api/payment/notify — PayHere sends payment status here
 export async function POST(request) {
@@ -17,31 +15,33 @@ export async function POST(request) {
     const statusCode      = formData.get('status_code');
     const md5sig          = formData.get('md5sig');
 
-    // Verify the signature
-    const secretHash = crypto.createHash('md5').update(PAYHERE_MERCHANT_SECRET).digest('hex').toUpperCase();
-    const localSig   = crypto
-      .createHash('md5')
-      .update(`${merchantId}${orderId}${payhereAmount}${payhereCurrency}${statusCode}${secretHash}`)
-      .digest('hex')
-      .toUpperCase();
+    // Verify the signature using shared utility
+    const isValid = verifyNotifySignature({
+      merchantId,
+      orderId,
+      amount:      payhereAmount,
+      currency:    payhereCurrency,
+      statusCode,
+      receivedSig: md5sig,
+    });
 
-    if (localSig !== md5sig) {
+    if (!isValid) {
       console.error('[PayHere Notify] Signature mismatch – possible tamper attempt.');
       return new Response('Invalid signature', { status: 400 });
     }
 
-    // status_code 2 = successful payment
-    if (statusCode === '2') {
+    // Handle payment status using constants
+    if (statusCode === PAYMENT_STATUS.SUCCESS) {
       console.log(`[PayHere] Payment SUCCESS | Order: ${orderId} | Payment: ${paymentId} | Amount: LKR ${payhereAmount}`);
       // TODO: Update database — mark course as enrolled for the student
       // await db.enrollments.create({ orderId, paymentId, amount: payhereAmount });
-    } else if (statusCode === '0') {
+    } else if (statusCode === PAYMENT_STATUS.PENDING) {
       console.log(`[PayHere] Payment PENDING | Order: ${orderId}`);
-    } else if (statusCode === '-1') {
+    } else if (statusCode === PAYMENT_STATUS.CANCELLED) {
       console.log(`[PayHere] Payment CANCELLED | Order: ${orderId}`);
-    } else if (statusCode === '-2') {
+    } else if (statusCode === PAYMENT_STATUS.FAILED) {
       console.log(`[PayHere] Payment FAILED | Order: ${orderId}`);
-    } else if (statusCode === '-3') {
+    } else if (statusCode === PAYMENT_STATUS.CHARGEDBACK) {
       console.log(`[PayHere] Payment CHARGEDBACK | Order: ${orderId}`);
     }
 

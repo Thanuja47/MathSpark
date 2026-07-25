@@ -2,6 +2,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { NAV_LINKS, GRADES, SITE } from '@/lib/data';
+import useAuth from '@/hooks/useAuth';
+import { normalisePhone } from '@/utils/formatPhone';
 
 export default function Header() {
   const [scrolled, setScrolled]       = useState(false);
@@ -12,8 +14,8 @@ export default function Header() {
   const [step, setStep]     = useState(1); // login modal step
   const [phone, setPhone]   = useState('');
   const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
-  const [loading, setLoading] = useState(false);
+  
+  const { login: performLogin, error: loginError, loading, setError: setLoginError } = useAuth();
   const headerRef = useRef(null);
 
   useEffect(() => {
@@ -29,43 +31,28 @@ export default function Header() {
   }, [mobileOpen, loginOpen]);
 
   const closeMobile = () => setMobileOpen(false);
-  const closeLogin  = () => { setLoginOpen(false); setStep(1); setPhone(''); setPassword(''); setLoginError(''); };
+  const closeLogin  = () => { setLoginOpen(false); setStep(1); setPhone(''); setPassword(''); setLoginError(null); };
 
   const handleStep1 = (e) => {
     e.preventDefault();
     if (!phone || phone.length < 9) { setLoginError('Please enter a valid WhatsApp number.'); return; }
-    setLoginError('');
-    setLoading(true);
-    setTimeout(() => { setLoading(false); setStep(2); }, 800);
+    setLoginError(null);
+    setStep(2);
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!password) { setLoginError('Please enter your password.'); return; }
-    setLoginError('');
-    setLoading(true);
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, password })
-      });
-      const data = await res.json();
-      setLoading(false);
-      if (!res.ok) {
-        setLoginError(data.error || 'Login failed. Please check your credentials.');
+    setLoginError(null);
+    
+    const result = await performLogin(phone, password);
+    if (result.success) {
+      closeLogin();
+      if (result.user?.role === 'admin') {
+        window.location.href = '/admin';
       } else {
-        closeLogin();
-        // Redirect based on role from API
-        if (data.user?.role === 'admin') {
-          window.location.href = '/admin';
-        } else {
-          window.location.href = '/my-account';
-        }
+        window.location.href = '/my-account';
       }
-    } catch {
-      setLoading(false);
-      setLoginError('Server error. Please try again.');
     }
   };
 

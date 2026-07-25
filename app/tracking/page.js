@@ -1,37 +1,35 @@
 'use client';
 import { useState } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import FloatingWidgets from '@/components/FloatingWidgets';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import FloatingWidgets from '@/components/layout/FloatingWidgets';
+import useTracking from '@/hooks/useTracking';
+import { formatDate } from '@/utils/formatDate';
 
 export default function TrackingPage() {
   const [trackingNo, setTrackingNo] = useState('');
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const { record, fetchTracking, loading, error } = useTracking();
 
-  const handleTrack = (e) => {
+  const handleTrack = async (e) => {
     e.preventDefault();
     if (!trackingNo) return;
-    setLoading(true);
-    setResult(null);
-
-    setTimeout(() => {
-      setLoading(false);
-      setResult({
-        trackingNo,
-        status: 'In Transit',
-        courier: 'Pronto Lanka / Domex',
-        estimatedDelivery: 'Tomorrow by 4:00 PM',
-        studentName: 'Kavindi Perera',
-        item: 'Grade 10 Maths Tute Pack - Month 05',
-        history: [
-          { time: 'Today, 09:30 AM', status: 'Out for delivery from Colombo Hub' },
-          { time: 'Yesterday, 06:15 PM', status: 'Dispatched from MatSpark Warehouse' },
-          { time: 'Yesterday, 02:00 PM', status: 'Order packed & verified' },
-        ],
-      });
-    }, 1000);
+    await fetchTracking(trackingNo);
   };
+
+  // Convert the simplified DB record structure to the UI display model
+  const result = record ? {
+    trackingNo: record.id,
+    status: record.status,
+    courier: record.courier || 'Pronto Lanka / Domex',
+    estimatedDelivery: 'Tomorrow by 4:00 PM',
+    studentName: record.student,
+    item: record.item,
+    history: [
+      { time: formatDate(record.updatedAt), status: `Package marked as [${record.status}]` },
+      { time: 'MatSpark Center', status: 'Dispatched from MatSpark Warehouse' },
+      { time: 'MatSpark Center', status: 'Order packed & verified' },
+    ]
+  } : null;
 
   return (
     <>
@@ -71,6 +69,10 @@ export default function TrackingPage() {
                   {loading ? 'Searching...' : 'Track Package 🚚'}
                 </button>
               </form>
+
+              {error && (
+                <div className="login-error" style={{ marginTop: 20 }}>⚠️ {error}</div>
+              )}
 
               {result && (
                 <div className="tracking-result">

@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import FloatingWidgets from '@/components/FloatingWidgets';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import FloatingWidgets from '@/components/layout/FloatingWidgets';
 
 // Sample tute packs available to student
 const TUTES = [

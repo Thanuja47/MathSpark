@@ -1,9 +1,9 @@
 'use client';
 import { useState } from 'react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import FloatingWidgets from '@/components/FloatingWidgets';
-import CourseCard from '@/components/CourseCard';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import FloatingWidgets from '@/components/layout/FloatingWidgets';
+import CourseCard from '@/components/courses/CourseCard';
 import { COURSES } from '@/lib/data';
 
 export default function CoursesPage() {

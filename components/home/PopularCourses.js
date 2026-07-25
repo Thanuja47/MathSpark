@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import CourseCard from '@/components/CourseCard';
+import CourseCard from '@/components/courses/CourseCard';
 import { POPULAR_COURSES } from '@/lib/data';
 
 export default function PopularCourses() {

@@ -1,8 +1,8 @@
 'use client';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import FloatingWidgets from '@/components/FloatingWidgets';
-import LiveScheduleWidget, { SCHEDULE, DAYS } from '@/components/LiveScheduleWidget';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import FloatingWidgets from '@/components/layout/FloatingWidgets';
+import LiveScheduleWidget, { SCHEDULE, DAYS } from '@/components/tracking/LiveScheduleWidget';
 
 const COLORS = ['#0052FF', '#7B2FFF', '#FF6B00', '#00C896', '#FF3D9A'];
 

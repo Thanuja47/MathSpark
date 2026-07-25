@@ -1,11 +1,14 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import FloatingWidgets from '@/components/FloatingWidgets';
+import Header from '@/components/layout/Header';
+import Footer from '@/components/layout/Footer';
+import FloatingWidgets from '@/components/layout/FloatingWidgets';
+
+import useAuth from '@/hooks/useAuth';
 
 export default function RegisterPage() {
+  const { register: performRegister, error, setError, loading } = useAuth();
   const [step, setStep] = useState(1);
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
@@ -13,9 +16,7 @@ export default function RegisterPage() {
   const [medium, setMedium] = useState('sinhala');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const handleStep1 = (e) => {
     e.preventDefault();
@@ -25,13 +26,23 @@ export default function RegisterPage() {
     setStep(2);
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
     if (password !== confirmPassword) { setError('Passwords do not match.'); return; }
     setError('');
-    setLoading(true);
-    setTimeout(() => { setLoading(false); setSuccess(true); }, 1200);
+    
+    const result = await performRegister({
+      name,
+      phone,
+      grade: parseInt(grade, 10),
+      medium,
+      password
+    });
+    
+    if (result.success) {
+      setSuccess(true);
+    }
   };
 
   return (

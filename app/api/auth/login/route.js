@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { comparePassword, signToken, setAuthCookie } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { normalisePhone } from '@/utils/formatPhone';
 
 export async function POST(request) {
   try {
@@ -12,10 +13,7 @@ export async function POST(request) {
     }
 
     // Normalise phone → always store/lookup as 0XXXXXXXXX
-    let normalised = phone.replace(/[\s\-]/g, '');     // strip spaces/dashes
-    if (normalised.startsWith('+94')) normalised = '0' + normalised.slice(3);
-    else if (normalised.startsWith('94') && normalised.length === 11) normalised = '0' + normalised.slice(2);
-    else if (!normalised.startsWith('0')) normalised = '0' + normalised; // e.g. 712345678 → 0712345678
+    const normalised = normalisePhone(phone);
 
     // Find student in DB
     const student = await db.students.findByPhone(normalised);
