@@ -34,7 +34,7 @@ export default function HeroSection() {
           <div className="hero-content">
             <div className="hero-tag">
               <span className="hero-tag-dot" />
-              Ishara Madushan Online School
+              MathSpark Online School
             </div>
 
             <h1 className="hero-title">

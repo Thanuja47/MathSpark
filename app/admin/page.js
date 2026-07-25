@@ -50,7 +50,7 @@ export default function AdminDashboardPage() {
       isFree: false,
       isPopular: false,
       description: 'Newly created class for upcoming term.',
-      instructor: 'Ishara Madushan',
+      instructor: 'Ishan Maduranga',
     };
     setCoursesList([newCourse, ...coursesList]);
     setNewCourseTitle('');
