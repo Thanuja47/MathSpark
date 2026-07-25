@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { hashPassword, signToken, setAuthCookie } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { normalisePhone } from '@/utils/formatPhone';
+import { ROLES } from '@/utils/constants';
 
 export async function POST(request) {
   try {
@@ -14,7 +16,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Password must be at least 6 characters.' }, { status: 400 });
     }
 
-    const normalised = phone.replace(/\s/g, '').replace(/^\+94/, '0').replace(/^94/, '0');
+    const normalised = normalisePhone(phone);
 
     // Check if already registered
     const exists = await db.students.exists(normalised);
@@ -30,6 +32,7 @@ export async function POST(request) {
       passwordHash,
       grade: parseInt(grade, 10),
       medium: medium || 'sinhala',
+      role: ROLES.STUDENT,
       enrolledCourses: [],
     });
 
@@ -38,7 +41,7 @@ export async function POST(request) {
 
     const response = NextResponse.json({
       success: true,
-      user: { id: student.id, name: student.name, phone: student.phone, grade: student.grade, medium: student.medium },
+      user: { id: student.id, name: student.name, phone: student.phone, grade: student.grade, medium: student.medium, role: student.role },
     }, { status: 201 });
 
     response.headers.set('Set-Cookie', setAuthCookie(token));
