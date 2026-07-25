@@ -4,13 +4,16 @@
  */
 
 /**
- * Look up a tute tracking record by tracking ID or phone number.
- * @param {string} query - Tracking ID (e.g. "MSP-9842") or phone number
+ * Look up a tute tracking record by tracking ID (e.g. "MSP-9842") or phone number.
+ * @param {string} query - Tracking ID or phone number
  * @returns {Promise<{record?: object, error?: string}>}
  */
 export async function getTracking(query) {
-  const res = await fetch(`/api/tracking?q=${encodeURIComponent(query)}`);
-  return res.json();
+  const res = await fetch(`/api/tracking?id=${encodeURIComponent(query)}`);
+  const data = await res.json();
+  // API returns { tracking: {...} } — normalise to { record }
+  if (data.tracking) return { record: data.tracking };
+  return data; // passthrough error
 }
 
 /**
