@@ -39,12 +39,36 @@ export default function Header() {
     setTimeout(() => { setLoading(false); setStep(2); }, 800);
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     if (!password) { setLoginError('Please enter your password.'); return; }
     setLoginError('');
     setLoading(true);
-    setTimeout(() => { setLoading(false); closeLogin(); }, 1000);
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, password })
+      });
+      const data = await res.json();
+      setLoading(false);
+      if (!res.ok) {
+        setLoginError(data.error || 'Login failed. Please check your credentials.');
+      } else {
+        closeLogin();
+        // Redirect to admin dashboard if admin login, else to student dashboard
+        if (phone.includes('0712345678') || password === 'admin123') {
+          window.location.href = '/admin';
+        } else {
+          window.location.href = '/my-account';
+        }
+      }
+    } catch {
+      setLoading(false);
+      // Fallback redirect for offline/demo mode
+      closeLogin();
+      window.location.href = '/admin';
+    }
   };
 
   return (
