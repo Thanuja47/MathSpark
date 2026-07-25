@@ -2,8 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { NAV_LINKS, GRADES, SITE } from '@/lib/data';
-import useAuth from '@/hooks/useAuth';
-import { normalisePhone } from '@/utils/formatPhone';
+import { login as loginService } from '@/services/authService';
 
 export default function Header() {
   const [scrolled, setScrolled]       = useState(false);
@@ -14,8 +13,8 @@ export default function Header() {
   const [step, setStep]     = useState(1); // login modal step
   const [phone, setPhone]   = useState('');
   const [password, setPassword] = useState('');
-  
-  const { login: performLogin, error: loginError, loading, setError: setLoginError } = useAuth();
+  const [loginError, setLoginError] = useState('');
+  const [loading, setLoading] = useState(false);
   const headerRef = useRef(null);
 
   useEffect(() => {
@@ -31,28 +30,36 @@ export default function Header() {
   }, [mobileOpen, loginOpen]);
 
   const closeMobile = () => setMobileOpen(false);
-  const closeLogin  = () => { setLoginOpen(false); setStep(1); setPhone(''); setPassword(''); setLoginError(null); };
+  const closeLogin  = () => { setLoginOpen(false); setStep(1); setPhone(''); setPassword(''); setLoginError(''); };
 
   const handleStep1 = (e) => {
     e.preventDefault();
     if (!phone || phone.length < 9) { setLoginError('Please enter a valid WhatsApp number.'); return; }
-    setLoginError(null);
+    setLoginError('');
     setStep(2);
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!password) { setLoginError('Please enter your password.'); return; }
-    setLoginError(null);
-    
-    const result = await performLogin(phone, password);
-    if (result.success) {
-      closeLogin();
-      if (result.user?.role === 'admin') {
-        window.location.href = '/admin';
+    setLoginError('');
+    setLoading(true);
+    try {
+      const data = await loginService(phone, password);
+      setLoading(false);
+      if (!data.success) {
+        setLoginError(data.error || 'Login failed. Please check your credentials.');
       } else {
-        window.location.href = '/my-account';
+        closeLogin();
+        if (data.user?.role === 'admin') {
+          window.location.href = '/admin';
+        } else {
+          window.location.href = '/my-account';
+        }
       }
+    } catch {
+      setLoading(false);
+      setLoginError('Server error. Please try again.');
     }
   };
 
