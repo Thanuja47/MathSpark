@@ -11,8 +11,11 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Phone number and password are required.' }, { status: 400 });
     }
 
-    // Normalise phone (remove spaces, leading 0, country code)
-    const normalised = phone.replace(/\s/g, '').replace(/^\+94/, '0').replace(/^94/, '0');
+    // Normalise phone → always store/lookup as 0XXXXXXXXX
+    let normalised = phone.replace(/[\s\-]/g, '');     // strip spaces/dashes
+    if (normalised.startsWith('+94')) normalised = '0' + normalised.slice(3);
+    else if (normalised.startsWith('94') && normalised.length === 11) normalised = '0' + normalised.slice(2);
+    else if (!normalised.startsWith('0')) normalised = '0' + normalised; // e.g. 712345678 → 0712345678
 
     // Find student in DB
     const student = await db.students.findByPhone(normalised);

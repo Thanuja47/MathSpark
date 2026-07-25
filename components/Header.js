@@ -295,15 +295,13 @@ export default function Header() {
               <div className="form-group">
                 <label className="form-label" htmlFor="login-phone">WhatsApp Number</label>
                 <div style={{position:'relative'}}>
-                  <span style={{position:'absolute',left:'14px',top:'50%',transform:'translateY(-50%)',color:'var(--text-muted)',fontSize:'0.9rem',fontWeight:600}}>+94</span>
                   <input
                     id="login-phone"
-                    type="number"
+                    type="tel"
                     className="form-input"
-                    style={{paddingLeft:'52px'}}
-                    placeholder="712 345 678"
+                    placeholder="0712 345 678"
                     value={phone}
-                    onChange={e => { if (e.target.value.length <= 10) setPhone(e.target.value); setLoginError(''); }}
+                    onChange={e => { setPhone(e.target.value.replace(/\s/g, '')); setLoginError(''); }}
                     required
                     autoFocus
                   />
