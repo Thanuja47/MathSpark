@@ -1,0 +1,41 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Student {
+  id              String   @id @default(uuid())
+  name            String
+  phone           String   @unique
+  passwordHash    String
+  grade           Int
+  medium          String   @default("sinhala")
+  enrolledCourses String   @default("[]")
+  createdAt       DateTime @default(now())
+  isActive        Boolean  @default(true)
+}
+
+model Tracking {
+  id        String   @id
+  student   String
+  phone     String
+  item      String
+  status    String
+  courier   String
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  grade       Int
+  medium      String
+  price       Float
+  badge       String?
+  description String
+  createdAt   DateTime @default(now())
+}
