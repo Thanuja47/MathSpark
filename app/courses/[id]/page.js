@@ -1,5 +1,4 @@
 'use client';
-import { use } from 'react';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
@@ -7,7 +6,7 @@ import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import { COURSES, SITE } from '@/lib/data';
 
 export default function CourseDetailPage({ params }) {
-  const { id } = use(params);
+  const { id } = params;
   const course = COURSES.find((c) => c.id.toString() === id) || COURSES[0];
 
   const syllabus = [

@@ -1,5 +1,4 @@
 'use client';
-import { use } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
@@ -7,8 +6,7 @@ import CourseCard from '@/components/courses/CourseCard';
 import { COURSES, GRADES } from '@/lib/data';
 
 export default function GradeFilteredPage({ params }) {
-  const resolvedParams = use(params);
-  const gradeId = parseInt(resolvedParams.id, 10);
+  const gradeId = parseInt(params.id, 10);
   const gradeObj = GRADES.find((g) => g.id === gradeId) || { label: `Grade ${gradeId}` };
   const filteredCourses = COURSES.filter((c) => c.grade === gradeId);
 
