@@ -441,24 +441,30 @@ export default function Header() {
         .logo-sub  { display: block; font-size: 0.62rem; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; }
 
         /* Desktop Nav */
-        .desktop-nav { display: flex; flex: 1; justify-content: center; }
-        .nav-list { display: flex; align-items: center; gap: 4px; }
+        .desktop-nav { display: flex; flex: 1; justify-content: center; margin: 0 12px; }
+        .nav-list { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
         .nav-item { position: relative; }
         .nav-link {
           display: flex;
           align-items: center;
-          gap: 4px;
-          padding: 8px 14px;
-          font-size: 0.9rem;
-          font-weight: 500;
+          gap: 5px;
+          padding: 7px 12px;
+          font-size: 0.85rem;
+          font-weight: 600;
+          letter-spacing: 0.01em;
           color: var(--text-secondary);
           border-radius: var(--radius-md);
-          transition: var(--transition);
+          transition: all 0.2s ease;
           white-space: nowrap;
+          border: 1px solid transparent;
         }
-        .nav-link:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
-        .nav-chevron { transition: transform 0.2s; }
-        .has-dropdown:hover .nav-chevron { transform: rotate(180deg); }
+        .nav-link:hover {
+          color: var(--text-primary);
+          background: rgba(255,255,255,0.06);
+          border-color: rgba(255,255,255,0.1);
+        }
+        .nav-chevron { transition: transform 0.2s; opacity: 0.7; }
+        .has-dropdown:hover .nav-chevron { transform: rotate(180deg); opacity: 1; }
         .nav-dropdown {
           position: absolute;
           top: calc(100% + 8px);
@@ -485,7 +491,7 @@ export default function Header() {
         .dropdown-item:hover { background: var(--primary-glow); color: var(--primary-light); }
 
         /* Header Actions */
-        .header-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .header-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; margin-left: 8px; }
         .mobile-menu-btn {
           display: none;
           color: var(--text-secondary);
