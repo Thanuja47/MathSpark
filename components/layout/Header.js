@@ -5,36 +5,36 @@ import { NAV_LINKS, GRADES, SITE } from '@/lib/data';
 import { login as loginService } from '@/services/authService';
 
 export default function Header() {
-  const [scrolled, setScrolled]       = useState(false);
-  const [mobileOpen, setMobileOpen]   = useState(false);
-  const [loginOpen, setLoginOpen]     = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [scrolled, setScrolled]             = useState(false);
+  const [mobileOpen, setMobileOpen]         = useState(false);
+  const [loginOpen, setLoginOpen]           = useState(false);
+  const [sidebarOpen, setSidebarOpen]       = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
-  const [step, setStep]     = useState(1); // login modal step
-  const [phone, setPhone]   = useState('');
-  const [password, setPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [step, setStep]                     = useState(1);
+  const [phone, setPhone]                   = useState('');
+  const [password, setPassword]             = useState('');
+  const [loginError, setLoginError]         = useState('');
+  const [loading, setLoading]               = useState(false);
+  const [expandedMobile, setExpandedMobile] = useState(null);
   const headerRef = useRef(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Lock body scroll when mobile menu / modal is open
   useEffect(() => {
     document.body.style.overflow = (mobileOpen || loginOpen) ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [mobileOpen, loginOpen]);
 
-  const closeMobile = () => setMobileOpen(false);
+  const closeMobile = () => { setMobileOpen(false); setExpandedMobile(null); };
   const closeLogin  = () => { setLoginOpen(false); setStep(1); setPhone(''); setPassword(''); setLoginError(''); };
 
   const handleStep1 = (e) => {
     e.preventDefault();
-    if (!phone || phone.length < 9) { setLoginError('Please enter a valid WhatsApp number.'); return; }
+    if (!phone || phone.replace(/\s/g,'').length < 9) { setLoginError('Please enter a valid WhatsApp number.'); return; }
     setLoginError('');
     setStep(2);
   };
@@ -51,11 +51,7 @@ export default function Header() {
         setLoginError(data.error || 'Login failed. Please check your credentials.');
       } else {
         closeLogin();
-        if (data.user?.role === 'admin') {
-          window.location.href = '/admin';
-        } else {
-          window.location.href = '/my-account';
-        }
+        window.location.href = data.user?.role === 'admin' ? '/admin' : '/my-account';
       }
     } catch {
       setLoading(false);
@@ -71,25 +67,28 @@ export default function Header() {
           <div className="header-topbar-inner">
             <div className="header-topbar-left">
               <a href={`tel:${SITE.phone}`} className="topbar-link">
-                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
                 {SITE.phone}
               </a>
               <a href={`mailto:${SITE.email}`} className="topbar-link">
-                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                 {SITE.email}
               </a>
             </div>
             <div className="header-topbar-right">
-              <span className="topbar-badge">🔥 2026 Syllabus Classes Now Live!</span>
+              <span className="topbar-badge">
+                <span className="topbar-badge-dot" />
+                2026 Syllabus Classes Live
+              </span>
               <div className="topbar-social">
-                <a href={SITE.facebook} target="_blank" rel="noreferrer" aria-label="Facebook">
-                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+                <a href={SITE.facebook}  target="_blank" rel="noreferrer" aria-label="Facebook"  className="topbar-social-link">
+                  <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
                 </a>
-                <a href={SITE.youtube} target="_blank" rel="noreferrer" aria-label="YouTube">
-                  <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
+                <a href={SITE.youtube}   target="_blank" rel="noreferrer" aria-label="YouTube"   className="topbar-social-link">
+                  <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
                 </a>
-                <a href={SITE.instagram} target="_blank" rel="noreferrer" aria-label="Instagram">
-                  <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+                <a href={SITE.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" className="topbar-social-link">
+                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                 </a>
               </div>
             </div>
@@ -98,17 +97,18 @@ export default function Header() {
       </div>
 
       {/* ── Main Header ── */}
-      <header ref={headerRef} className={`main-header ${scrolled ? 'scrolled' : ''}`}>
+      <header ref={headerRef} className={`main-header${scrolled ? ' scrolled' : ''}`}>
         <div className="container">
           <div className="header-inner">
+
             {/* Logo */}
             <Link href="/" className="header-logo">
               <div className="logo-mark">
-                <span className="logo-icon">⚡</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
               </div>
               <div className="logo-text">
                 <span className="logo-name">MathSpark</span>
-                <span className="logo-sub">Online School</span>
+                <span className="logo-sub">Online Tuition</span>
               </div>
             </Link>
 
@@ -118,7 +118,7 @@ export default function Header() {
                 {NAV_LINKS.map((link) => (
                   <li
                     key={link.label}
-                    className={`nav-item ${link.dropdown ? 'has-dropdown' : ''}`}
+                    className={`nav-item${link.dropdown ? ' has-dropdown' : ''}`}
                     onMouseEnter={() => link.dropdown && setActiveDropdown(link.label)}
                     onMouseLeave={() => setActiveDropdown(null)}
                   >
@@ -130,16 +130,23 @@ export default function Header() {
                     >
                       {link.label}
                       {link.dropdown && (
-                        <svg className="nav-chevron" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                        <svg
+                          className={`nav-chevron${activeDropdown === link.label ? ' open' : ''}`}
+                          width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"
+                        >
+                          <polyline points="6 9 12 15 18 9"/>
+                        </svg>
                       )}
                     </Link>
                     {link.dropdown && activeDropdown === link.label && (
                       <div className="nav-dropdown">
-                        {link.dropdown.map((item) => (
-                          <Link key={item.label} href={item.href} className="dropdown-item">
-                            {item.label}
-                          </Link>
-                        ))}
+                        <div className="nav-dropdown-inner">
+                          {link.dropdown.map((item) => (
+                            <Link key={item.label} href={item.href} className="dropdown-item">
+                              {item.label}
+                            </Link>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </li>
@@ -151,65 +158,96 @@ export default function Header() {
             <div className="header-actions">
               <button
                 id="grades-sidebar-btn"
-                className="btn btn-ghost btn-sm"
+                className="grades-btn"
                 onClick={() => setSidebarOpen(true)}
-                aria-label="Browse Grades"
+                aria-label="Browse by Grade"
               >
-                <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
                 Grades
               </button>
               <button
                 id="login-btn-header"
-                className="btn btn-primary btn-sm"
+                className="login-btn"
                 onClick={() => setLoginOpen(true)}
               >
                 Login
-                <svg className="arrow" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
               </button>
-              {/* Mobile hamburger */}
               <button
                 id="mobile-menu-btn"
                 className="mobile-menu-btn"
                 onClick={() => setMobileOpen(true)}
                 aria-label="Open menu"
+                aria-expanded={mobileOpen}
               >
-                <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <line x1="3" y1="6"  x2="21" y2="6"/>
+                  <line x1="3" y1="12" x2="21" y2="12"/>
+                  <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
               </button>
             </div>
+
           </div>
         </div>
       </header>
 
       {/* ── Overlay ── */}
       <div
-        className={`overlay ${(mobileOpen || loginOpen || sidebarOpen) ? 'active' : ''}`}
+        className={`overlay${(mobileOpen || loginOpen || sidebarOpen) ? ' active' : ''}`}
         onClick={() => { closeMobile(); closeLogin(); setSidebarOpen(false); }}
+        aria-hidden="true"
       />
 
       {/* ── Mobile Menu ── */}
-      <div className={`mobile-menu ${mobileOpen ? 'open' : ''}`} aria-hidden={!mobileOpen}>
+      <div className={`mobile-menu${mobileOpen ? ' open' : ''}`} aria-hidden={!mobileOpen} role="dialog" aria-label="Navigation menu">
         <div className="mobile-menu-header">
           <Link href="/" className="header-logo" onClick={closeMobile}>
-            <div className="logo-mark"><span className="logo-icon">⚡</span></div>
+            <div className="logo-mark">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+            </div>
             <div className="logo-text">
               <span className="logo-name">MathSpark</span>
-              <span className="logo-sub">Online School</span>
+              <span className="logo-sub">Online Tuition</span>
             </div>
           </Link>
-          <button id="mobile-close-btn" className="modal-close" onClick={closeMobile} aria-label="Close menu">✕</button>
+          <button id="mobile-close-btn" className="icon-btn" onClick={closeMobile} aria-label="Close menu">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
+
         <div className="mobile-contact-bar">
-          <a href={`tel:${SITE.phone}`}><span>📞</span> {SITE.phone}</a>
-          <a href={`mailto:${SITE.email}`}><span>✉️</span> {SITE.email}</a>
+          <a href={`tel:${SITE.phone}`} className="mobile-contact-link">
+            <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+            {SITE.phone}
+          </a>
         </div>
+
         <nav className="mobile-nav">
           {NAV_LINKS.map((link) => (
-            <div key={link.label}>
-              <Link href={link.href} className="mobile-nav-link" onClick={closeMobile}
-                target={link.external ? '_blank' : undefined}>
-                {link.label}
-              </Link>
-              {link.dropdown && (
+            <div key={link.label} className="mobile-nav-item">
+              <button
+                className="mobile-nav-link"
+                onClick={() => {
+                  if (link.dropdown) {
+                    setExpandedMobile(expandedMobile === link.label ? null : link.label);
+                  } else {
+                    closeMobile();
+                    window.location.href = link.href;
+                  }
+                }}
+              >
+                <span>{link.label}</span>
+                {link.dropdown && (
+                  <svg
+                    className={`mobile-chevron${expandedMobile === link.label ? ' open' : ''}`}
+                    width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
+                  >
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                )}
+              </button>
+              {link.dropdown && expandedMobile === link.label && (
                 <div className="mobile-sub-links">
                   {link.dropdown.map((item) => (
                     <Link key={item.label} href={item.href} className="mobile-sub-link" onClick={closeMobile}>
@@ -221,33 +259,38 @@ export default function Header() {
             </div>
           ))}
         </nav>
+
         <div className="mobile-menu-footer">
-          <button id="mobile-login-btn" className="btn btn-primary" style={{width:'100%'}} onClick={() => { closeMobile(); setLoginOpen(true); }}>
+          <button
+            id="mobile-login-btn"
+            className="login-btn"
+            style={{width:'100%', justifyContent:'center'}}
+            onClick={() => { closeMobile(); setLoginOpen(true); }}
+          >
             Login to Your Account
+            <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
-          <div className="mobile-social">
-            <span className="text-muted text-sm">Find us on</span>
-            <div style={{display:'flex',gap:'12px',marginTop:'12px'}}>
-              <a href={SITE.facebook} target="_blank" rel="noreferrer" className="social-btn">f</a>
-              <a href={SITE.youtube}  target="_blank" rel="noreferrer" className="social-btn">▶</a>
-              <a href={SITE.instagram} target="_blank" rel="noreferrer" className="social-btn">📸</a>
-            </div>
-          </div>
         </div>
       </div>
 
       {/* ── Grades Sidebar ── */}
-      <div className={`grades-sidebar ${sidebarOpen ? 'open' : ''}`} aria-hidden={!sidebarOpen}>
+      <div className={`grades-sidebar${sidebarOpen ? ' open' : ''}`} aria-hidden={!sidebarOpen} role="dialog" aria-label="Browse by grade">
         <div className="grades-sidebar-header">
-          <h4>Browse by Grade</h4>
-          <button id="sidebar-close-btn" className="modal-close" onClick={() => setSidebarOpen(false)}>✕</button>
+          <div>
+            <div style={{fontSize:'0.7rem', fontWeight:700, letterSpacing:'0.1em', textTransform:'uppercase', color:'var(--muted)', marginBottom:4}}>Browse</div>
+            <h4 style={{fontSize:'1.0625rem', color:'var(--paper)', letterSpacing:'-0.01em'}}>By Grade</h4>
+          </div>
+          <button id="sidebar-close-btn" className="icon-btn" onClick={() => setSidebarOpen(false)} aria-label="Close grades panel">
+            <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
         </div>
         <div className="grades-sidebar-body">
           {GRADES.map((grade) => (
             <div key={grade.id} className="grade-sidebar-item">
               <Link href={`/grades/${grade.id}`} className="grade-sidebar-label" onClick={() => setSidebarOpen(false)}>
                 <span className="grade-sidebar-badge">{grade.id}</span>
-                {grade.label}
+                <span>{grade.label}</span>
+                <svg style={{marginLeft:'auto', opacity:0.4}} width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
               </Link>
               <div className="grade-sidebar-subjects">
                 {grade.subjects.map((sub) => (
@@ -262,25 +305,48 @@ export default function Header() {
       </div>
 
       {/* ── Login Modal ── */}
-      <div className={`modal ${loginOpen ? 'active' : ''}`} role="dialog" aria-modal="true" aria-label="Login">
+      <div className={`modal${loginOpen ? ' active' : ''}`} role="dialog" aria-modal="true" aria-label="Login to MathSpark">
         <div className="modal-box">
-          <button id="login-modal-close" className="modal-close" onClick={closeLogin} aria-label="Close login">✕</button>
-          <div className="modal-logo" style={{marginBottom:'24px'}}>
-            <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'8px'}}>
-              <span style={{fontSize:'1.8rem'}}>⚡</span>
-              <span style={{fontFamily:'var(--font-heading)',fontWeight:800,fontSize:'1.4rem'}}>MathSpark</span>
+          <button id="login-modal-close" className="modal-close" onClick={closeLogin} aria-label="Close login">
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+
+          {/* Modal Header */}
+          <div className="modal-header">
+            <div className="modal-logo-row">
+              <div className="logo-mark" style={{width:32,height:32}}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              </div>
+              <span className="logo-name" style={{fontSize:'1rem'}}>MathSpark</span>
             </div>
-            <h3 style={{fontSize:'1.2rem',fontWeight:700,marginBottom:'4px'}}>
-              {step === 1 ? 'Welcome Back!' : 'Enter your password'}
+            <h3 className="modal-title">
+              {step === 1 ? 'Welcome back' : 'Enter password'}
             </h3>
-            <p style={{fontSize:'0.85rem',color:'var(--text-muted)'}}>
-              {step === 1 ? 'Enter your WhatsApp number to continue' : `Logging in as ${phone}`}
+            <p className="modal-subtitle">
+              {step === 1
+                ? 'Sign in with your registered WhatsApp number'
+                : <span>Signing in as <strong style={{color:'var(--paper)'}}>{phone}</strong></span>
+              }
             </p>
           </div>
 
+          {/* Step indicator */}
+          <div className="modal-steps">
+            <div className={`modal-step${step >= 1 ? ' active' : ''}`}>
+              <div className="modal-step-dot">{step > 1 ? '✓' : '1'}</div>
+              <span>Phone</span>
+            </div>
+            <div className={`modal-step-line${step >= 2 ? ' active' : ''}`} />
+            <div className={`modal-step${step >= 2 ? ' active' : ''}`}>
+              <div className="modal-step-dot">2</div>
+              <span>Password</span>
+            </div>
+          </div>
+
           {loginError && (
-            <div className="login-error">
-              ⚠️ {loginError}
+            <div className="login-error" role="alert">
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" style={{flexShrink:0}}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              {loginError}
             </div>
           )}
 
@@ -288,21 +354,19 @@ export default function Header() {
             <form id="login-step1-form" onSubmit={handleStep1}>
               <div className="form-group">
                 <label className="form-label" htmlFor="login-phone">WhatsApp Number</label>
-                <div style={{position:'relative'}}>
-                  <input
-                    id="login-phone"
-                    type="tel"
-                    className="form-input"
-                    placeholder="0712 345 678"
-                    value={phone}
-                    onChange={e => { setPhone(e.target.value.replace(/\s/g, '')); setLoginError(''); }}
-                    required
-                    autoFocus
-                  />
-                </div>
+                <input
+                  id="login-phone"
+                  type="tel"
+                  className="form-input"
+                  placeholder="0712 345 678"
+                  value={phone}
+                  onChange={e => { setPhone(e.target.value.replace(/\s/g,'')); setLoginError(''); }}
+                  required
+                  autoFocus
+                />
               </div>
-              <button type="submit" id="login-step1-btn" className="btn btn-primary" style={{width:'100%'}} disabled={loading}>
-                {loading ? 'Checking...' : <>Continue <svg className="arrow" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></>}
+              <button type="submit" id="login-step1-btn" className="login-btn" style={{width:'100%',justifyContent:'center'}} disabled={loading}>
+                {loading ? 'Checking...' : <>Continue <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></>}
               </button>
             </form>
           )}
@@ -310,17 +374,7 @@ export default function Header() {
           {step === 2 && (
             <form id="login-step2-form" onSubmit={handleLogin}>
               <div className="form-group">
-                <label className="form-label">WhatsApp Number</label>
-                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                  <span style={{fontWeight:600}}>+94 {phone}</span>
-                  <button type="button" id="change-number-btn" style={{fontSize:'0.8rem',color:'var(--primary-light)',cursor:'pointer',background:'none',border:'none'}}
-                    onClick={() => { setStep(1); setPassword(''); setLoginError(''); }}>
-                    Change
-                  </button>
-                </div>
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="login-password">Password</label>
+                <label className="form-label">Password</label>
                 <input
                   id="login-password"
                   type="password"
@@ -332,18 +386,28 @@ export default function Header() {
                   autoFocus
                 />
               </div>
-              <div style={{textAlign:'right',marginBottom:'20px'}}>
-                <Link href="/forgot-password" style={{fontSize:'0.83rem',color:'var(--primary-light)'}}>Forgot Password?</Link>
+              <div style={{textAlign:'right', marginBottom:'18px', marginTop:'-6px'}}>
+                <Link href="/forgot-password" style={{fontSize:'0.8125rem', color:'var(--cobalt-light)'}} onClick={closeLogin}>
+                  Forgot password?
+                </Link>
               </div>
-              <button type="submit" id="login-submit-btn" className="btn btn-primary" style={{width:'100%'}} disabled={loading}>
-                {loading ? 'Logging in...' : <>Login <svg className="arrow" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></>}
+              <button type="submit" id="login-submit-btn" className="login-btn" style={{width:'100%',justifyContent:'center'}} disabled={loading}>
+                {loading
+                  ? <><span className="spinner" /> Signing in...</>
+                  : <>Sign in <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></>
+                }
+              </button>
+              <button type="button" className="modal-back-btn" onClick={() => { setStep(1); setPassword(''); setLoginError(''); }}>
+                ← Use a different number
               </button>
             </form>
           )}
 
-          <p style={{textAlign:'center',marginTop:'24px',fontSize:'0.85rem',color:'var(--text-muted)'}}>
+          <p className="modal-footer-text">
             Don&apos;t have an account?{' '}
-            <Link href="/register" style={{color:'var(--primary-light)',fontWeight:600}} onClick={closeLogin}>Register here</Link>
+            <Link href="/register" style={{color:'var(--cobalt-light)', fontWeight:600}} onClick={closeLogin}>
+              Register here
+            </Link>
           </p>
         </div>
       </div>
@@ -351,8 +415,8 @@ export default function Header() {
       <style jsx>{`
         /* ── Top Bar ── */
         .header-topbar {
-          background: var(--dark-2);
-          border-bottom: 1px solid var(--border-light);
+          background: var(--surface);
+          border-bottom: 1px solid var(--rule-light);
           height: var(--header-top-h);
           display: flex;
           align-items: center;
@@ -366,58 +430,75 @@ export default function Header() {
           justify-content: space-between;
           width: 100%;
         }
-        .header-topbar-left { display: flex; align-items: center; gap: 20px; }
-        .header-topbar-right { display: flex; align-items: center; gap: 16px; }
+        .header-topbar-left  { display: flex; align-items: center; gap: 18px; }
+        .header-topbar-right { display: flex; align-items: center; gap: 14px; }
+
         .topbar-link {
-          font-size: 0.78rem;
-          color: var(--text-muted);
+          font-size: 0.75rem;
+          color: var(--muted);
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          transition: color 0.2s;
+          font-family: var(--font-mono);
+        }
+        .topbar-link:hover { color: var(--paper); }
+
+        .topbar-badge {
           display: flex;
           align-items: center;
           gap: 6px;
-          transition: color 0.2s;
-        }
-        .topbar-link:hover { color: var(--text-primary); }
-        .topbar-badge {
-          font-size: 0.75rem;
+          font-size: 0.72rem;
           font-weight: 600;
-          color: var(--accent-light);
-          background: var(--accent-glow);
-          border: 1px solid rgba(255,107,0,0.2);
+          color: var(--emerald);
+          background: rgba(16,185,129,0.08);
+          border: 1px solid rgba(16,185,129,0.18);
           padding: 3px 10px;
-          border-radius: 100px;
+          border-radius: var(--radius-full);
+          letter-spacing: 0.01em;
         }
-        .topbar-social { display: flex; align-items: center; gap: 10px; }
-        .topbar-social a {
-          color: var(--text-muted);
-          display: flex;
-          align-items: center;
-          transition: color 0.2s;
+        .topbar-badge-dot {
+          width: 6px; height: 6px;
+          border-radius: 50%;
+          background: var(--emerald);
+          animation: pulse-glow 2s ease-in-out infinite;
+          flex-shrink: 0;
         }
-        .topbar-social a:hover { color: var(--primary-light); }
+
+        .topbar-social { display: flex; align-items: center; gap: 8px; }
+        .topbar-social-link {
+          width: 26px; height: 26px;
+          border-radius: var(--radius-sm);
+          display: flex; align-items: center; justify-content: center;
+          color: var(--muted);
+          transition: color 0.2s, background 0.2s;
+        }
+        .topbar-social-link:hover { color: var(--paper); background: var(--rule); }
 
         /* ── Main Header ── */
         .main-header {
-          background: rgba(11,14,26,0.85);
+          background: rgba(13,15,20,0.80);
           backdrop-filter: blur(20px);
-          border-bottom: 1px solid var(--border-light);
+          -webkit-backdrop-filter: blur(20px);
+          border-bottom: 1px solid var(--rule-light);
           position: sticky;
           top: var(--header-top-h);
           z-index: 90;
           height: var(--header-main-h);
           display: flex;
           align-items: center;
-          transition: var(--transition);
+          transition: background 0.3s var(--ease), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
         }
         .main-header.scrolled {
-          background: rgba(11,14,26,0.97);
-          border-bottom-color: var(--border);
-          box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+          background: rgba(13,15,20,0.96);
+          border-bottom-color: var(--rule);
+          box-shadow: 0 1px 0 var(--rule), 0 4px 24px rgba(0,0,0,0.4);
         }
         .header-inner {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 32px;
+          gap: 24px;
           width: 100%;
         }
 
@@ -430,224 +511,437 @@ export default function Header() {
           flex-shrink: 0;
         }
         .logo-mark {
-          width: 40px; height: 40px;
-          background: var(--gradient-blue);
-          border-radius: 10px;
+          width: 36px; height: 36px;
+          background: var(--cobalt);
+          border-radius: var(--radius-md);
           display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 4px 16px rgba(0,82,255,0.4);
+          box-shadow: 0 2px 12px rgba(37,99,235,0.35);
+          flex-shrink: 0;
         }
-        .logo-icon { font-size: 1.3rem; }
-        .logo-name { display: block; font-family: var(--font-heading); font-weight: 800; font-size: 1.15rem; color: var(--text-primary); line-height: 1.1; }
-        .logo-sub  { display: block; font-size: 0.62rem; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; }
+        .logo-name {
+          display: block;
+          font-family: var(--font-body);
+          font-weight: 800;
+          font-size: 1.0625rem;
+          color: var(--paper);
+          line-height: 1.1;
+          letter-spacing: -0.02em;
+        }
+        .logo-sub {
+          display: block;
+          font-size: 0.6rem;
+          color: var(--muted);
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          margin-top: 1px;
+        }
 
         /* Desktop Nav */
-        .desktop-nav { display: flex; flex: 1; justify-content: center; margin: 0 12px; }
-        .nav-list { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+        .desktop-nav { display: flex; flex: 1; justify-content: center; }
+        .nav-list { display: flex; align-items: center; gap: 2px; flex-wrap: nowrap; }
         .nav-item { position: relative; }
+
         .nav-link {
           display: flex;
           align-items: center;
-          gap: 5px;
-          padding: 7px 12px;
-          font-size: 0.85rem;
-          font-weight: 600;
-          letter-spacing: 0.01em;
-          color: var(--text-secondary);
-          border-radius: var(--radius-md);
-          transition: all 0.2s ease;
+          gap: 4px;
+          padding: 7px 11px;
+          font-size: 0.8438rem;
+          font-weight: 500;
+          color: var(--muted);
+          border-radius: var(--radius-sm);
+          transition: color 0.2s, background 0.2s;
           white-space: nowrap;
-          border: 1px solid transparent;
+          border: none;
+          background: none;
+          cursor: pointer;
+          text-decoration: none;
         }
         .nav-link:hover {
-          color: var(--text-primary);
-          background: rgba(255,255,255,0.06);
-          border-color: rgba(255,255,255,0.1);
+          color: var(--paper);
+          background: var(--rule);
         }
-        .nav-chevron { transition: transform 0.2s; opacity: 0.7; }
-        .has-dropdown:hover .nav-chevron { transform: rotate(180deg); opacity: 1; }
+        .nav-link:focus-visible {
+          outline: 2px solid var(--cobalt-light);
+          outline-offset: 2px;
+        }
+
+        .nav-chevron {
+          opacity: 0.5;
+          transition: transform 0.2s var(--ease), opacity 0.2s;
+          flex-shrink: 0;
+        }
+        .nav-chevron.open { transform: rotate(180deg); opacity: 1; }
+        .has-dropdown:hover .nav-link { color: var(--paper); }
+
         .nav-dropdown {
           position: absolute;
-          top: calc(100% + 8px);
+          top: calc(100% + 6px);
           left: 50%;
           transform: translateX(-50%);
-          background: var(--dark-2);
-          border: 1px solid var(--border);
+          z-index: 200;
+          animation: fadeInUp 0.15s var(--ease-out);
+        }
+        .nav-dropdown-inner {
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
           border-radius: var(--radius-md);
-          padding: 8px;
+          padding: 6px;
           min-width: 160px;
           box-shadow: var(--shadow-lg);
-          z-index: 200;
-          animation: fadeInUp 0.15s ease;
         }
         .dropdown-item {
           display: block;
-          padding: 9px 14px;
-          font-size: 0.875rem;
-          color: var(--text-secondary);
+          padding: 8px 12px;
+          font-size: 0.8438rem;
+          font-weight: 500;
+          color: var(--text);
           border-radius: var(--radius-sm);
+          transition: background 0.15s, color 0.15s;
+          white-space: nowrap;
+        }
+        .dropdown-item:hover {
+          background: var(--cobalt-glow);
+          color: var(--cobalt-light);
+        }
+
+        /* Header Actions */
+        .header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+        .grades-btn {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 7px 14px;
+          font-size: 0.8438rem;
+          font-weight: 500;
+          color: var(--text);
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
+          border-radius: var(--radius-sm);
+          cursor: pointer;
           transition: var(--transition);
           white-space: nowrap;
         }
-        .dropdown-item:hover { background: var(--primary-glow); color: var(--primary-light); }
+        .grades-btn:hover { color: var(--paper); border-color: var(--cobalt-ring); background: var(--cobalt-glow); }
+        .grades-btn:focus-visible { outline: 2px solid var(--cobalt-light); outline-offset: 2px; }
 
-        /* Header Actions */
-        .header-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; margin-left: 8px; }
+        .login-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          padding: 8px 18px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: white;
+          background: var(--cobalt);
+          border: none;
+          border-radius: var(--radius-sm);
+          cursor: pointer;
+          transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+          text-decoration: none;
+          white-space: nowrap;
+          letter-spacing: -0.01em;
+        }
+        .login-btn:hover {
+          background: var(--cobalt-dark);
+          transform: translateY(-1px);
+          box-shadow: var(--shadow-cobalt);
+        }
+        .login-btn:active { transform: translateY(0); }
+        .login-btn:focus-visible { outline: 2px solid var(--cobalt-light); outline-offset: 2px; }
+        .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .login-btn .arrow { transition: transform 0.2s; }
+        .login-btn:hover .arrow { transform: translateX(3px); }
+
         .mobile-menu-btn {
           display: none;
-          color: var(--text-secondary);
-          padding: 8px;
+          align-items: center;
+          justify-content: center;
+          width: 38px; height: 38px;
+          color: var(--text);
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
           border-radius: var(--radius-sm);
+          cursor: pointer;
           transition: var(--transition);
         }
-        .mobile-menu-btn:hover { color: var(--text-primary); background: rgba(255,255,255,0.06); }
+        .mobile-menu-btn:hover { color: var(--paper); border-color: var(--cobalt-ring); }
 
-        /* Mobile Menu */
+        .icon-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 34px; height: 34px;
+          color: var(--muted);
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
+          border-radius: var(--radius-sm);
+          cursor: pointer;
+          transition: var(--transition);
+        }
+        .icon-btn:hover { color: var(--paper); background: var(--rule); }
+        .icon-btn:focus-visible { outline: 2px solid var(--cobalt-light); outline-offset: 2px; }
+
+        /* ── Mobile Menu ── */
         .mobile-menu {
           position: fixed;
           top: 0; right: -100%;
-          width: min(360px, 90vw);
-          height: 100vh;
-          background: var(--dark-2);
-          border-left: 1px solid var(--border);
+          width: min(340px, 92vw);
+          height: 100dvh;
+          background: var(--surface);
+          border-left: 1px solid var(--rule);
           z-index: 1000;
           display: flex;
           flex-direction: column;
-          transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: right 0.32s var(--ease);
           overflow-y: auto;
         }
         .mobile-menu.open { right: 0; }
+
         .mobile-menu-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 20px 24px;
-          border-bottom: 1px solid var(--border);
+          padding: 18px 20px;
+          border-bottom: 1px solid var(--rule);
+          flex-shrink: 0;
         }
         .mobile-contact-bar {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          padding: 16px 24px;
-          border-bottom: 1px solid var(--border-light);
-          font-size: 0.82rem;
-          color: var(--text-muted);
+          padding: 12px 20px;
+          border-bottom: 1px solid var(--rule-light);
+          flex-shrink: 0;
         }
-        .mobile-contact-bar a { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
-        .mobile-nav { flex: 1; padding: 16px 24px; }
-        .mobile-nav-link {
-          display: block;
-          padding: 14px 0;
-          font-size: 1rem;
-          font-weight: 600;
-          color: var(--text-primary);
-          border-bottom: 1px solid var(--border-light);
+        .mobile-contact-link {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          font-size: 0.8125rem;
+          color: var(--muted);
+          font-family: var(--font-mono);
           transition: color 0.2s;
         }
-        .mobile-nav-link:hover { color: var(--primary-light); }
-        .mobile-sub-links { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 0 14px 16px; }
+        .mobile-contact-link:hover { color: var(--paper); }
+
+        .mobile-nav {
+          flex: 1;
+          padding: 8px 12px;
+          overflow-y: auto;
+        }
+        .mobile-nav-item { border-bottom: 1px solid var(--rule-light); }
+        .mobile-nav-item:last-child { border-bottom: none; }
+
+        .mobile-nav-link {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          padding: 14px 8px;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          color: var(--paper);
+          background: none;
+          border: none;
+          cursor: pointer;
+          text-align: left;
+          transition: color 0.2s;
+          letter-spacing: -0.01em;
+        }
+        .mobile-nav-link:hover { color: var(--cobalt-light); }
+        .mobile-nav-link:focus-visible { outline: 2px solid var(--cobalt-light); outline-offset: -2px; border-radius: var(--radius-sm); }
+
+        .mobile-chevron { transition: transform 0.22s var(--ease); opacity: 0.5; flex-shrink: 0; }
+        .mobile-chevron.open { transform: rotate(180deg); opacity: 1; }
+
+        .mobile-sub-links {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          padding: 8px 8px 14px;
+        }
         .mobile-sub-link {
-          font-size: 0.82rem;
-          color: var(--text-muted);
+          font-size: 0.8rem;
+          color: var(--muted);
           padding: 5px 12px;
-          background: rgba(255,255,255,0.04);
-          border: 1px solid var(--border-light);
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
           border-radius: var(--radius-full);
           transition: var(--transition);
         }
-        .mobile-sub-link:hover { background: var(--primary-glow); color: var(--primary-light); border-color: rgba(0,82,255,0.2); }
-        .mobile-menu-footer { padding: 24px; border-top: 1px solid var(--border); }
-        .mobile-social { margin-top: 20px; }
-        .social-btn {
-          width: 36px; height: 36px;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.06);
-          border: 1px solid var(--border);
-          display: flex; align-items: center; justify-content: center;
-          font-size: 0.8rem;
-          color: var(--text-secondary);
-          transition: var(--transition);
-        }
-        .social-btn:hover { background: var(--primary-glow); color: var(--primary-light); }
+        .mobile-sub-link:hover { background: var(--cobalt-glow); color: var(--cobalt-light); border-color: var(--cobalt-ring); }
 
-        /* Grades Sidebar */
+        .mobile-menu-footer {
+          padding: 18px 20px;
+          border-top: 1px solid var(--rule);
+          flex-shrink: 0;
+        }
+
+        /* ── Grades Sidebar ── */
         .grades-sidebar {
           position: fixed;
           top: 0; left: -100%;
-          width: min(320px, 90vw);
-          height: 100vh;
-          background: var(--dark-2);
-          border-right: 1px solid var(--border);
+          width: min(300px, 88vw);
+          height: 100dvh;
+          background: var(--surface);
+          border-right: 1px solid var(--rule);
           z-index: 1000;
           display: flex;
           flex-direction: column;
-          transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+          transition: left 0.32s var(--ease);
           overflow-y: auto;
         }
         .grades-sidebar.open { left: 0; }
+
         .grades-sidebar-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 24px;
-          border-bottom: 1px solid var(--border);
+          padding: 20px;
+          border-bottom: 1px solid var(--rule);
+          flex-shrink: 0;
         }
-        .grades-sidebar-body { padding: 16px; flex: 1; }
-        .grade-sidebar-item { margin-bottom: 8px; }
+        .grades-sidebar-body { padding: 12px; flex: 1; }
+
+        .grade-sidebar-item { margin-bottom: 4px; }
         .grade-sidebar-label {
           display: flex;
           align-items: center;
-          gap: 12px;
-          padding: 12px 16px;
+          gap: 10px;
+          padding: 10px 12px;
           border-radius: var(--radius-md);
           font-weight: 600;
-          font-size: 0.95rem;
-          color: var(--text-primary);
-          transition: var(--transition);
+          font-size: 0.9rem;
+          color: var(--text);
+          transition: background 0.15s, color 0.15s;
+          text-decoration: none;
         }
-        .grade-sidebar-label:hover { background: var(--primary-glow); color: var(--primary-light); }
+        .grade-sidebar-label:hover { background: var(--cobalt-glow); color: var(--cobalt-light); }
+        .grade-sidebar-label:focus-visible { outline: 2px solid var(--cobalt-light); outline-offset: -2px; }
+
         .grade-sidebar-badge {
-          width: 30px; height: 30px;
-          background: var(--gradient-blue);
-          border-radius: 8px;
+          width: 28px; height: 28px;
+          background: var(--cobalt);
+          border-radius: var(--radius-sm);
           display: flex; align-items: center; justify-content: center;
-          font-size: 0.8rem;
+          font-size: 0.75rem;
           font-weight: 700;
           color: white;
           flex-shrink: 0;
+          font-family: var(--font-mono);
         }
-        .grade-sidebar-subjects { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px 16px 12px 58px; }
+        .grade-sidebar-subjects {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 5px;
+          padding: 4px 12px 10px 50px;
+        }
         .grade-sidebar-sub {
-          font-size: 0.78rem;
-          color: var(--text-muted);
+          font-size: 0.75rem;
+          color: var(--muted);
           padding: 4px 10px;
-          background: rgba(255,255,255,0.03);
-          border: 1px solid var(--border-light);
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
           border-radius: var(--radius-full);
           transition: var(--transition);
+          text-decoration: none;
         }
-        .grade-sidebar-sub:hover { color: var(--primary-light); background: var(--primary-glow); }
+        .grade-sidebar-sub:hover { color: var(--cobalt-light); background: var(--cobalt-glow); border-color: var(--cobalt-ring); }
 
-        /* Login error */
-        .login-error {
-          background: rgba(255,60,60,0.1);
-          border: 1px solid rgba(255,60,60,0.2);
-          border-radius: var(--radius-md);
-          padding: 12px 16px;
-          font-size: 0.875rem;
-          color: #FF6B6B;
-          margin-bottom: 20px;
+        /* ── Login Modal ── */
+        .modal-header { margin-bottom: 22px; }
+        .modal-logo-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .modal-title {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: var(--paper);
+          letter-spacing: -0.02em;
+          margin-bottom: 4px;
+        }
+        .modal-subtitle { font-size: 0.8438rem; color: var(--muted); line-height: 1.5; }
+
+        .modal-steps {
+          display: flex;
+          align-items: center;
+          gap: 0;
+          margin-bottom: 22px;
+        }
+        .modal-step {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          opacity: 0.4;
+          transition: opacity 0.2s;
+        }
+        .modal-step.active { opacity: 1; }
+        .modal-step-dot {
+          width: 24px; height: 24px;
+          border-radius: 50%;
+          background: var(--surface-2);
+          border: 1.5px solid var(--rule);
+          display: flex; align-items: center; justify-content: center;
+          font-size: 0.7rem;
+          font-weight: 700;
+          font-family: var(--font-mono);
+          color: var(--muted);
+          transition: var(--transition);
+        }
+        .modal-step.active .modal-step-dot {
+          background: var(--cobalt);
+          border-color: var(--cobalt);
+          color: white;
+        }
+        .modal-step span { font-size: 0.78rem; font-weight: 600; color: var(--muted); }
+        .modal-step.active span { color: var(--text); }
+        .modal-step-line {
+          flex: 1;
+          height: 1px;
+          background: var(--rule);
+          margin: 0 10px;
+          transition: background 0.2s;
+        }
+        .modal-step-line.active { background: var(--cobalt); }
+
+        /* Spinner */
+        .spinner {
+          width: 14px; height: 14px;
+          border: 2px solid rgba(255,255,255,0.3);
+          border-top-color: white;
+          border-radius: 50%;
+          animation: spin 0.7s linear infinite;
+          display: inline-block;
         }
 
-        /* Responsive */
-        @media (max-width: 1100px) {
+        .modal-back-btn {
+          display: block;
+          margin: 14px auto 0;
+          font-size: 0.8125rem;
+          color: var(--muted);
+          background: none;
+          border: none;
+          cursor: pointer;
+          transition: color 0.2s;
+          padding: 4px;
+        }
+        .modal-back-btn:hover { color: var(--cobalt-light); }
+
+        .modal-footer-text {
+          text-align: center;
+          margin-top: 22px;
+          font-size: 0.8438rem;
+          color: var(--muted);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 1024px) {
           .desktop-nav { display: none; }
           .mobile-menu-btn { display: flex; }
           .header-topbar-left { display: none; }
+          .grades-btn { display: none; }
         }
-        @media (max-width: 640px) {
-          .topbar-badge { display: none; }
+        @media (max-width: 600px) {
           .header-topbar { display: none; }
           .main-header { top: 0; }
+          .topbar-badge { display: none; }
         }
       `}</style>
     </>
