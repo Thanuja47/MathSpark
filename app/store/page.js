@@ -65,7 +65,6 @@ export default function StorePage() {
       </main>
       <Footer />
       <FloatingWidgets />
-
       <style jsx>{`
         .store-grid {
           display: grid;
@@ -74,26 +73,42 @@ export default function StorePage() {
         }
         .store-img-placeholder {
           width: 100%; height: 100%;
-          background: linear-gradient(135deg, #1A1F35, #0D1230);
+          background: linear-gradient(135deg, var(--surface), var(--surface-2));
           display: flex; align-items: center; justify-content: center;
-          font-size: 3rem;
+          font-size: 2.5rem;
           position: relative;
+        }
+        /* Subtle signature graph paper overlay */
+        .store-img-placeholder::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background-image: 
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+          background-size: 14px 14px;
+          pointer-events: none;
         }
         .store-type-badge {
           position: absolute;
           bottom: 8px; right: 8px;
-          font-size: 0.65rem; font-weight: 700;
-          background: rgba(0,0,0,0.4);
-          padding: 2px 8px; border-radius: 4px;
-          color: var(--text-muted);
+          font-size: 0.625rem; font-weight: 700;
+          background: var(--ink);
+          border: 1px solid var(--rule);
+          padding: 3px 8px; border-radius: var(--radius-xs);
+          color: var(--muted);
+          font-family: var(--font-mono);
+          letter-spacing: 0.05em;
         }
         .store-card-badge {
           position: absolute;
           top: 10px; left: 10px;
-          font-size: 0.7rem; font-weight: 700;
-          background: var(--accent);
-          color: white;
-          padding: 3px 10px; border-radius: 100px;
+          font-size: 0.65rem; font-weight: 700;
+          background: var(--gold-glow);
+          border: 1px solid rgba(245,158,11,0.3);
+          color: var(--gold);
+          padding: 3px 10px; border-radius: var(--radius-full);
+          letter-spacing: 0.05em;
         }
         @media (max-width: 1024px) {
           .store-grid { grid-template-columns: repeat(2, 1fr); }
