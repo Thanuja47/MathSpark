@@ -3,15 +3,15 @@ import { TESTIMONIALS } from '@/lib/data';
 
 export default function TestimonialsSection() {
   return (
-    <section className="section" style={{ background: 'var(--dark)' }}>
+    <section className="section testimonials-section">
       <div className="container">
-        <div className="text-center" style={{ marginBottom: 52 }}>
+        <div className="text-center" style={{ marginBottom: 44 }}>
           <div className="section-tag">Student Success Stories</div>
           <h2 className="section-title">
             What Our <span className="theme-gradient">Students</span> Say
           </h2>
           <p className="section-subtitle" style={{ margin: '0 auto' }}>
-            Real reviews and proven results from students across Sri Lanka who transformed their Maths grades with MatSpark.
+            Proven results from students across Sri Lanka who transformed their Maths grades with MathSpark.
           </p>
         </div>
 
@@ -29,7 +29,7 @@ export default function TestimonialsSection() {
                 <div>
                   <div className="testimonial-name">{t.name}</div>
                   <div className="testimonial-grade">{t.grade}</div>
-                  <div className="testimonial-result">🏆 {t.result}</div>
+                  <div className="testimonial-result">{t.result}</div>
                 </div>
               </div>
             </div>
@@ -38,6 +38,9 @@ export default function TestimonialsSection() {
       </div>
 
       <style jsx>{`
+        .testimonials-section {
+          background: var(--ink);
+        }
         .testimonials-grid {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
