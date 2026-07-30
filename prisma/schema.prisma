@@ -1,6 +1,7 @@
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -14,6 +15,7 @@ model Student {
   passwordHash    String
   grade           Int
   medium          String   @default("sinhala")
+  role            String   @default("student")
   enrolledCourses String   @default("[]")
   createdAt       DateTime @default(now())
   isActive        Boolean  @default(true)
@@ -37,5 +39,52 @@ model Course {
   price       Float
   badge       String?
   description String
+  imageUrl    String?
   createdAt   DateTime @default(now())
+}
+
+model Timetable {
+  id        String   @id @default(uuid())
+  day       String
+  time      String
+  subject   String
+  grade     Int
+  liveLink  String?
+  createdAt DateTime @default(now())
+}
+
+model Exam {
+  id        String   @id @default(uuid())
+  title     String
+  grade     Int
+  duration  Int
+  questions String
+  createdAt DateTime @default(now())
+}
+
+model StoreItem {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  imageUrl    String?
+  stock       Int
+  createdAt   DateTime @default(now())
+}
+
+model Result {
+  id          String   @id @default(uuid())
+  studentName String
+  grade       Int
+  subject     String
+  score       Int
+  year        Int
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+}
+
+model Grade {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
 }
