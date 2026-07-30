@@ -243,6 +243,17 @@ export default function ExamsPage() {
                   <button className="btn btn-primary btn-lg" onClick={() => startQuiz(selected)}>Retry Test 🔄</button>
                   <button className="btn btn-outline btn-lg" onClick={() => setView('list')}>← All Tests</button>
                   <Link href="/courses" className="btn btn-accent btn-lg">Enroll in Class →</Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+      </main>
+
+      <Footer />
+      <FloatingWidgets />
+
+      <style jsx>{`
         .quiz-card {
           background: var(--surface);
           border: 1px solid var(--rule);
