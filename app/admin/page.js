@@ -410,7 +410,6 @@ export default function AdminDashboardPage() {
       </main>
       <Footer />
       <FloatingWidgets />
-
       <style jsx>{`
         .admin-grid {
           display: grid;
@@ -420,28 +419,30 @@ export default function AdminDashboardPage() {
         .admin-sidebar {
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: 6px;
         }
         .admin-nav-item {
-          padding: 14px 16px;
+          padding: 12px 16px;
           border-radius: var(--radius-md);
-          background: var(--dark-2);
-          border: 1px solid var(--border);
-          color: var(--text-secondary);
-          font-size: 0.88rem;
+          background: var(--surface);
+          border: 1px solid var(--rule);
+          color: var(--text);
+          font-size: 0.8438rem;
           font-weight: 500;
           text-align: left;
           cursor: pointer;
           transition: var(--transition);
         }
         .admin-nav-item.active, .admin-nav-item:hover {
-          background: var(--primary-glow);
-          border-color: rgba(0,82,255,0.3);
-          color: var(--primary-light);
+          background: var(--cobalt-glow);
+          border-color: var(--cobalt-ring);
+          color: var(--cobalt-light);
         }
+        .admin-nav-item:focus-visible { outline: 2px solid var(--cobalt-light); outline-offset: 2px; }
+        
         .admin-content {
-          background: var(--dark-card);
-          border: 1px solid var(--border);
+          background: var(--surface);
+          border: 1px solid var(--rule);
           border-radius: var(--radius-xl);
           padding: 32px;
         }
@@ -451,27 +452,28 @@ export default function AdminDashboardPage() {
           gap: 20px;
         }
         .admin-stat-card {
-          background: var(--dark-2);
-          border: 1px solid var(--border);
+          background: var(--surface-2);
+          border: 1px solid var(--rule-light);
           border-radius: var(--radius-lg);
           padding: 24px;
           text-align: center;
         }
         .admin-stat-val {
-          font-family: var(--font-heading);
-          font-size: 2rem;
-          font-weight: 900;
-          color: var(--primary-light);
+          font-family: var(--font-mono);
+          font-size: 1.875rem;
+          font-weight: 600;
+          color: var(--paper);
           margin-bottom: 4px;
         }
         .admin-stat-lbl {
-          font-size: 0.8rem;
-          color: var(--text-muted);
+          font-size: 0.75rem;
+          color: var(--muted);
           text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
         .admin-form-box {
-          background: var(--dark-2);
-          border: 1px solid var(--border);
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
           border-radius: var(--radius-lg);
           padding: 24px;
           margin-bottom: 24px;
@@ -487,13 +489,14 @@ export default function AdminDashboardPage() {
         }
         .admin-table th, .admin-table td {
           padding: 14px 16px;
-          border-bottom: 1px solid var(--border-light);
+          border-bottom: 1px solid var(--rule-light);
         }
         .admin-table th {
-          color: var(--text-muted);
+          color: var(--muted);
           font-weight: 600;
           text-transform: uppercase;
-          font-size: 0.75rem;
+          font-size: 0.72rem;
+          letter-spacing: 0.05em;
         }
         @media (max-width: 850px) {
           .admin-grid { grid-template-columns: 1fr; }
