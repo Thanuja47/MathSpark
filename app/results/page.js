@@ -1,26 +1,48 @@
 'use client';
+import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
-import { SITE } from '@/lib/data';
 
-const RESULTS = [
+const STATIC_RESULTS = [
   { year: '2025', grade: 'O/L (Grade 11)', aPass: 3682, total: 3950, percentage: '93%', topScorer: 'Kavindi P. — 100/100', medium: 'Sinhala & English' },
   { year: '2025', grade: 'Grade 10 Term Exam', aPass: 1840, total: 2100, percentage: '87%', topScorer: 'Tharindu S. — 98/100', medium: 'Sinhala' },
   { year: '2024', grade: 'O/L (Grade 11)', aPass: 2910, total: 3200, percentage: '91%', topScorer: 'Sithmi F. — 99/100', medium: 'Sinhala & English' },
-  { year: '2024', grade: 'Grade 10 Term Exam', aPass: 1540, total: 1820, percentage: '84%', topScorer: 'Dinesh B. — 97/100', medium: 'Sinhala' },
 ];
 
-const TOPPERS = [
+const STATIC_TOPPERS = [
   { name: 'Kavindi Perera', grade: 'Grade 11 · O/L 2025', score: '100/100', school: 'Visakha Vidyalaya, Colombo', medium: 'Sinhala', color: '#0052FF' },
   { name: 'Tharindu Silva', grade: 'Grade 10 · Term 2025', score: '98/100', school: 'Mahinda College, Galle', medium: 'Sinhala', color: '#7B2FFF' },
   { name: 'Sithmi Fernando', grade: 'Grade 11 · O/L 2024', score: '99/100', school: "S. Thomas' Girls, Colombo", medium: 'English', color: '#FF6B00' },
   { name: 'Dinesh Bandara', grade: 'Grade 10 · Term 2024', score: '97/100', school: 'Ananda College, Colombo', medium: 'Sinhala', color: '#00C896' },
-  { name: 'Nimal Siripala', grade: 'Grade 09 · Term 2025', score: '95/100', school: 'Dharmaraja College, Kandy', medium: 'Sinhala', color: '#FF3D9A' },
-  { name: 'Oshadi Wickrama', grade: 'Grade 11 · O/L 2025', score: '99/100', school: 'Methodist College, Colombo', medium: 'English', color: '#0052FF' },
 ];
 
 export default function ResultsPage() {
+  const [liveResults, setLiveResults] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/results')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setLiveResults(data);
+        }
+      })
+      .catch(err => console.error('Error fetching results:', err));
+  }, []);
+
+  const allToppers = [
+    ...liveResults.map(r => ({
+      name: r.studentName,
+      grade: `Grade ${r.grade} · ${r.year}`,
+      score: `${r.score}/100`,
+      school: 'MathSpark Student',
+      medium: r.subject || 'Sinhala',
+      color: '#0052FF',
+    })),
+    ...STATIC_TOPPERS
+  ];
+
   return (
     <>
       <Header />
@@ -60,7 +82,7 @@ export default function ResultsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {RESULTS.map((r, i) => (
+                  {STATIC_RESULTS.map((r, i) => (
                     <tr key={i}>
                       <td><strong style={{ color: 'var(--primary-light)' }}>{r.year}</strong></td>
                       <td>{r.grade}</td>
@@ -92,7 +114,7 @@ export default function ResultsPage() {
             </div>
 
             <div className="toppers-grid">
-              {TOPPERS.map((t, i) => (
+              {allToppers.map((t, i) => (
                 <div key={i} className="topper-card" style={{ '--topper-color': t.color }}>
                   <div className="topper-avatar" style={{ background: t.color }}>
                     {t.name.charAt(0)}
@@ -101,110 +123,100 @@ export default function ResultsPage() {
                   <h4 className="topper-name">{t.name}</h4>
                   <div className="topper-grade">{t.grade}</div>
                   <div className="topper-school">{t.school}</div>
-                  <span className="badge badge-primary" style={{ marginTop: 12 }}>{t.medium} Medium</span>
+                  <span className="badge badge-primary" style={{ marginTop: 12 }}>{t.medium}</span>
                 </div>
               ))}
             </div>
           </div>
         </section>
-
-        {/* CTA */}
-        <section className="section-sm" style={{ background: 'var(--dark)', borderTop: '1px solid var(--border)' }}>
-          <div className="container text-center">
-            <h2>Your Name Could Be <span className="theme-gradient">Next!</span></h2>
-            <p className="text-secondary" style={{ marginTop: 12, maxWidth: 500, margin: '12px auto 32px' }}>
-              Join MathSpark today and write your own success story in the next O/L exam.
-            </p>
-            <div style={{ display: 'flex', gap: 14, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer" className="btn btn-accent btn-xl">
-                💬 Enroll via WhatsApp
-              </a>
-              <a href="/courses" className="btn btn-outline btn-xl">Browse Classes →</a>
-            </div>
-          </div>
-        </section>
       </main>
+
       <Footer />
       <FloatingWidgets />
 
       <style jsx>{`
-        .results-table-wrap { overflow-x: auto; }
+        .results-table-wrap {
+          overflow-x: auto;
+        }
         .results-table {
           width: 100%;
           border-collapse: collapse;
-          font-size: 0.9rem;
+          text-align: left;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+        }
+        .results-table th, .results-table td {
+          padding: 16px 20px;
+          border-bottom: 1px solid var(--border);
         }
         .results-table th {
-          padding: 14px 18px;
-          font-size: 0.75rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
           color: var(--text-muted);
-          border-bottom: 1px solid var(--border);
-          background: var(--dark-2);
-          text-align: left;
+          font-weight: 600;
+          font-size: 0.78rem;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
-        .results-table td {
-          padding: 16px 18px;
-          border-bottom: 1px solid var(--border-light);
-          vertical-align: middle;
+        .result-bar-wrap {
+          display: flex;
+          align-items: center;
+          gap: 12px;
         }
-        .results-table tr:hover td { background: rgba(255,255,255,0.02); }
-        .result-bar-wrap { display: flex; align-items: center; gap: 10px; }
         .result-bar {
-          height: 6px;
-          border-radius: 3px;
-          background: var(--gradient-blue);
-          min-width: 20px;
+          height: 8px;
+          background: var(--primary-gradient);
+          border-radius: 4px;
         }
         .toppers-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
           gap: 24px;
         }
         .topper-card {
-          background: var(--dark-card);
+          background: var(--surface);
           border: 1px solid var(--border);
-          border-radius: var(--radius-lg);
+          border-radius: var(--radius-xl);
           padding: 28px 24px;
           text-align: center;
           transition: var(--transition);
-          position: relative;
-          overflow: hidden;
         }
-        .topper-card::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0;
-          height: 3px;
-          background: var(--topper-color);
+        .topper-card:hover {
+          transform: translateY(-4px);
+          border-color: var(--topper-color);
+          box-shadow: 0 12px 30px rgba(0,0,0,0.3);
         }
-        .topper-card:hover { transform: translateY(-6px); box-shadow: 0 24px 64px rgba(0,0,0,0.5); }
         .topper-avatar {
-          width: 64px; height: 64px;
+          width: 56px;
+          height: 56px;
           border-radius: 50%;
+          color: white;
+          font-size: 1.5rem;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           margin: 0 auto 16px;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 1.5rem; font-weight: 800; color: white;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
         .topper-score {
-          font-family: var(--font-heading);
-          font-size: 1.8rem;
-          font-weight: 900;
-          background: var(--gradient-brand);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
+          font-family: var(--font-mono);
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: var(--topper-color);
           margin-bottom: 8px;
         }
-        .topper-name { font-size: 1.05rem; font-weight: 700; margin-bottom: 4px; }
-        .topper-grade { font-size: 0.8rem; color: var(--primary-light); font-weight: 500; margin-bottom: 6px; }
-        .topper-school { font-size: 0.78rem; color: var(--text-muted); }
-
-        @media (max-width: 900px) { .toppers-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 580px) { .toppers-grid { grid-template-columns: 1fr; } }
+        .topper-name {
+          font-size: 1.1rem;
+          margin-bottom: 4px;
+        }
+        .topper-grade {
+          font-size: 0.85rem;
+          color: var(--primary-light);
+          margin-bottom: 4px;
+        }
+        .topper-school {
+          font-size: 0.78rem;
+          color: var(--text-muted);
+        }
       `}</style>
     </>
   );
