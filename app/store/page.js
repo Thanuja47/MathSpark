@@ -1,10 +1,69 @@
 'use client';
+import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
-import { STORE_ITEMS } from '@/lib/data';
+import { STORE_ITEMS as STATIC_STORE_ITEMS } from '@/lib/data';
 
 export default function StorePage() {
+  const [storeItems, setStoreItems] = useState(STATIC_STORE_ITEMS);
+  const [orderingItem, setOrderingItem] = useState(null);
+  const [studentName, setStudentName] = useState('');
+  const [studentPhone, setStudentPhone] = useState('');
+  const [orderSuccess, setOrderSuccess] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/store')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          const liveFormatted = data.map(item => ({
+            id: item.id,
+            title: item.name,
+            type: 'Tute Pack',
+            price: item.price,
+            currency: 'LKR',
+            inStock: (item.stock || 0) > 0,
+            badge: 'Official',
+            description: item.description || 'Official MathSpark print edition tute pack.',
+          }));
+          setStoreItems([...liveFormatted, ...STATIC_STORE_ITEMS]);
+        }
+      })
+      .catch(err => console.error('Error fetching store items:', err));
+  }, []);
+
+  const handlePlaceOrder = async (e) => {
+    e.preventDefault();
+    if (!studentName || !studentPhone || !orderingItem) return;
+
+    const trackId = `MSP-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    try {
+      const res = await fetch('/api/tracking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: trackId,
+          student: studentName,
+          phone: studentPhone,
+          item: orderingItem.title,
+          status: 'Processing',
+          courier: 'Domex Express',
+        }),
+      });
+
+      if (res.ok) {
+        setOrderSuccess(trackId);
+        setOrderingItem(null);
+        setStudentName('');
+        setStudentPhone('');
+      }
+    } catch (err) {
+      alert('Order failed. Please try again.');
+    }
+  };
+
   return (
     <>
       <Header />
@@ -16,7 +75,7 @@ export default function StorePage() {
             </div>
             <div className="section-tag page-hero-tag">Study Materials &amp; Tutes</div>
             <h1 className="page-hero-title">
-              MatSpark <span className="theme-gradient">Store</span>
+              MathSpark <span className="theme-gradient">Store</span>
             </h1>
             <p className="page-hero-desc">
               Get official revision books, formula sheets, workbooks, and past paper packs delivered to your doorstep.
@@ -24,10 +83,29 @@ export default function StorePage() {
           </div>
         </section>
 
+        {orderSuccess && (
+          <div className="container" style={{ paddingTop: 30 }}>
+            <div style={{
+              background: 'rgba(0,200,150,0.1)',
+              border: '1px solid #00C896',
+              borderRadius: 'var(--radius-lg)',
+              padding: 24,
+              color: '#00C896',
+              textAlign: 'center'
+            }}>
+              <h3>🎉 Order Placed Successfully!</h3>
+              <p style={{ marginTop: 8 }}>Your Tracking ID: <strong><code>{orderSuccess}</code></strong></p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                You can track your delivery status anytime on our <a href="/tracking" style={{ color: '#00C896', textDecoration: 'underline' }}>Tracking Page</a>.
+              </p>
+            </div>
+          </div>
+        )}
+
         <section className="section" style={{ background: 'var(--dark)' }}>
           <div className="container">
             <div className="store-grid">
-              {STORE_ITEMS.map((item) => (
+              {storeItems.map((item) => (
                 <div key={item.id} className="store-card">
                   <div className="store-card-image">
                     <div className="store-img-placeholder">
@@ -53,6 +131,7 @@ export default function StorePage() {
                       className="btn btn-primary"
                       style={{ width: '100%' }}
                       disabled={!item.inStock}
+                      onClick={() => setOrderingItem(item)}
                     >
                       {item.inStock ? 'Order Now 🛒' : 'Out of Stock'}
                     </button>
@@ -62,14 +141,77 @@ export default function StorePage() {
             </div>
           </div>
         </section>
+
+        {/* Modal for placing order */}
+        {orderingItem && (
+          <div style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20
+          }}>
+            <div style={{
+              background: 'var(--surface)', border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-xl)', padding: 32, maxWidth: 460, width: '100%'
+            }}>
+              <h3 style={{ marginBottom: 8 }}>Order: {orderingItem.title}</h3>
+              <p className="text-muted text-sm" style={{ marginBottom: 20 }}>
+                Total: LKR {orderingItem.price.toLocaleString()} (Cash on Delivery / Courier Delivery)
+              </p>
+              <form onSubmit={handlePlaceOrder}>
+                <div className="form-group" style={{ marginBottom: 16 }}>
+                  <label className="form-label">Your Name</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Ex: Kavindi Perera"
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group" style={{ marginBottom: 20 }}>
+                  <label className="form-label">WhatsApp / Phone Number</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="Ex: 0712345678"
+                    value={studentPhone}
+                    onChange={(e) => setStudentPhone(e.target.value)}
+                    required
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+                  <button type="button" className="btn btn-ghost" onClick={() => setOrderingItem(null)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-accent">
+                    Confirm Order 🚀
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
+
       <Footer />
       <FloatingWidgets />
+
       <style jsx>{`
         .store-grid {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
           gap: 24px;
+        }
+        .store-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          overflow: hidden;
+          display: flex; flex-direction: column;
+        }
+        .store-card-image {
+          height: 160px;
+          position: relative;
         }
         .store-img-placeholder {
           width: 100%; height: 100%;
@@ -77,17 +219,6 @@ export default function StorePage() {
           display: flex; align-items: center; justify-content: center;
           font-size: 2.5rem;
           position: relative;
-        }
-        /* Subtle signature graph paper overlay */
-        .store-img-placeholder::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background-image: 
-            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-          background-size: 14px 14px;
-          pointer-events: none;
         }
         .store-type-badge {
           position: absolute;
@@ -98,23 +229,35 @@ export default function StorePage() {
           padding: 3px 8px; border-radius: var(--radius-xs);
           color: var(--muted);
           font-family: var(--font-mono);
-          letter-spacing: 0.05em;
         }
         .store-card-badge {
           position: absolute;
           top: 10px; left: 10px;
-          font-size: 0.65rem; font-weight: 700;
-          background: var(--gold-glow);
-          border: 1px solid rgba(245,158,11,0.3);
-          color: var(--gold);
-          padding: 3px 10px; border-radius: var(--radius-full);
-          letter-spacing: 0.05em;
+          background: var(--accent-gradient);
+          color: white;
+          font-size: 0.68rem; font-weight: 700;
+          padding: 4px 10px; border-radius: var(--radius-xs);
         }
-        @media (max-width: 1024px) {
-          .store-grid { grid-template-columns: repeat(2, 1fr); }
+        .store-card-body {
+          padding: 20px; flex: 1;
         }
-        @media (max-width: 580px) {
-          .store-grid { grid-template-columns: 1fr; }
+        .store-card-title {
+          font-size: 1.05rem; margin-bottom: 8px;
+        }
+        .store-card-desc {
+          font-size: 0.82rem; color: var(--text-muted); margin-bottom: 16px;
+        }
+        .store-price-row {
+          display: flex; align-items: center; gap: 10px;
+        }
+        .store-price {
+          font-family: var(--font-mono); font-weight: 700; color: var(--paper); font-size: 1.1rem;
+        }
+        .store-original-price {
+          font-family: var(--font-mono); font-size: 0.85rem; color: var(--muted); text-decoration: line-through;
+        }
+        .store-card-footer {
+          padding: 0 20px 20px;
         }
       `}</style>
     </>
