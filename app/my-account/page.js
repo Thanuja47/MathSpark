@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
@@ -7,6 +7,25 @@ import { COURSES } from '@/lib/data';
 
 export default function MyAccountPage() {
   const [activeTab, setActiveTab] = useState('courses');
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.user) {
+          setUser(data.user);
+        }
+      })
+      .catch(err => console.error('Auth error', err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/me', { method: 'POST' });
+    window.location.href = '/';
+  };
 
   const enrolledCourses = COURSES.slice(0, 2);
 
@@ -19,8 +38,12 @@ export default function MyAccountPage() {
             <div className="dashboard-user-header">
               <div className="dashboard-avatar">👨‍🎓</div>
               <div>
-                <h2 style={{ fontSize: '1.8rem' }}>Welcome back, <span className="theme-gradient">Kavindi!</span></h2>
-                <p className="text-secondary text-sm">Grade 10 · Sinhala Medium · WhatsApp: +94 71 234 5678</p>
+                <h2 style={{ fontSize: '1.8rem' }}>
+                  Welcome back, <span className="theme-gradient">{user ? user.name : 'Student'}!</span>
+                </h2>
+                <p className="text-secondary text-sm">
+                  {user ? `Grade ${user.grade} · ${user.medium.toUpperCase()} Medium · WhatsApp: ${user.phone}` : 'Grade 10 · Sinhala Medium'}
+                </p>
               </div>
             </div>
           </div>
@@ -55,6 +78,15 @@ export default function MyAccountPage() {
                 >
                   ⚙️ Profile Settings
                 </button>
+                {user && (
+                  <button
+                    className="dashboard-nav-item"
+                    onClick={handleLogout}
+                    style={{ color: '#ff4d4f', marginTop: 12 }}
+                  >
+                    🚪 Logout
+                  </button>
+                )}
               </div>
 
               {/* Main content */}
@@ -99,12 +131,11 @@ export default function MyAccountPage() {
                             <h4 style={{ fontSize: '0.95rem', fontWeight: 600 }}>{rec.title}</h4>
                             <div className="text-muted text-xs" style={{ display: 'flex', gap: 16, marginTop: 4 }}>
                               <span>📅 {rec.date}</span>
-                              <span>⏱️ {rec.duration}</span>
+                              <span>⏱ {rec.duration}</span>
+                              <span>👁 {rec.views}</span>
                             </div>
                           </div>
-                          <button className="btn btn-accent btn-sm">
-                            Watch Video 🎬
-                          </button>
+                          <button className="btn btn-secondary btn-sm">Watch Video</button>
                         </div>
                       ))}
                     </div>
@@ -113,16 +144,32 @@ export default function MyAccountPage() {
 
                 {activeTab === 'tutes' && (
                   <div>
-                    <h3 style={{ marginBottom: 20 }}>Tute Packs &amp; Book Deliveries</h3>
-                    <div className="enrolled-card">
-                      <div>
-                        <span className="badge badge-green">DELIVERED</span>
-                        <h4 style={{ marginTop: 8, fontSize: '1rem' }}>Grade 10 Maths Tute Pack - Month 05</h4>
-                        <p className="text-muted text-xs" style={{ marginTop: 4 }}>Tracking ID: MSP-9842 · Delivered on July 14, 2026</p>
-                      </div>
-                      <a href="/tracking" className="btn btn-outline btn-sm">
-                        View Receipt
-                      </a>
+                    <h3 style={{ marginBottom: 20 }}>Tute Order Deliveries</h3>
+                    <div className="orders-table-wrap">
+                      <table className="orders-table">
+                        <thead>
+                          <tr>
+                            <th>Tracking ID</th>
+                            <th>Item Description</th>
+                            <th>Courier</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><code>MSP-9842</code></td>
+                            <td>Grade 10 Maths Tute Month 05</td>
+                            <td>Domex Express</td>
+                            <td><span className="badge badge-primary">In Transit</span></td>
+                          </tr>
+                          <tr>
+                            <td><code>MSP-9841</code></td>
+                            <td>Grade 10 Past Paper Pack</td>
+                            <td>Prompt Express</td>
+                            <td><span className="badge badge-green">Delivered</span></td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 )}
@@ -130,21 +177,26 @@ export default function MyAccountPage() {
                 {activeTab === 'profile' && (
                   <div>
                     <h3 style={{ marginBottom: 20 }}>Profile Settings</h3>
-                    <div className="form-group">
-                      <label className="form-label">Full Name</label>
-                      <input type="text" className="form-input" defaultValue="Kavindi Perera" />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">WhatsApp Number</label>
-                      <input type="text" className="form-input" defaultValue="+94 71 234 5678" readOnly />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Grade</label>
-                      <input type="text" className="form-input" defaultValue="Grade 10" readOnly />
-                    </div>
-                    <button className="btn btn-primary" style={{ marginTop: 12 }}>
-                      Save Changes
-                    </button>
+                    <form className="profile-form">
+                      <div className="form-group">
+                        <label className="form-label">Full Name</label>
+                        <input type="text" className="form-input" defaultValue={user?.name || 'Kavindi Perera'} readOnly />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">WhatsApp Number</label>
+                        <input type="text" className="form-input" defaultValue={user?.phone || '0712345678'} readOnly />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                        <div className="form-group">
+                          <label className="form-label">Grade</label>
+                          <input type="text" className="form-input" defaultValue={`Grade ${user?.grade || 10}`} readOnly />
+                        </div>
+                        <div className="form-group">
+                          <label className="form-label">Medium</label>
+                          <input type="text" className="form-input" defaultValue={(user?.medium || 'sinhala').toUpperCase()} readOnly />
+                        </div>
+                      </div>
+                    </form>
                   </div>
                 )}
               </div>
@@ -152,6 +204,7 @@ export default function MyAccountPage() {
           </div>
         </section>
       </main>
+
       <Footer />
       <FloatingWidgets />
 
@@ -162,42 +215,46 @@ export default function MyAccountPage() {
           gap: 20px;
         }
         .dashboard-avatar {
-          width: 64px; height: 64px;
+          width: 64px;
+          height: 64px;
           border-radius: 50%;
-          background: var(--gradient-blue);
-          display: flex; align-items: center; justify-content: center;
+          background: var(--cobalt-glow);
+          border: 2px solid var(--cobalt-ring);
+          display: flex;
+          align-items: center;
+          justify-content: center;
           font-size: 2rem;
         }
         .dashboard-grid {
           display: grid;
-          grid-template-columns: 260px 1fr;
+          grid-template-columns: 240px 1fr;
           gap: 32px;
         }
         .dashboard-sidebar {
           display: flex;
           flex-direction: column;
-          gap: 8px;
+          gap: 6px;
         }
         .dashboard-nav-item {
-          padding: 14px 18px;
+          padding: 12px 16px;
           border-radius: var(--radius-md);
-          background: var(--dark-2);
-          border: 1px solid var(--border);
-          color: var(--text-secondary);
-          font-size: 0.9rem;
+          background: var(--surface);
+          border: 1px solid var(--rule);
+          color: var(--text);
+          font-size: 0.8438rem;
           font-weight: 500;
           text-align: left;
           cursor: pointer;
           transition: var(--transition);
         }
         .dashboard-nav-item.active, .dashboard-nav-item:hover {
-          background: var(--primary-glow);
-          border-color: rgba(0,82,255,0.3);
-          color: var(--primary-light);
+          background: var(--cobalt-glow);
+          border-color: var(--cobalt-ring);
+          color: var(--cobalt-light);
         }
         .dashboard-content {
-          background: var(--dark-card);
-          border: 1px solid var(--border);
+          background: var(--surface);
+          border: 1px solid var(--rule);
           border-radius: var(--radius-xl);
           padding: 32px;
         }
@@ -207,26 +264,44 @@ export default function MyAccountPage() {
           gap: 16px;
         }
         .enrolled-card, .recording-card {
-          background: var(--dark-2);
-          border: 1px solid var(--border);
+          background: var(--surface-2);
+          border: 1px solid var(--rule-light);
           border-radius: var(--radius-lg);
           padding: 20px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 20px;
+          gap: 16px;
+          flex-wrap: wrap;
         }
         .rec-icon {
-          width: 44px; height: 44px;
+          width: 40px;
+          height: 40px;
           border-radius: 50%;
-          background: rgba(255,107,0,0.1);
-          color: var(--accent);
-          display: flex; align-items: center; justify-content: center;
-          font-size: 1.2rem; flex-shrink: 0;
+          background: var(--cobalt-glow);
+          color: var(--cobalt-light);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .orders-table {
+          width: 100%;
+          border-collapse: collapse;
+          text-align: left;
+          font-size: 0.875rem;
+        }
+        .orders-table th, .orders-table td {
+          padding: 12px 16px;
+          border-bottom: 1px solid var(--rule-light);
+        }
+        .profile-form {
+          max-width: 500px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
         }
         @media (max-width: 850px) {
           .dashboard-grid { grid-template-columns: 1fr; }
-          .enrolled-card, .recording-card { flex-direction: column; align-items: flex-start; }
         }
       `}</style>
     </>
