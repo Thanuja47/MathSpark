@@ -6,7 +6,7 @@ import { CURRENCY, PAYHERE_DEFAULTS } from '@/utils/constants';
 // POST /api/payment/create — initiate PayHere checkout
 export async function POST(request) {
   try {
-    const { courseId, courseTitle, amount, studentName, studentEmail, studentPhone } = await request.json();
+    const { courseId, courseTitle, amount, studentName, studentEmail, studentPhone, studentId } = await request.json();
 
     if (!courseId || !amount || !studentName) {
       return NextResponse.json({ error: 'Missing required payment fields.' }, { status: 400 });
@@ -17,7 +17,7 @@ export async function POST(request) {
 
     const paymentData = {
       merchant_id:   PAYHERE_MERCHANT_ID,
-      return_url:    `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/payment/success`,
+      return_url:    `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/payment/success?courseId=${courseId}`,
       cancel_url:    `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/payment/cancel`,
       notify_url:    `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/payment/notify`,
       order_id:      orderId,
@@ -31,6 +31,8 @@ export async function POST(request) {
       address:       PAYHERE_DEFAULTS.ADDRESS,
       city:          PAYHERE_DEFAULTS.CITY,
       country:       PAYHERE_DEFAULTS.COUNTRY,
+      custom_1:      studentId || studentPhone || '',
+      custom_2:      courseId,
       hash,
     };
 

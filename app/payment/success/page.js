@@ -1,9 +1,28 @@
+'use client';
+import { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import Link from 'next/link';
 
 export default function PaymentSuccessPage() {
+  const searchParams = useSearchParams();
+  const courseId = searchParams.get('courseId');
+
+  useEffect(() => {
+    if (courseId) {
+      fetch('/api/enroll', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ courseId }),
+      })
+        .then(res => res.json())
+        .then(data => console.log('Auto-enroll result:', data))
+        .catch(err => console.error('Auto-enroll error:', err));
+    }
+  }, [courseId]);
+
   return (
     <>
       <Header />

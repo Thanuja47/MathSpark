@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { verifyNotifySignature } from '@/utils/payhereSignature';
 import { PAYMENT_STATUS } from '@/utils/constants';
+import { db } from '@/lib/db';
 
 // POST /api/payment/notify — PayHere sends payment status here
 export async function POST(request) {
@@ -15,6 +16,8 @@ export async function POST(request) {
     const payhereCurrency = formData.get('payhere_currency');
     const statusCode      = formData.get('status_code');
     const md5sig          = formData.get('md5sig');
+    const custom1         = formData.get('custom_1'); // studentId or studentPhone
+    const custom2         = formData.get('custom_2'); // courseId
 
     // Verify the signature using shared utility
     const isValid = verifyNotifySignature({
@@ -31,19 +34,31 @@ export async function POST(request) {
       return new Response('Invalid signature', { status: 400 });
     }
 
-    // Handle payment status using constants
+    // Handle payment status
     if (statusCode === PAYMENT_STATUS.SUCCESS) {
-      console.log(`[PayHere] Payment SUCCESS | Order: ${orderId} | Payment: ${paymentId} | Amount: LKR ${payhereAmount}`);
-      // TODO: Update database — mark course as enrolled for the student
-      // await db.enrollments.create({ orderId, paymentId, amount: payhereAmount });
-    } else if (statusCode === PAYMENT_STATUS.PENDING) {
-      console.log(`[PayHere] Payment PENDING | Order: ${orderId}`);
-    } else if (statusCode === PAYMENT_STATUS.CANCELLED) {
-      console.log(`[PayHere] Payment CANCELLED | Order: ${orderId}`);
-    } else if (statusCode === PAYMENT_STATUS.FAILED) {
-      console.log(`[PayHere] Payment FAILED | Order: ${orderId}`);
-    } else if (statusCode === PAYMENT_STATUS.CHARGEDBACK) {
-      console.log(`[PayHere] Payment CHARGEDBACK | Order: ${orderId}`);
+      console.log(`[PayHere] Payment SUCCESS | Order: ${orderId} | Course: ${custom2} | Student: ${custom1}`);
+      
+      if (custom1 && custom2) {
+        let student = await db.students.findById(custom1);
+        if (!student) {
+          student = await db.students.findByPhone(custom1);
+        }
+
+        if (student) {
+          let enrolled = [];
+          try {
+            enrolled = JSON.parse(student.enrolledCourses || '[]');
+          } catch (e) {
+            enrolled = [];
+          }
+
+          if (!enrolled.includes(custom2)) {
+            enrolled.push(custom2);
+            await db.students.updateEnrollments(student.id, enrolled);
+            console.log(`[PayHere] Successfully enrolled student ${student.phone} into course ${custom2}`);
+          }
+        }
+      }
     }
 
     return new Response('OK', { status: 200 });
