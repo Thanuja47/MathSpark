@@ -68,6 +68,8 @@ export default function StorePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           storeItemId: orderingItem.id,
+          itemTitle: orderingItem.title,
+          itemPrice: orderingItem.price,
           quantity: quantity,
         }),
       });

@@ -16,29 +16,42 @@ export async function POST(request) {
     }
 
     const body = await request.json();
-    const { storeItemId, quantity = 1 } = body;
+    const { storeItemId, itemTitle, itemPrice, quantity = 1 } = body;
 
-    if (!storeItemId) {
-      return NextResponse.json({ error: 'Store item ID is required.' }, { status: 400 });
+    let finalItemName = 'Store Item';
+    let finalPrice = 0;
+    let validStoreItemId = null;
+
+    if (storeItemId) {
+      const storeItem = await db.store.findById(storeItemId);
+      if (storeItem) {
+        finalItemName = storeItem.name;
+        finalPrice = storeItem.price;
+        validStoreItemId = storeItem.id;
+      }
     }
 
-    const storeItem = await db.store.findById(storeItemId);
-    if (!storeItem) {
-      return NextResponse.json({ error: 'Store item not found.' }, { status: 404 });
+    if (!validStoreItemId) {
+      if (!itemTitle || !itemPrice) {
+        return NextResponse.json({ error: 'Store item information missing.' }, { status: 400 });
+      }
+      finalItemName = itemTitle;
+      finalPrice = Number(itemPrice) || 0;
     }
 
     const qty = Math.max(1, Number(quantity) || 1);
-    const totalPrice = storeItem.price * qty;
+    const totalPrice = finalPrice * qty;
 
     const newOrder = await db.orders.create({
       studentName: student.name,
       phone: student.phone,
-      storeItemId: storeItem.id,
-      itemName: storeItem.name,
+      storeItemId: validStoreItemId,
+      itemName: finalItemName,
       quantity: qty,
       totalPrice: totalPrice,
       status: 'Pending',
     });
+
 
     return NextResponse.json({
       success: true,
