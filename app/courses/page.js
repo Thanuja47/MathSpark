@@ -1,17 +1,44 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import CourseCard from '@/components/courses/CourseCard';
-import { COURSES } from '@/lib/data';
+import { COURSES as STATIC_COURSES } from '@/lib/data';
 
 export default function CoursesPage() {
+  const [coursesList, setCoursesList] = useState(STATIC_COURSES);
   const [selectedGrade, setSelectedGrade] = useState('all');
   const [selectedMedium, setSelectedMedium] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredCourses = COURSES.filter((course) => {
+  useEffect(() => {
+    fetch('/api/courses')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          // Merge live DB courses with static mock courses for maximum completeness
+          const liveFormatted = data.map(c => ({
+            id: c.id,
+            title: c.title,
+            grade: c.grade,
+            medium: c.medium,
+            lessons: 12,
+            students: 150,
+            packs: 2,
+            price: c.price,
+            currency: 'LKR',
+            isPopular: c.badge === 'Popular',
+            description: c.description || '',
+            instructor: 'Ishan Maduranga',
+          }));
+          setCoursesList([...liveFormatted, ...STATIC_COURSES]);
+        }
+      })
+      .catch(err => console.error('Failed to load live courses', err));
+  }, []);
+
+  const filteredCourses = coursesList.filter((course) => {
     const matchesGrade = selectedGrade === 'all' || course.grade.toString() === selectedGrade;
     const matchesMedium = selectedMedium === 'all' || course.medium === selectedMedium;
     const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -100,22 +127,23 @@ export default function CoursesPage() {
                 ))}
               </div>
             ) : (
-              <div className="empty-state">
-                <div className="empty-state-icon">🔍</div>
-                <h3 className="empty-state-title">No classes found</h3>
-                <p className="empty-state-desc">Try adjusting your filters or search query.</p>
+              <div className="no-results-box">
+                <div style={{ fontSize: '3rem', marginBottom: '12px' }}>🔍</div>
+                <h3>No Classes Found</h3>
+                <p>Try adjusting your search query or grade filters.</p>
                 <button
-                  className="btn btn-outline"
-                  style={{ marginTop: '20px' }}
+                  className="btn btn-secondary btn-sm"
                   onClick={() => { setSelectedGrade('all'); setSelectedMedium('all'); setSearchQuery(''); }}
+                  style={{ marginTop: '16px' }}
                 >
-                  Reset Filters
+                  Reset All Filters
                 </button>
               </div>
             )}
           </div>
         </section>
       </main>
+
       <Footer />
       <FloatingWidgets />
 
@@ -126,11 +154,11 @@ export default function CoursesPage() {
           gap: 16px;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 40px;
-          background: var(--dark-2);
+          background: var(--surface);
           border: 1px solid var(--border);
           border-radius: var(--radius-lg);
-          padding: 20px;
+          padding: 16px 20px;
+          margin-bottom: 36px;
         }
         .search-input-wrap {
           position: relative;
@@ -143,27 +171,49 @@ export default function CoursesPage() {
           top: 50%;
           transform: translateY(-50%);
           color: var(--text-muted);
+          pointer-events: none;
         }
         .filter-tags {
           display: flex;
-          gap: 8px;
+          gap: 6px;
           flex-wrap: wrap;
         }
-        .medium-select-wrap select {
-          min-width: 150px;
+        .filter-tag {
+          padding: 8px 14px;
+          border-radius: var(--radius-md);
+          background: var(--surface-2);
+          border: 1px solid var(--border);
+          color: var(--text-muted);
+          font-size: 0.8438rem;
+          font-weight: 500;
           cursor: pointer;
+          transition: var(--transition);
+        }
+        .filter-tag:hover, .filter-tag.active {
+          background: var(--cobalt-glow);
+          border-color: var(--cobalt-ring);
+          color: var(--cobalt-light);
+        }
+        .medium-select-wrap select {
+          min-width: 160px;
         }
         .courses-page-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
+          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+          gap: 28px;
         }
-        @media (max-width: 900px) {
-          .courses-page-grid { grid-template-columns: repeat(2, 1fr); }
+        .no-results-box {
+          text-align: center;
+          padding: 60px 20px;
+          background: var(--surface);
+          border: 1px dashed var(--border);
+          border-radius: var(--radius-lg);
         }
-        @media (max-width: 600px) {
-          .courses-page-grid { grid-template-columns: 1fr; }
-          .courses-filter-bar { flex-direction: column; align-items: stretch; }
+        @media (max-width: 768px) {
+          .courses-filter-bar {
+            flex-direction: column;
+            align-items: stretch;
+          }
         }
       `}</style>
     </>

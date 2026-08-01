@@ -2,13 +2,19 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
-// GET /api/tracking?id=MSP-9842
+// GET /api/tracking or /api/tracking?id=MSP-9842
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get('id')?.trim().toUpperCase();
 
   if (!id) {
-    return NextResponse.json({ error: 'Tracking ID is required.' }, { status: 400 });
+    // Return all tracking records for admin list
+    try {
+      const records = await db.tracking.all();
+      return NextResponse.json(records);
+    } catch (e) {
+      return NextResponse.json({ error: 'Failed to fetch tracking records' }, { status: 500 });
+    }
   }
 
   // Search by tracking ID
@@ -33,10 +39,17 @@ export async function POST(request) {
     if (!data.id || !data.student) {
       return NextResponse.json({ error: 'Tracking ID and student name are required.' }, { status: 400 });
     }
-    const record = { ...data, updatedAt: new Date().toISOString() };
-    await db.tracking.set(data.id.toUpperCase(), record);
-    return NextResponse.json({ success: true, tracking: record });
+    const record = {
+      student: data.student,
+      phone: data.phone || '',
+      item: data.item || 'Tute Pack',
+      status: data.status || 'Processing',
+      courier: data.courier || 'Domex / Prompt Express',
+    };
+    const saved = await db.tracking.set(data.id.toUpperCase(), record);
+    return NextResponse.json({ success: true, tracking: saved });
   } catch (err) {
+    console.error('[POST /api/tracking]', err);
     return NextResponse.json({ error: 'Invalid request.' }, { status: 400 });
   }
 }
