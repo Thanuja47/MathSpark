@@ -4,21 +4,20 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import CourseCard from '@/components/courses/CourseCard';
-import { COURSES as STATIC_COURSES } from '@/lib/data';
+import { courseService } from '@/services/courseService';
 
 export default function CoursesPage() {
-  const [coursesList, setCoursesList] = useState(STATIC_COURSES);
+  const [coursesList, setCoursesList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedGrade, setSelectedGrade] = useState('all');
   const [selectedMedium, setSelectedMedium] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    fetch('/api/courses')
-      .then(res => res.json())
+    courseService.getAllCourses()
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          // Merge live DB courses with static mock courses for maximum completeness
-          const liveFormatted = data.map(c => ({
+        if (Array.isArray(data)) {
+          const formatted = data.map(c => ({
             id: c.id,
             title: c.title,
             grade: c.grade,
@@ -31,11 +30,13 @@ export default function CoursesPage() {
             isPopular: c.badge === 'Popular',
             description: c.description || '',
             instructor: 'Ishan Maduranga',
+            imageUrl: c.imageUrl,
           }));
-          setCoursesList([...liveFormatted, ...STATIC_COURSES]);
+          setCoursesList(formatted);
         }
       })
-      .catch(err => console.error('Failed to load live courses', err));
+      .catch(err => console.error('Failed to load courses', err))
+      .finally(() => setLoading(false));
   }, []);
 
   const filteredCourses = coursesList.filter((course) => {
@@ -120,7 +121,11 @@ export default function CoursesPage() {
             </div>
 
             {/* Results Grid */}
-            {filteredCourses.length > 0 ? (
+            {loading ? (
+              <div style={{ textCenter: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
+                Loading live classes from database...
+              </div>
+            ) : filteredCourses.length > 0 ? (
               <div className="courses-page-grid">
                 {filteredCourses.map((course) => (
                   <CourseCard key={course.id} course={course} />

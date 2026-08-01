@@ -3,145 +3,158 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
+import { uploadImage } from '@/utils/uploadImage';
 
 export default function AdminDashboardPage() {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('courses');
 
   // Live DB State
   const [coursesList, setCoursesList] = useState([]);
-  const [trackingList, setTrackingList] = useState([]);
-  const [studentsList, setStudentsList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Form states
+  // Form states for Courses Create/Edit
   const [showAddCourse, setShowAddCourse] = useState(false);
-  const [newCourseTitle, setNewCourseTitle] = useState('');
-  const [newCourseGrade, setNewCourseGrade] = useState('10');
-  const [newCourseMedium, setNewCourseMedium] = useState('sinhala');
-  const [newCoursePrice, setNewCoursePrice] = useState('2000');
-  const [newCourseDesc, setNewCourseDesc] = useState('');
+  const [editingCourseId, setEditingCourseId] = useState(null);
 
-  // Tracking state
-  const [newTrackId, setNewTrackId] = useState('');
-  const [newStudentName, setNewStudentName] = useState('');
-  const [newStudentPhone, setNewStudentPhone] = useState('');
-  const [newItemName, setNewItemName] = useState('');
-  const [newStatus, setNewStatus] = useState('Processing');
+  const [courseTitle, setCourseTitle] = useState('');
+  const [courseGrade, setCourseGrade] = useState('10');
+  const [courseMedium, setCourseMedium] = useState('sinhala');
+  const [coursePrice, setCoursePrice] = useState('2000');
+  const [courseDesc, setCourseDesc] = useState('');
+  const [courseBadge, setCourseBadge] = useState('Popular');
+  
+  // Image Upload States
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
 
-  // Video state
-  const [uploadCourseId, setUploadCourseId] = useState('');
-  const [lessonTitle, setLessonTitle] = useState('');
-  const [videoUrl, setVideoUrl] = useState('');
-  const [uploadSuccess, setUploadSuccess] = useState(false);
-
-  // Fetch initial live data
-  const fetchData = async () => {
+  // Fetch live courses from Admin API
+  const fetchCourses = async () => {
     setLoading(true);
     try {
-      const [resCourses, resTracking, resStudents] = await Promise.all([
-        fetch('/api/courses').then(r => r.json()).catch(() => []),
-        fetch('/api/tracking').then(r => r.json()).catch(() => []),
-        fetch('/api/students').then(r => r.json()).catch(() => []),
-      ]);
-
-      if (Array.isArray(resCourses)) setCoursesList(resCourses);
-      if (Array.isArray(resTracking)) setTrackingList(resTracking);
-      if (Array.isArray(resStudents)) setStudentsList(resStudents);
+      const res = await fetch('/api/admin/courses');
+      if (res.ok) {
+        const data = await res.json();
+        setCoursesList(data);
+      }
     } catch (err) {
-      console.error('Error loading admin data', err);
+      console.error('Error loading admin courses', err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchCourses();
   }, []);
 
-  const handleAddCourse = async (e) => {
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const resetForm = () => {
+    setCourseTitle('');
+    setCourseGrade('10');
+    setCourseMedium('sinhala');
+    setCoursePrice('2000');
+    setCourseDesc('');
+    setCourseBadge('Popular');
+    setImageFile(null);
+    setImagePreview('');
+    setEditingCourseId(null);
+    setShowAddCourse(false);
+  };
+
+  const handleEditClick = (course) => {
+    setEditingCourseId(course.id);
+    setCourseTitle(course.title || '');
+    setCourseGrade(course.grade?.toString() || '10');
+    setCourseMedium(course.medium || 'sinhala');
+    setCoursePrice(course.price?.toString() || '2000');
+    setCourseDesc(course.description || '');
+    setCourseBadge(course.badge || 'Popular');
+    setImagePreview(course.imageUrl || '');
+    setImageFile(null);
+    setShowAddCourse(true);
+  };
+
+  const handleSubmitCourse = async (e) => {
     e.preventDefault();
-    if (!newCourseTitle) return;
+    if (!courseTitle) return;
 
+    setIsUploading(true);
     try {
-      const res = await fetch('/api/courses', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: newCourseTitle,
-          grade: Number(newCourseGrade),
-          medium: newCourseMedium,
-          price: Number(newCoursePrice),
-          description: newCourseDesc || `Grade ${newCourseGrade} ${newCourseMedium} medium class by Ishan Maduranga.`,
-          badge: 'Popular',
-        }),
-      });
+      let finalImageUrl = imagePreview;
 
-      if (res.ok) {
-        const created = await res.json();
-        setCoursesList([created, ...coursesList]);
-        setNewCourseTitle('');
-        setNewCourseDesc('');
-        setShowAddCourse(false);
+      // Upload new image if file selected
+      if (imageFile) {
+        finalImageUrl = await uploadImage(imageFile);
+      }
+
+      const payload = {
+        title: courseTitle,
+        grade: Number(courseGrade),
+        medium: courseMedium,
+        price: Number(coursePrice),
+        description: courseDesc || `Grade ${courseGrade} ${courseMedium} medium class by Ishan Maduranga.`,
+        badge: courseBadge,
+        imageUrl: finalImageUrl || null,
+      };
+
+      if (editingCourseId) {
+        // PUT update existing course
+        const res = await fetch(`/api/admin/courses/${editingCourseId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          const updated = await res.json();
+          setCoursesList(coursesList.map(c => c.id === editingCourseId ? updated : c));
+          resetForm();
+        } else {
+          alert('Failed to update course.');
+        }
+      } else {
+        // POST create new course
+        const res = await fetch('/api/admin/courses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          const created = await res.json();
+          setCoursesList([created, ...coursesList]);
+          resetForm();
+        } else {
+          alert('Failed to create course.');
+        }
       }
     } catch (err) {
-      alert('Failed to create class');
+      alert('Error saving course: ' + err.message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleDeleteCourse = async (id) => {
-    if (!confirm('Are you sure you want to delete this class?')) return;
+    if (!confirm('Are you sure you want to delete this course? This action cannot be undone.')) return;
     try {
-      const res = await fetch(`/api/courses/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/admin/courses/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setCoursesList(coursesList.filter(c => c.id !== id));
+      } else {
+        alert('Failed to delete course.');
       }
     } catch (e) {
-      alert('Failed to delete class');
+      alert('Failed to delete course.');
     }
-  };
-
-  const handleAddTracking = async (e) => {
-    e.preventDefault();
-    if (!newTrackId || !newStudentName) return;
-
-    try {
-      const res = await fetch('/api/tracking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: newTrackId,
-          student: newStudentName,
-          phone: newStudentPhone,
-          item: newItemName || 'Tute Pack Month 01',
-          status: newStatus,
-          courier: 'Domex',
-        }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.tracking) {
-          setTrackingList([data.tracking, ...trackingList.filter(t => t.id !== data.tracking.id)]);
-          setNewTrackId('');
-          setNewStudentName('');
-          setNewStudentPhone('');
-          setNewItemName('');
-        }
-      }
-    } catch (err) {
-      alert('Failed to save tracking info');
-    }
-  };
-
-  const handleUploadVideo = (e) => {
-    e.preventDefault();
-    if (!lessonTitle || !videoUrl) return;
-    setUploadSuccess(true);
-    setTimeout(() => {
-      setUploadSuccess(false);
-      setLessonTitle('');
-      setVideoUrl('');
-    }, 2500);
   };
 
   return (
@@ -169,320 +182,163 @@ export default function AdminDashboardPage() {
               {/* Admin Navigation */}
               <div className="admin-sidebar">
                 <button
-                  className={`admin-nav-item ${activeTab === 'overview' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('overview')}
-                >
-                  📊 Platform Analytics
-                </button>
-                <button
                   className={`admin-nav-item ${activeTab === 'courses' ? 'active' : ''}`}
                   onClick={() => setActiveTab('courses')}
                 >
-                  📚 Manage Classes ({coursesList.length})
-                </button>
-                <button
-                  className={`admin-nav-item ${activeTab === 'upload' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('upload')}
-                >
-                  📹 Upload Lesson Video
-                </button>
-                <button
-                  className={`admin-nav-item ${activeTab === 'tracking' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('tracking')}
-                >
-                  🚚 Tute Delivery Tracking ({trackingList.length})
-                </button>
-                <button
-                  className={`admin-nav-item ${activeTab === 'students' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('students')}
-                >
-                  👥 Student Directory ({studentsList.length})
+                  📚 Manage Courses ({coursesList.length})
                 </button>
               </div>
 
-              {/* Admin Main Window */}
+              {/* Admin Main Content */}
               <div className="admin-content">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <h3>Course Management (CRUD)</h3>
+                  <button className="btn btn-primary btn-sm" onClick={() => { if (showAddCourse) resetForm(); else setShowAddCourse(true); }}>
+                    {showAddCourse ? 'Cancel' : '+ Add New Course'}
+                  </button>
+                </div>
+
+                {/* Create / Edit Form */}
+                {showAddCourse && (
+                  <form onSubmit={handleSubmitCourse} className="admin-form-box">
+                    <h4 style={{ marginBottom: 16 }}>{editingCourseId ? 'Edit Course' : 'Create New Course'}</h4>
+                    <div className="form-group" style={{ marginBottom: 12 }}>
+                      <label className="form-label">Course Title</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Grade 10 Maths Revision Batch 2026"
+                        className="form-input"
+                        value={courseTitle}
+                        onChange={(e) => setCourseTitle(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
+                      <div className="form-group">
+                        <label className="form-label">Grade</label>
+                        <select className="form-input" value={courseGrade} onChange={(e) => setCourseGrade(e.target.value)}>
+                          {[6, 7, 8, 9, 10, 11].map(g => <option key={g} value={g}>Grade {g}</option>)}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Medium</label>
+                        <select className="form-input" value={courseMedium} onChange={(e) => setCourseMedium(e.target.value)}>
+                          <option value="sinhala">Sinhala Medium</option>
+                          <option value="english">English Medium</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Fee (LKR)</label>
+                        <input type="number" className="form-input" value={coursePrice} onChange={(e) => setCoursePrice(e.target.value)} required />
+                      </div>
+                    </div>
+
+                    <div className="form-group" style={{ marginBottom: 12 }}>
+                      <label className="form-label">Description</label>
+                      <textarea
+                        className="form-input"
+                        rows="2"
+                        placeholder="Brief overview of course topics..."
+                        value={courseDesc}
+                        onChange={(e) => setCourseDesc(e.target.value)}
+                      />
+                    </div>
+
+                    {/* Image Upload Field */}
+                    <div className="form-group" style={{ marginBottom: 16 }}>
+                      <label className="form-label">Course Image (Supabase Storage)</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="form-input"
+                        style={{ padding: '8px' }}
+                      />
+                      {imagePreview && (
+                        <div style={{ marginTop: 10 }}>
+                          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Image Preview:</span>
+                          <img
+                            src={imagePreview}
+                            alt="Course Preview"
+                            style={{ height: 100, borderRadius: 8, objectFit: 'cover', display: 'block', marginTop: 4, border: '1px solid var(--border)' }}
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 10 }}>
+                      <button type="submit" className="btn btn-accent btn-sm" disabled={isUploading}>
+                        {isUploading ? 'Uploading & Saving...' : (editingCourseId ? 'Update Course 💾' : 'Publish Course 🚀')}
+                      </button>
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={resetForm}>
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* Course List Table */}
                 {loading ? (
                   <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
-                    Loading live platform data...
+                    Loading courses from database...
                   </div>
                 ) : (
-                  <>
-                    {/* 1. OVERVIEW */}
-                    {activeTab === 'overview' && (
-                      <div>
-                        <h3 style={{ marginBottom: 24 }}>Platform Live Overview</h3>
-                        <div className="admin-stats-grid">
-                          <div className="admin-stat-card">
-                            <div className="admin-stat-val">{studentsList.length}</div>
-                            <div className="admin-stat-lbl">Registered Students</div>
-                          </div>
-                          <div className="admin-stat-card">
-                            <div className="admin-stat-val">{coursesList.length}</div>
-                            <div className="admin-stat-lbl">Active Classes</div>
-                          </div>
-                          <div className="admin-stat-card">
-                            <div className="admin-stat-val">{trackingList.length}</div>
-                            <div className="admin-stat-lbl">Tracked Tute Shipments</div>
-                          </div>
-                          <div className="admin-stat-card">
-                            <div className="admin-stat-val">LKR {(coursesList.reduce((acc, c) => acc + (c.price || 0), 0) * 15).toLocaleString()}</div>
-                            <div className="admin-stat-lbl">Est. Monthly Revenue</div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 2. MANAGE COURSES */}
-                    {activeTab === 'courses' && (
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                          <h3>Class Management</h3>
-                          <button className="btn btn-primary btn-sm" onClick={() => setShowAddCourse(!showAddCourse)}>
-                            {showAddCourse ? 'Cancel' : '+ Add New Class'}
-                          </button>
-                        </div>
-
-                        {showAddCourse && (
-                          <form onSubmit={handleAddCourse} className="admin-form-box">
-                            <h4 style={{ marginBottom: 16 }}>Create New Class</h4>
-                            <div className="form-group">
-                              <label className="form-label">Class Title</label>
-                              <input
-                                type="text"
-                                placeholder="Ex: Grade 10 Maths Revision Batch 2026"
-                                className="form-input"
-                                value={newCourseTitle}
-                                onChange={(e) => setNewCourseTitle(e.target.value)}
-                                required
-                              />
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-                              <div className="form-group">
-                                <label className="form-label">Grade</label>
-                                <select className="form-input" value={newCourseGrade} onChange={(e) => setNewCourseGrade(e.target.value)}>
-                                  {[6, 7, 8, 9, 10, 11].map(g => <option key={g} value={g}>Grade {g}</option>)}
-                                </select>
-                              </div>
-                              <div className="form-group">
-                                <label className="form-label">Medium</label>
-                                <select className="form-input" value={newCourseMedium} onChange={(e) => setNewCourseMedium(e.target.value)}>
-                                  <option value="sinhala">Sinhala Medium</option>
-                                  <option value="english">English Medium</option>
-                                </select>
-                              </div>
-                              <div className="form-group">
-                                <label className="form-label">Fee (LKR)</label>
-                                <input type="number" className="form-input" value={newCoursePrice} onChange={(e) => setNewCoursePrice(e.target.value)} />
-                              </div>
-                            </div>
-                            <button type="submit" className="btn btn-accent btn-sm" style={{ marginTop: 12 }}>
-                              Publish Class 🚀
-                            </button>
-                          </form>
+                  <div className="admin-table-wrap">
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th>Image</th>
+                          <th>Course Title</th>
+                          <th>Grade</th>
+                          <th>Medium</th>
+                          <th>Fee</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {coursesList.length === 0 ? (
+                          <tr>
+                            <td colSpan="6" style={{ textAlign: 'center', color: 'var(--muted)' }}>No courses found. Add your first course!</td>
+                          </tr>
+                        ) : (
+                          coursesList.map((c) => (
+                            <tr key={c.id}>
+                              <td>
+                                {c.imageUrl ? (
+                                  <img src={c.imageUrl} alt={c.title} style={{ width: 48, height: 36, objectFit: 'cover', borderRadius: 4 }} />
+                                ) : (
+                                  <span style={{ fontSize: '1.2rem' }}>📚</span>
+                                )}
+                              </td>
+                              <td><strong>{c.title}</strong></td>
+                              <td>Grade {c.grade}</td>
+                              <td><span className="badge badge-primary">{c.medium}</span></td>
+                              <td>LKR {c.price}</td>
+                              <td>
+                                <div style={{ display: 'flex', gap: 8 }}>
+                                  <button
+                                    onClick={() => handleEditClick(c)}
+                                    className="btn btn-secondary btn-sm"
+                                    style={{ padding: '4px 10px', fontSize: '0.75rem' }}
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteCourse(c.id)}
+                                    className="btn btn-ghost btn-sm"
+                                    style={{ padding: '4px 10px', fontSize: '0.75rem', color: '#ff4d4f' }}
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          ))
                         )}
-
-                        <div className="admin-table-wrap">
-                          <table className="admin-table">
-                            <thead>
-                              <tr>
-                                <th>Class Title</th>
-                                <th>Grade</th>
-                                <th>Medium</th>
-                                <th>Fee</th>
-                                <th>Action</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {coursesList.length === 0 ? (
-                                <tr>
-                                  <td colSpan="5" style={{ textCenter: 'center', color: 'var(--muted)' }}>No courses found. Add your first class!</td>
-                                </tr>
-                              ) : (
-                                coursesList.map((c) => (
-                                  <tr key={c.id}>
-                                    <td><strong>{c.title}</strong></td>
-                                    <td>Grade {c.grade}</td>
-                                    <td><span className="badge badge-primary">{c.medium}</span></td>
-                                    <td>LKR {c.price}</td>
-                                    <td>
-                                      <button
-                                        onClick={() => handleDeleteCourse(c.id)}
-                                        className="btn btn-ghost btn-sm"
-                                        style={{ padding: '4px 10px', fontSize: '0.75rem', color: '#ff4d4f' }}
-                                      >
-                                        Delete
-                                      </button>
-                                    </td>
-                                  </tr>
-                                ))
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 3. UPLOAD LESSON VIDEO */}
-                    {activeTab === 'upload' && (
-                      <div>
-                        <h3 style={{ marginBottom: 20 }}>Upload Lesson Video Recording</h3>
-                        {uploadSuccess && (
-                          <div className="alert alert-success" style={{ background: 'rgba(0,200,150,0.1)', border: '1px solid #00C896', padding: 14, borderRadius: 8, color: '#00C896', marginBottom: 20 }}>
-                            ✅ Video recording successfully uploaded and published to student dashboard!
-                          </div>
-                        )}
-                        <form onSubmit={handleUploadVideo} className="admin-form-box">
-                          <div className="form-group">
-                            <label className="form-label">Select Target Class</label>
-                            <select className="form-input" value={uploadCourseId} onChange={(e) => setUploadCourseId(e.target.value)}>
-                              {coursesList.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
-                            </select>
-                          </div>
-                          <div className="form-group">
-                            <label className="form-label">Lesson Title</label>
-                            <input
-                              type="text"
-                              placeholder="Ex: Lesson 15: Quadratic Equations & Past Paper Questions"
-                              className="form-input"
-                              value={lessonTitle}
-                              onChange={(e) => setLessonTitle(e.target.value)}
-                              required
-                            />
-                          </div>
-                          <div className="form-group">
-                            <label className="form-label">Video Stream URL / Embed Link (Vimeo/Cloudflare Stream/HLS)</label>
-                            <input
-                              type="text"
-                              placeholder="Ex: https://player.vimeo.com/video/84920491 or HLS stream link"
-                              className="form-input"
-                              value={videoUrl}
-                              onChange={(e) => setVideoUrl(e.target.value)}
-                              required
-                            />
-                          </div>
-                          <button type="submit" className="btn btn-primary">
-                            Publish Lesson Video 🎬
-                          </button>
-                        </form>
-                      </div>
-                    )}
-
-                    {/* 4. TUTE TRACKING MANAGEMENT */}
-                    {activeTab === 'tracking' && (
-                      <div>
-                        <h3 style={{ marginBottom: 20 }}>Update Tute Delivery Tracking</h3>
-
-                        <form onSubmit={handleAddTracking} className="admin-form-box" style={{ marginBottom: 24 }}>
-                          <h4 style={{ marginBottom: 12 }}>Add/Update Tracking Code</h4>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                            <div className="form-group">
-                              <label className="form-label">Tracking ID</label>
-                              <input type="text" placeholder="Ex: MSP-9843" className="form-input" value={newTrackId} onChange={(e) => setNewTrackId(e.target.value)} required />
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label">Student Name</label>
-                              <input type="text" placeholder="Ex: Nimal Siripala" className="form-input" value={newStudentName} onChange={(e) => setNewStudentName(e.target.value)} required />
-                            </div>
-                          </div>
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12 }}>
-                            <div className="form-group">
-                              <label className="form-label">Phone</label>
-                              <input type="text" placeholder="0712345678" className="form-input" value={newStudentPhone} onChange={(e) => setNewStudentPhone(e.target.value)} />
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label">Item Description</label>
-                              <input type="text" placeholder="Grade 10 Tute Month 06" className="form-input" value={newItemName} onChange={(e) => setNewItemName(e.target.value)} />
-                            </div>
-                            <div className="form-group">
-                              <label className="form-label">Status</label>
-                              <select className="form-input" value={newStatus} onChange={(e) => setNewStatus(e.target.value)}>
-                                <option value="Processing">Processing</option>
-                                <option value="Dispatched">Dispatched</option>
-                                <option value="In Transit">In Transit</option>
-                                <option value="Delivered">Delivered</option>
-                              </select>
-                            </div>
-                          </div>
-                          <button type="submit" className="btn btn-accent btn-sm">
-                            Save Tracking Info 🚚
-                          </button>
-                        </form>
-
-                        <div className="admin-table-wrap">
-                          <table className="admin-table">
-                            <thead>
-                              <tr>
-                                <th>Tracking ID</th>
-                                <th>Student</th>
-                                <th>Phone</th>
-                                <th>Item</th>
-                                <th>Status</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {trackingList.length === 0 ? (
-                                <tr>
-                                  <td colSpan="5" style={{ textCenter: 'center', color: 'var(--muted)' }}>No tracking records yet.</td>
-                                </tr>
-                              ) : (
-                                trackingList.map((t) => (
-                                  <tr key={t.id}>
-                                    <td><code>{t.id}</code></td>
-                                    <td>{t.student}</td>
-                                    <td>{t.phone}</td>
-                                    <td>{t.item}</td>
-                                    <td>
-                                      <span className={`badge ${t.status === 'Delivered' ? 'badge-green' : t.status === 'In Transit' ? 'badge-primary' : 'badge-accent'}`}>
-                                        {t.status}
-                                      </span>
-                                    </td>
-                                  </tr>
-                                ))
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* 5. STUDENTS DIRECTORY */}
-                    {activeTab === 'students' && (
-                      <div>
-                        <h3 style={{ marginBottom: 20 }}>Registered Students Directory</h3>
-                        <div className="admin-table-wrap">
-                          <table className="admin-table">
-                            <thead>
-                              <tr>
-                                <th>Student Name</th>
-                                <th>WhatsApp Number</th>
-                                <th>Grade</th>
-                                <th>Medium</th>
-                                <th>Role</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {studentsList.length === 0 ? (
-                                <tr>
-                                  <td colSpan="5" style={{ textCenter: 'center', color: 'var(--muted)' }}>No registered students yet.</td>
-                                </tr>
-                              ) : (
-                                studentsList.map((s) => (
-                                  <tr key={s.id}>
-                                    <td><strong>{s.name}</strong></td>
-                                    <td>{s.phone}</td>
-                                    <td>Grade {s.grade}</td>
-                                    <td><span className="badge badge-primary">{s.medium}</span></td>
-                                    <td><span className="badge badge-green">{s.role}</span></td>
-                                  </tr>
-                                ))
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    )}
-                  </>
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
             </div>
@@ -491,6 +347,7 @@ export default function AdminDashboardPage() {
       </main>
       <Footer />
       <FloatingWidgets />
+
       <style jsx>{`
         .admin-grid {
           display: grid;
@@ -519,38 +376,11 @@ export default function AdminDashboardPage() {
           border-color: var(--cobalt-ring);
           color: var(--cobalt-light);
         }
-        .admin-nav-item:focus-visible { outline: 2px solid var(--cobalt-light); outline-offset: 2px; }
-        
         .admin-content {
           background: var(--surface);
           border: 1px solid var(--rule);
           border-radius: var(--radius-xl);
           padding: 32px;
-        }
-        .admin-stats-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 20px;
-        }
-        .admin-stat-card {
-          background: var(--surface-2);
-          border: 1px solid var(--rule-light);
-          border-radius: var(--radius-lg);
-          padding: 24px;
-          text-align: center;
-        }
-        .admin-stat-val {
-          font-family: var(--font-mono);
-          font-size: 1.875rem;
-          font-weight: 600;
-          color: var(--paper);
-          margin-bottom: 4px;
-        }
-        .admin-stat-lbl {
-          font-size: 0.75rem;
-          color: var(--muted);
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
         }
         .admin-form-box {
           background: var(--surface-2);
