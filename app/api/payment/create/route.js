@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { generatePaymentHash, PAYHERE_MERCHANT_ID } from '@/utils/payhereSignature';
 import { CURRENCY, PAYHERE_DEFAULTS } from '@/utils/constants';

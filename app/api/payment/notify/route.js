@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { verifyNotifySignature } from '@/utils/payhereSignature';
 import { PAYMENT_STATUS } from '@/utils/constants';

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { hashPassword, signToken, setAuthCookie } from '@/lib/auth';
 import { db } from '@/lib/db';
