@@ -70,6 +70,7 @@ model StoreItem {
   imageUrl    String?
   stock       Int
   createdAt   DateTime @default(now())
+  orders      Order[]
 }
 
 model Result {
@@ -88,3 +89,17 @@ model Grade {
   name        String
   description String?
 }
+
+model Order {
+  id          String    @id @default(uuid())
+  studentName String
+  phone       String
+  storeItemId String?
+  storeItem   StoreItem? @relation(fields: [storeItemId], references: [id], onDelete: SetNull)
+  itemName    String
+  quantity    Int       @default(1)
+  totalPrice  Float
+  status      String    @default("Pending")
+  createdAt   DateTime  @default(now())
+}
+

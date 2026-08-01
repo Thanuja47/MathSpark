@@ -95,6 +95,12 @@ export default function AdminPage() {
   const [gradeMsg, setGradeMsg]             = useState('');
 
   /* ════════════════════════════════════════════════════
+     ORDERS STATE
+  ════════════════════════════════════════════════════ */
+  const [ordersList, setOrdersList] = useState([]);
+  const [orderMsg, setOrderMsg]     = useState('');
+
+  /* ════════════════════════════════════════════════════
      INITIAL DATA LOAD
   ════════════════════════════════════════════════════ */
   useEffect(() => {
@@ -104,7 +110,9 @@ export default function AdminPage() {
     fetch('/api/admin/store').then(r => r.json()).then(d => Array.isArray(d) && setStoreList(d)).catch(() => {});
     fetch('/api/admin/results').then(r => r.json()).then(d => Array.isArray(d) && setResultsList(d)).catch(() => {});
     fetch('/api/admin/grades').then(r => r.json()).then(d => Array.isArray(d) && setGradesList(d)).catch(() => {});
+    fetch('/api/admin/orders').then(r => r.json()).then(d => d?.orders && Array.isArray(d.orders) && setOrdersList(d.orders)).catch(() => {});
   }, []);
+
 
   /* ════════════════════════════════════════════════════
      COURSES CRUD
@@ -341,6 +349,30 @@ export default function AdminPage() {
   };
 
   /* ════════════════════════════════════════════════════
+     ORDERS CRUD
+  ════════════════════════════════════════════════════ */
+  const updateOrderStatus = async (id, newStatus) => {
+    try {
+      const res = await apiFetch(`/api/admin/orders/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!res.ok) throw new Error('Failed to update status');
+      setOrdersList(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
+      setOrderMsg('✅ Order status updated!');
+      setTimeout(() => setOrderMsg(''), 2000);
+    } catch (err) {
+      setOrderMsg(`❌ ${err.message}`);
+    }
+  };
+
+  const deleteOrder = async (id) => {
+    if (!confirm('Delete this order record?')) return;
+    await apiFetch(`/api/admin/orders/${id}`, { method: 'DELETE' });
+    setOrdersList(prev => prev.filter(o => o.id !== id));
+  };
+
+  /* ════════════════════════════════════════════════════
      NAV TABS CONFIG
   ════════════════════════════════════════════════════ */
   const tabs = [
@@ -348,9 +380,11 @@ export default function AdminPage() {
     { key: 'timetable', label: '📅 Timetable',  count: ttList.length },
     { key: 'exams',     label: '📝 MCQ Tests',  count: examList.length },
     { key: 'store',     label: '🛒 Store',      count: storeList.length },
+    { key: 'orders',    label: '📦 Orders',     count: ordersList.length },
     { key: 'results',   label: '🏆 Results',    count: resultsList.length },
     { key: 'grades',    label: '🎓 Grades',     count: gradesList.length },
   ];
+
 
   /* ════════════════════════════════════════════════════
      RENDER
@@ -639,7 +673,89 @@ export default function AdminPage() {
                   </div>
                 )}
 
+                {/* ── ORDERS TAB ── */}
+                {activeTab === 'orders' && (
+                  <div>
+                    <div className="tab-header">
+                      <h3>Store Orders Management</h3>
+                    </div>
+                    {orderMsg && <p className="form-msg" style={{ marginBottom: 16 }}>{orderMsg}</p>}
+                    <div className="admin-table-wrap">
+                      <table className="admin-table">
+                        <thead>
+                          <tr>
+                            <th>Student Name</th>
+                            <th>Phone</th>
+                            <th>Item</th>
+                            <th>Qty</th>
+                            <th>Total Price</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {ordersList.length === 0 && (
+                            <tr><td colSpan={8} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No orders placed yet.</td></tr>
+                          )}
+                          {ordersList.map(o => {
+                            const cleanPhone = o.phone ? o.phone.replace(/[^0-9]/g, '') : '';
+                            const formattedPhone = cleanPhone.startsWith('0') ? '94' + cleanPhone.slice(1) : cleanPhone;
+                            const waText = encodeURIComponent(`Hi ${o.studentName}, thanks for ordering ${o.itemName} (LKR ${Number(o.totalPrice).toLocaleString()}) from MathSpark! Please transfer to [Bank Details: Commercial Bank 123456789] and reply with your payment slip to confirm.`);
+                            const waUrl = `https://wa.me/${formattedPhone}?text=${waText}`;
+
+                            return (
+                              <tr key={o.id}>
+                                <td><strong>{o.studentName}</strong></td>
+                                <td><a href={`tel:${o.phone}`} style={{ color: 'var(--cobalt-light)' }}>{o.phone}</a></td>
+                                <td>{o.itemName}</td>
+                                <td>{o.quantity}</td>
+                                <td><strong>LKR {Number(o.totalPrice).toLocaleString()}</strong></td>
+                                <td>
+                                  <select
+                                    className="form-input"
+                                    style={{ padding: '4px 8px', fontSize: '0.8rem', width: 'auto' }}
+                                    value={o.status}
+                                    onChange={(e) => updateOrderStatus(o.id, e.target.value)}
+                                  >
+                                    <option value="Pending">Pending</option>
+                                    <option value="Contacted">Contacted</option>
+                                    <option value="Confirmed">Confirmed</option>
+                                    <option value="Delivered">Delivered</option>
+                                  </select>
+                                </td>
+                                <td><small style={{ color: 'var(--text-muted)' }}>{new Date(o.createdAt).toLocaleDateString()}</small></td>
+                                <td>
+                                  <div style={{ display: 'flex', gap: 6 }}>
+                                    <a
+                                      href={waUrl}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="btn btn-sm"
+                                      style={{ background: '#10B981', color: '#fff', fontSize: '0.75rem', textDecoration: 'none' }}
+                                    >
+                                      Contact on WhatsApp 💬
+                                    </a>
+                                    <button
+                                      className="btn btn-sm"
+                                      style={{ background: '#ef4444', color: '#fff' }}
+                                      onClick={() => deleteOrder(o.id)}
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
                 {/* ── RESULTS TAB ── */}
+
                 {activeTab === 'results' && (
                   <div>
                     <div className="tab-header">
