@@ -1,27 +1,27 @@
-import { supabase } from '@/lib/supabase';
-
+/**
+ * uploadImage(file) — uploads a File to Supabase Storage via our secure server route.
+ * Returns the public URL string, or throws on error.
+ *
+ * Usage:
+ *   import { uploadImage } from '@/utils/uploadImage';
+ *   const url = await uploadImage(file);
+ */
 export async function uploadImage(file) {
-  if (!file) return null;
+  if (!file) throw new Error('No file provided');
 
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
-  const filePath = `courses/${fileName}`;
+  const formData = new FormData();
+  formData.append('file', file);
 
-  const { data, error } = await supabase.storage
-    .from('mathspark-images')
-    .upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: false,
-    });
+  const res = await fetch('/api/admin/upload', {
+    method: 'POST',
+    body: formData,
+  });
 
-  if (error) {
-    console.error('Error uploading image to Supabase Storage:', error);
-    throw new Error('Image upload failed: ' + error.message);
+  const data = await res.json();
+
+  if (!res.ok || data.error) {
+    throw new Error(data.error || 'Image upload failed');
   }
 
-  const { data: publicUrlData } = supabase.storage
-    .from('mathspark-images')
-    .getPublicUrl(filePath);
-
-  return publicUrlData.publicUrl;
+  return data.url;
 }
