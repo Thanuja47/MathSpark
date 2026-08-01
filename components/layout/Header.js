@@ -16,7 +16,36 @@ export default function Header() {
   const [loginError, setLoginError]         = useState('');
   const [loading, setLoading]               = useState(false);
   const [expandedMobile, setExpandedMobile] = useState(null);
-  const headerRef = useRef(null);
+
+  // Auth state
+  const [user, setUser]               = useState(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+  const headerRef   = useRef(null);
+
+  // Check auth on mount
+  useEffect(() => {
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data?.user) setUser(data.user);
+      })
+      .catch(() => {})
+      .finally(() => setAuthChecked(true));
+  }, []);
+
+  // Close user menu on outside click
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const handle = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handle);
+    return () => document.removeEventListener('mousedown', handle);
+  }, [userMenuOpen]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -50,6 +79,7 @@ export default function Header() {
       if (!data.success) {
         setLoginError(data.error || 'Login failed. Please check your credentials.');
       } else {
+        setUser(data.user);
         closeLogin();
         window.location.href = data.user?.role === 'admin' ? '/admin' : '/my-account';
       }
@@ -58,6 +88,28 @@ export default function Header() {
       setLoginError('Server error. Please try again.');
     }
   };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/me', { method: 'POST', credentials: 'include' });
+    } catch {}
+    setUser(null);
+    setUserMenuOpen(false);
+    window.location.href = '/';
+  };
+
+  const getInitials = (name, phone) => {
+    if (name) {
+      const parts = name.trim().split(' ');
+      return parts.length >= 2
+        ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+        : parts[0].slice(0, 2).toUpperCase();
+    }
+    return phone ? phone.slice(-2) : '??';
+  };
+
+  const dashboardHref = user?.role === 'admin' ? '/admin' : '/my-account';
+  const displayName   = user?.name || user?.phone || '';
 
   return (
     <>
@@ -143,7 +195,7 @@ export default function Header() {
                         <div className="nav-dropdown-inner">
                           {link.dropdown.map((item) => (
                             <Link key={item.label} href={item.href} className="dropdown-item">
-                              {item.label}
+                              <span className="dropdown-item-text">{item.label}</span>
                             </Link>
                           ))}
                         </div>
@@ -156,6 +208,7 @@ export default function Header() {
 
             {/* Header Actions */}
             <div className="header-actions">
+              {/* Grades sidebar trigger */}
               <button
                 id="grades-sidebar-btn"
                 className="grades-icon-btn"
@@ -169,14 +222,71 @@ export default function Header() {
                 </svg>
                 <span className="grades-icon-label">Grades</span>
               </button>
-              <button
-                id="login-btn-header"
-                className="login-btn"
-                onClick={() => setLoginOpen(true)}
-              >
-                Login
-                <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-              </button>
+
+              {/* Separator */}
+              <span className="actions-separator" aria-hidden="true" />
+
+              {/* Auth: User menu OR Login button */}
+              {authChecked && (
+                user ? (
+                  /* ── Logged-in user menu ── */
+                  <div className="user-menu-wrap" ref={userMenuRef}>
+                    <button
+                      id="user-menu-btn"
+                      className="user-menu-btn"
+                      onClick={() => setUserMenuOpen(o => !o)}
+                      aria-expanded={userMenuOpen}
+                      aria-label="User menu"
+                    >
+                      <span className="user-avatar">{getInitials(user.name, user.phone)}</span>
+                      <span className="user-name-text">{displayName.split(' ')[0] || displayName}</span>
+                      <svg
+                        className={`nav-chevron${userMenuOpen ? ' open' : ''}`}
+                        width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"
+                      >
+                        <polyline points="6 9 12 15 18 9"/>
+                      </svg>
+                    </button>
+
+                    {userMenuOpen && (
+                      <div className="user-dropdown">
+                        <div className="user-dropdown-header">
+                          <span className="user-dropdown-name">{displayName}</span>
+                          <span className="user-dropdown-role">{user.role === 'admin' ? 'Administrator' : `Grade ${user.grade || ''} Student`}</span>
+                        </div>
+                        <div className="user-dropdown-divider" />
+                        <Link
+                          href={dashboardHref}
+                          className="user-dropdown-item"
+                          onClick={() => setUserMenuOpen(false)}
+                        >
+                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                          Dashboard
+                        </Link>
+                        <button
+                          className="user-dropdown-item user-dropdown-logout"
+                          onClick={handleLogout}
+                        >
+                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                          Logout
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* ── Logged-out Login button ── */
+                  <button
+                    id="login-btn-header"
+                    className="login-btn"
+                    onClick={() => setLoginOpen(true)}
+                  >
+                    Login
+                    <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </button>
+                )
+              )}
+
+              {/* Mobile hamburger */}
               <button
                 id="mobile-menu-btn"
                 className="mobile-menu-btn"
@@ -199,7 +309,7 @@ export default function Header() {
       {/* ── Overlay ── */}
       <div
         className={`overlay${(mobileOpen || loginOpen || sidebarOpen) ? ' active' : ''}`}
-        onClick={() => { closeMobile(); closeLogin(); setSidebarOpen(false); }}
+        onClick={() => { closeMobile(); closeLogin(); setSidebarOpen(false); setUserMenuOpen(false); }}
         aria-hidden="true"
       />
 
@@ -219,6 +329,17 @@ export default function Header() {
             <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
+
+        {/* Mobile user info strip (if logged in) */}
+        {user && (
+          <div className="mobile-user-strip">
+            <span className="user-avatar user-avatar-sm">{getInitials(user.name, user.phone)}</span>
+            <div>
+              <div className="mobile-user-name">{displayName}</div>
+              <div className="mobile-user-role">{user.role === 'admin' ? 'Administrator' : 'Student'}</div>
+            </div>
+          </div>
+        )}
 
         <div className="mobile-contact-bar">
           <a href={`tel:${SITE.phone}`} className="mobile-contact-link">
@@ -265,15 +386,36 @@ export default function Header() {
         </nav>
 
         <div className="mobile-menu-footer">
-          <button
-            id="mobile-login-btn"
-            className="login-btn"
-            style={{width:'100%', justifyContent:'center'}}
-            onClick={() => { closeMobile(); setLoginOpen(true); }}
-          >
-            Login to Your Account
-            <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-          </button>
+          {user ? (
+            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+              <Link
+                href={dashboardHref}
+                className="login-btn"
+                style={{ width:'100%', justifyContent:'center', textDecoration:'none' }}
+                onClick={closeMobile}
+              >
+                My Dashboard
+                <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </Link>
+              <button
+                className="logout-btn-mobile"
+                onClick={handleLogout}
+              >
+                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Logout
+              </button>
+            </div>
+          ) : (
+            <button
+              id="mobile-login-btn"
+              className="login-btn"
+              style={{ width:'100%', justifyContent:'center' }}
+              onClick={() => { closeMobile(); setLoginOpen(true); }}
+            >
+              Login to Your Account
+              <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          )}
         </div>
       </div>
 
@@ -315,7 +457,6 @@ export default function Header() {
             <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
 
-          {/* Modal Header */}
           <div className="modal-header">
             <div className="modal-logo-row">
               <div className="logo-mark" style={{width:32,height:32}}>
@@ -334,7 +475,6 @@ export default function Header() {
             </p>
           </div>
 
-          {/* Step indicator */}
           <div className="modal-steps">
             <div className={`modal-step${step >= 1 ? ' active' : ''}`}>
               <div className="modal-step-dot">{step > 1 ? '✓' : '1'}</div>
@@ -502,7 +642,7 @@ export default function Header() {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 24px;
+          gap: 32px;
           width: 100%;
         }
 
@@ -549,8 +689,8 @@ export default function Header() {
           display: flex;
           align-items: center;
           gap: 4px;
-          padding: 7px 11px;
-          font-size: 0.8438rem;
+          padding: 7px 12px;
+          font-size: 0.875rem;
           font-weight: 500;
           color: var(--muted);
           border-radius: var(--radius-sm);
@@ -580,7 +720,7 @@ export default function Header() {
 
         .nav-dropdown {
           position: absolute;
-          top: calc(100% + 6px);
+          top: calc(100% + 8px);
           left: 50%;
           transform: translateX(-50%);
           z-index: 200;
@@ -591,18 +731,28 @@ export default function Header() {
           border: 1px solid var(--rule);
           border-radius: var(--radius-md);
           padding: 6px;
-          min-width: 160px;
+          min-width: 180px;
           box-shadow: var(--shadow-lg);
         }
+
+        /* Fix: dropdown items — proper flex layout, no icon overlap */
         .dropdown-item {
-          display: block;
-          padding: 8px 12px;
-          font-size: 0.8438rem;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 14px;
+          font-size: 0.875rem;
           font-weight: 500;
           color: var(--text);
           border-radius: var(--radius-sm);
           transition: background 0.15s, color 0.15s;
           white-space: nowrap;
+          text-decoration: none;
+          line-height: 1.4;
+        }
+        .dropdown-item-text {
+          display: block;
+          line-height: 1;
         }
         .dropdown-item:hover {
           background: var(--cobalt-glow);
@@ -610,12 +760,26 @@ export default function Header() {
         }
 
         /* Header Actions */
-        .header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-shrink: 0;
+        }
+
+        /* Visual separator between Grades and Login */
+        .actions-separator {
+          display: block;
+          width: 1px;
+          height: 22px;
+          background: var(--rule);
+          flex-shrink: 0;
+        }
 
         .grades-icon-btn {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 7px;
           padding: 7px 14px;
           font-size: 0.8125rem;
           font-weight: 600;
@@ -659,6 +823,93 @@ export default function Header() {
         .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
         .login-btn .arrow { transition: transform 0.2s; }
         .login-btn:hover .arrow { transform: translateX(3px); }
+
+        /* ── User Menu ── */
+        .user-menu-wrap { position: relative; }
+
+        .user-menu-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 5px 12px 5px 5px;
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
+          border-radius: var(--radius-full);
+          cursor: pointer;
+          transition: var(--transition);
+          color: var(--text);
+          font-size: 0.875rem;
+          font-weight: 500;
+        }
+        .user-menu-btn:hover { border-color: var(--cobalt-ring); background: var(--cobalt-glow); color: var(--paper); }
+
+        .user-avatar {
+          width: 30px; height: 30px;
+          background: var(--cobalt);
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 0.7rem;
+          font-weight: 700;
+          color: white;
+          flex-shrink: 0;
+          letter-spacing: 0.02em;
+        }
+        .user-avatar-sm { width: 36px; height: 36px; font-size: 0.8rem; }
+        .user-name-text { font-weight: 600; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .user-dropdown {
+          position: absolute;
+          top: calc(100% + 10px);
+          right: 0;
+          min-width: 210px;
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
+          border-radius: var(--radius-md);
+          box-shadow: var(--shadow-lg);
+          overflow: hidden;
+          z-index: 200;
+          animation: fadeInUp 0.15s var(--ease-out);
+        }
+        .user-dropdown-header {
+          padding: 14px 16px 12px;
+        }
+        .user-dropdown-name {
+          display: block;
+          font-size: 0.9rem;
+          font-weight: 700;
+          color: var(--paper);
+          letter-spacing: -0.01em;
+        }
+        .user-dropdown-role {
+          display: block;
+          font-size: 0.75rem;
+          color: var(--muted);
+          margin-top: 2px;
+        }
+        .user-dropdown-divider {
+          height: 1px;
+          background: var(--rule);
+          margin: 0;
+        }
+        .user-dropdown-item {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+          padding: 11px 16px;
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: var(--text);
+          background: none;
+          border: none;
+          cursor: pointer;
+          text-decoration: none;
+          transition: background 0.15s, color 0.15s;
+          text-align: left;
+        }
+        .user-dropdown-item:hover { background: var(--cobalt-glow); color: var(--cobalt-light); }
+        .user-dropdown-logout { color: var(--muted); }
+        .user-dropdown-logout:hover { background: rgba(239,68,68,0.08); color: #f87171; }
 
         .mobile-menu-btn {
           display: none;
@@ -713,6 +964,19 @@ export default function Header() {
           border-bottom: 1px solid var(--rule);
           flex-shrink: 0;
         }
+
+        .mobile-user-strip {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 14px 20px;
+          background: var(--cobalt-glow);
+          border-bottom: 1px solid var(--cobalt-ring);
+          flex-shrink: 0;
+        }
+        .mobile-user-name { font-size: 0.9rem; font-weight: 700; color: var(--paper); }
+        .mobile-user-role { font-size: 0.75rem; color: var(--muted); margin-top: 1px; }
+
         .mobile-contact-bar {
           padding: 12px 20px;
           border-bottom: 1px solid var(--rule-light);
@@ -781,6 +1045,23 @@ export default function Header() {
           border-top: 1px solid var(--rule);
           flex-shrink: 0;
         }
+        .logout-btn-mobile {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          width: 100%;
+          padding: 10px;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: var(--muted);
+          background: none;
+          border: 1px solid var(--rule);
+          border-radius: var(--radius-sm);
+          cursor: pointer;
+          transition: var(--transition);
+        }
+        .logout-btn-mobile:hover { color: #f87171; border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.06); }
 
         /* ── Grades Sidebar ── */
         .grades-sidebar {
@@ -804,150 +1085,182 @@ export default function Header() {
           justify-content: space-between;
           padding: 20px;
           border-bottom: 1px solid var(--rule);
-          flex-shrink: 0;
         }
-        .grades-sidebar-body { padding: 12px; flex: 1; }
-
-        .grade-sidebar-item { margin-bottom: 4px; }
+        .grades-sidebar-body { padding: 12px; flex: 1; overflow-y: auto; }
+        .grade-sidebar-item { margin-bottom: 8px; }
         .grade-sidebar-label {
           display: flex;
           align-items: center;
           gap: 10px;
           padding: 10px 12px;
-          border-radius: var(--radius-md);
+          border-radius: var(--radius-sm);
+          color: var(--text);
           font-weight: 600;
           font-size: 0.9rem;
-          color: var(--text);
-          transition: background 0.15s, color 0.15s;
+          transition: var(--transition);
           text-decoration: none;
         }
         .grade-sidebar-label:hover { background: var(--cobalt-glow); color: var(--cobalt-light); }
-        .grade-sidebar-label:focus-visible { outline: 2px solid var(--cobalt-light); outline-offset: -2px; }
-
         .grade-sidebar-badge {
           width: 28px; height: 28px;
-          background: var(--cobalt);
-          border-radius: var(--radius-sm);
           display: flex; align-items: center; justify-content: center;
+          background: var(--cobalt);
+          color: white;
+          border-radius: var(--radius-sm);
           font-size: 0.75rem;
           font-weight: 700;
-          color: white;
           flex-shrink: 0;
-          font-family: var(--font-mono);
         }
         .grade-sidebar-subjects {
           display: flex;
           flex-wrap: wrap;
           gap: 5px;
-          padding: 4px 12px 10px 50px;
+          padding: 4px 12px 8px 50px;
         }
         .grade-sidebar-sub {
           font-size: 0.75rem;
           color: var(--muted);
-          padding: 4px 10px;
+          padding: 3px 10px;
           background: var(--surface-2);
           border: 1px solid var(--rule);
           border-radius: var(--radius-full);
           transition: var(--transition);
           text-decoration: none;
         }
-        .grade-sidebar-sub:hover { color: var(--cobalt-light); background: var(--cobalt-glow); border-color: var(--cobalt-ring); }
+        .grade-sidebar-sub:hover { background: var(--cobalt-glow); color: var(--cobalt-light); border-color: var(--cobalt-ring); }
+
+        /* ── Overlay ── */
+        .overlay {
+          position: fixed; inset: 0;
+          background: rgba(0,0,0,0.5);
+          z-index: 900;
+          opacity: 0; pointer-events: none;
+          transition: opacity 0.3s var(--ease);
+          backdrop-filter: blur(2px);
+        }
+        .overlay.active { opacity: 1; pointer-events: auto; }
 
         /* ── Login Modal ── */
-        .modal-header { margin-bottom: 22px; }
-        .modal-logo-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-        .modal-title {
-          font-size: 1.25rem;
-          font-weight: 700;
-          color: var(--paper);
-          letter-spacing: -0.02em;
-          margin-bottom: 4px;
-        }
-        .modal-subtitle { font-size: 0.8438rem; color: var(--muted); line-height: 1.5; }
-
-        .modal-steps {
-          display: flex;
-          align-items: center;
-          gap: 0;
-          margin-bottom: 22px;
-        }
-        .modal-step {
-          display: flex;
-          align-items: center;
-          gap: 7px;
-          opacity: 0.4;
-          transition: opacity 0.2s;
-        }
-        .modal-step.active { opacity: 1; }
-        .modal-step-dot {
-          width: 24px; height: 24px;
-          border-radius: 50%;
-          background: var(--surface-2);
-          border: 1.5px solid var(--rule);
+        .modal {
+          position: fixed; inset: 0;
+          z-index: 1100;
           display: flex; align-items: center; justify-content: center;
-          font-size: 0.7rem;
-          font-weight: 700;
-          font-family: var(--font-mono);
+          padding: 20px;
+          opacity: 0; pointer-events: none;
+          transition: opacity 0.25s var(--ease);
+        }
+        .modal.active { opacity: 1; pointer-events: auto; }
+
+        .modal-box {
+          background: var(--surface);
+          border: 1px solid var(--rule);
+          border-radius: var(--radius-lg);
+          padding: 32px;
+          width: 100%;
+          max-width: 420px;
+          position: relative;
+          box-shadow: var(--shadow-xl);
+          animation: fadeInUp 0.25s var(--ease-out);
+        }
+        .modal-close {
+          position: absolute; top: 16px; right: 16px;
+          display: flex; align-items: center; justify-content: center;
+          width: 28px; height: 28px;
           color: var(--muted);
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
+          border-radius: var(--radius-sm);
+          cursor: pointer;
           transition: var(--transition);
         }
-        .modal-step.active .modal-step-dot {
-          background: var(--cobalt);
-          border-color: var(--cobalt);
-          color: white;
+        .modal-close:hover { color: var(--paper); background: var(--rule); }
+
+        .modal-header { margin-bottom: 24px; }
+        .modal-logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .modal-title { font-size: 1.375rem; font-weight: 800; color: var(--paper); letter-spacing: -0.02em; margin-bottom: 6px; }
+        .modal-subtitle { font-size: 0.875rem; color: var(--muted); }
+
+        .modal-steps {
+          display: flex; align-items: center; gap: 8px;
+          margin-bottom: 24px;
         }
-        .modal-step span { font-size: 0.78rem; font-weight: 600; color: var(--muted); }
-        .modal-step.active span { color: var(--text); }
-        .modal-step-line {
-          flex: 1;
-          height: 1px;
-          background: var(--rule);
-          margin: 0 10px;
-          transition: background 0.2s;
+        .modal-step { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--muted); }
+        .modal-step.active { color: var(--cobalt-light); }
+        .modal-step-dot {
+          width: 22px; height: 22px;
+          border-radius: 50%;
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
+          display: flex; align-items: center; justify-content: center;
+          font-size: 0.72rem; font-weight: 700;
         }
+        .modal-step.active .modal-step-dot { background: var(--cobalt); border-color: var(--cobalt); color: white; }
+        .modal-step-line { flex: 1; height: 1px; background: var(--rule); }
         .modal-step-line.active { background: var(--cobalt); }
 
-        /* Spinner */
+        .login-error {
+          display: flex; align-items: flex-start; gap: 8px;
+          padding: 10px 14px;
+          background: rgba(239,68,68,0.08);
+          border: 1px solid rgba(239,68,68,0.2);
+          border-radius: var(--radius-sm);
+          font-size: 0.8125rem;
+          color: #f87171;
+          margin-bottom: 18px;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        .form-label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--text); margin-bottom: 7px; letter-spacing: 0.01em; }
+        .form-input {
+          width: 100%; padding: 10px 14px;
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
+          border-radius: var(--radius-sm);
+          color: var(--paper); font-size: 0.9375rem;
+          font-family: var(--font-body);
+          transition: border-color 0.2s, box-shadow 0.2s;
+          outline: none;
+          box-sizing: border-box;
+        }
+        .form-input:focus { border-color: var(--cobalt-ring); box-shadow: 0 0 0 3px var(--cobalt-glow); }
+        .form-input::placeholder { color: var(--muted); }
+
+        .modal-back-btn {
+          display: block; width: 100%; margin-top: 12px;
+          font-size: 0.8125rem; color: var(--muted);
+          background: none; border: none; cursor: pointer;
+          text-align: center; transition: color 0.2s;
+        }
+        .modal-back-btn:hover { color: var(--paper); }
+        .modal-footer-text { margin-top: 20px; text-align: center; font-size: 0.8125rem; color: var(--muted); }
+
         .spinner {
-          width: 14px; height: 14px;
+          display: inline-block; width: 12px; height: 12px;
           border: 2px solid rgba(255,255,255,0.3);
           border-top-color: white;
           border-radius: 50%;
           animation: spin 0.7s linear infinite;
-          display: inline-block;
         }
 
-        .modal-back-btn {
-          display: block;
-          margin: 14px auto 0;
-          font-size: 0.8125rem;
-          color: var(--muted);
-          background: none;
-          border: none;
-          cursor: pointer;
-          transition: color 0.2s;
-          padding: 4px;
-        }
-        .modal-back-btn:hover { color: var(--cobalt-light); }
-
-        .modal-footer-text {
-          text-align: center;
-          margin-top: 22px;
-          font-size: 0.8438rem;
-          color: var(--muted);
-        }
-
-        /* ── Responsive ── */
-        @media (max-width: 1024px) {
+        /* Responsive */
+        @media (max-width: 900px) {
           .desktop-nav { display: none; }
+          .grades-icon-btn { display: none; }
+          .actions-separator { display: none; }
           .mobile-menu-btn { display: flex; }
-          .header-topbar-left { display: none; }
-          .grades-btn { display: none; }
+          .user-name-text { display: none; }
         }
-        @media (max-width: 600px) {
-          .header-topbar { display: none; }
-          .main-header { top: 0; }
-          .topbar-badge { display: none; }
+
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        @keyframes pulse-glow {
+          0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+          50%       { opacity: 0.7; box-shadow: 0 0 0 4px rgba(16,185,129,0); }
         }
       `}</style>
     </>

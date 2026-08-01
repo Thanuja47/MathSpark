@@ -15,17 +15,18 @@ export async function GET(request) {
   }
   return NextResponse.json({
     user: {
-      id: student.id,
-      name: student.name,
-      phone: student.phone,
-      grade: student.grade,
-      medium: student.medium,
+      id:              student.id,
+      name:            student.name,
+      phone:           student.phone,
+      grade:           student.grade,
+      medium:          student.medium,
+      role:            student.role,
       enrolledCourses: student.enrolledCourses,
     },
   });
 }
 
-// POST /api/auth/me/logout — clear cookie
+// POST /api/auth/me — logout (clear cookie)
 export async function POST() {
   const response = NextResponse.json({ success: true, message: 'Logged out.' });
   response.headers.set('Set-Cookie', clearAuthCookie());
