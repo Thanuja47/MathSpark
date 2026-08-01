@@ -5,7 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 
-const QUIZZES = [
+const STATIC_QUIZZES = [
   {
     id: 1, grade: 10, title: 'Algebra — Speed Test 01', duration: 600,
     medium: 'Sinhala', badge: 'Monthly Test',
@@ -63,6 +63,7 @@ function formatTime(s) {
 }
 
 export default function ExamsPage() {
+  const [quizzes, setQuizzes] = useState(STATIC_QUIZZES);
   const [view, setView] = useState('list'); // list | quiz | result
   const [selected, setSelected] = useState(null);
   const [current, setCurrent] = useState(0);
@@ -70,8 +71,59 @@ export default function ExamsPage() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [showExplain, setShowExplain] = useState(false);
   const [gradeFilter, setGradeFilter] = useState('all');
+  const [user, setUser] = useState(null);
 
-  const endQuiz = useCallback(() => setView('result'), []);
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => { if (data.user) setUser(data.user); })
+      .catch(() => {});
+
+    fetch('/api/exams')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          const formatted = data.map(e => ({
+            id: e.id,
+            grade: e.grade,
+            title: e.title,
+            duration: e.duration * 60,
+            medium: 'Sinhala',
+            badge: 'Online Exam',
+            questions: typeof e.questions === 'string' ? JSON.parse(e.questions) : e.questions
+          }));
+          setQuizzes([...formatted, ...STATIC_QUIZZES]);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const saveResultToDB = useCallback(async (finalScore, totalQuestions, quizTitle, grade) => {
+    const calculatedScore = Math.round((finalScore / totalQuestions) * 100);
+    try {
+      await fetch('/api/results', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentName: user ? user.name : 'MathSpark Student',
+          grade: Number(grade),
+          subject: quizTitle,
+          score: calculatedScore,
+          year: 2026,
+        }),
+      });
+    } catch (e) {
+      console.error('Failed to save score', e);
+    }
+  }, [user]);
+
+  const endQuiz = useCallback(() => {
+    setView('result');
+    if (selected) {
+      const finalScore = answers.filter((a, i) => a === selected.questions[i]?.answer).length;
+      saveResultToDB(finalScore, selected.questions.length, selected.title, selected.grade);
+    }
+  }, [selected, answers, saveResultToDB]);
 
   useEffect(() => {
     if (view !== 'quiz') return;
@@ -99,13 +151,15 @@ export default function ExamsPage() {
         setCurrent(c => c + 1);
       } else {
         setView('result');
+        const finalScore = newAnswers.filter((a, i) => a === selected.questions[i]?.answer).length;
+        saveResultToDB(finalScore, selected.questions.length, selected.title, selected.grade);
       }
     }, 1800);
   };
 
   const score = selected ? answers.filter((a, i) => a === selected.questions[i]?.answer).length : 0;
   const pct = selected ? Math.round((score / selected.questions.length) * 100) : 0;
-  const filtered = gradeFilter === 'all' ? QUIZZES : QUIZZES.filter(q => q.grade === parseInt(gradeFilter));
+  const filtered = gradeFilter === 'all' ? quizzes : quizzes.filter(q => q.grade === parseInt(gradeFilter));
 
   return (
     <>
@@ -133,15 +187,15 @@ export default function ExamsPage() {
                 </div>
 
                 <div className="grid grid-3">
-                  {filtered.map(quiz => (
-                    <div key={quiz.id} className="quiz-card">
+                  {filtered.map((quiz, idx) => (
+                    <div key={quiz.id || idx} className="quiz-card">
                       <div className="quiz-card-top">
                         <span className="badge badge-accent">{quiz.badge}</span>
                         <span className="badge badge-primary">Grade {quiz.grade}</span>
                       </div>
                       <h3 className="quiz-card-title">{quiz.title}</h3>
                       <div className="quiz-meta">
-                        <span>📝 {quiz.questions.length} Questions</span>
+                        <span>📝 {quiz.questions ? quiz.questions.length : 0} Questions</span>
                         <span>⏱️ {Math.floor(quiz.duration / 60)} min</span>
                         <span>🌐 {quiz.medium}</span>
                       </div>
@@ -225,6 +279,10 @@ export default function ExamsPage() {
                   {pct}%
                 </div>
 
+                <p style={{ fontSize: '0.85rem', color: '#00C896', marginBottom: 20 }}>
+                  ✅ Your exam score has been automatically saved to your student record and the Results Hall of Fame!
+                </p>
+
                 {/* Answer Review */}
                 <div className="result-review">
                   {selected.questions.map((q, i) => (
@@ -242,7 +300,7 @@ export default function ExamsPage() {
                 <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginTop: 32 }}>
                   <button className="btn btn-primary btn-lg" onClick={() => startQuiz(selected)}>Retry Test 🔄</button>
                   <button className="btn btn-outline btn-lg" onClick={() => setView('list')}>← All Tests</button>
-                  <Link href="/courses" className="btn btn-accent btn-lg">Enroll in Class →</Link>
+                  <Link href="/results" className="btn btn-accent btn-lg">View Hall of Fame →</Link>
                 </div>
               </div>
             </div>
