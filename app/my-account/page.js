@@ -9,6 +9,7 @@ export default function MyAccountPage() {
   const [activeTab, setActiveTab] = useState('courses');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [activeVideo, setActiveVideo] = useState(null); // video modal stream
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -28,6 +29,12 @@ export default function MyAccountPage() {
   };
 
   const enrolledCourses = COURSES.slice(0, 2);
+
+  const recordings = [
+    { title: 'Lesson 14: Quadratic Equations & Formula Proofs', date: 'July 18, 2026', duration: '1h 45m', views: '230 watching', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+    { title: 'Lesson 13: Linear Graphs & Intercept Analysis', date: 'July 11, 2026', duration: '2h 00m', views: '410 watching', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+    { title: 'Lesson 12: Algebraic Expressions & Expansion', date: 'July 04, 2026', duration: '1h 50m', views: '520 watching', videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
+  ];
 
   return (
     <>
@@ -64,7 +71,7 @@ export default function MyAccountPage() {
                   className={`dashboard-nav-item ${activeTab === 'recordings' ? 'active' : ''}`}
                   onClick={() => setActiveTab('recordings')}
                 >
-                  📹 Lesson Recordings
+                  📹 Lesson Recordings ({recordings.length})
                 </button>
                 <button
                   className={`dashboard-nav-item ${activeTab === 'tutes' ? 'active' : ''}`}
@@ -103,9 +110,14 @@ export default function MyAccountPage() {
                             <p className="text-muted text-xs" style={{ marginTop: 4 }}>Schedule: {course.schedule}</p>
                           </div>
                           <div className="enrolled-actions">
-                            <button className="btn btn-primary btn-sm">
+                            <a
+                              href="https://zoom.us"
+                              target="_blank"
+                              rel="noreferrer"
+                              className="btn btn-primary btn-sm"
+                            >
                               🔴 Join Live Room
-                            </button>
+                            </a>
                             <button className="btn btn-outline btn-sm" onClick={() => setActiveTab('recordings')}>
                               View Recordings
                             </button>
@@ -120,11 +132,7 @@ export default function MyAccountPage() {
                   <div>
                     <h3 style={{ marginBottom: 20 }}>Lesson Recordings Archive</h3>
                     <div className="recordings-list">
-                      {[
-                        { title: 'Lesson 14: Quadratic Equations & Formula Proofs', date: 'July 18, 2026', duration: '1h 45m', views: '230 watching' },
-                        { title: 'Lesson 13: Linear Graphs & Intercept Analysis', date: 'July 11, 2026', duration: '2h 00m', views: '410 watching' },
-                        { title: 'Lesson 12: Algebraic Expressions & Expansion', date: 'July 04, 2026', duration: '1h 50m', views: '520 watching' },
-                      ].map((rec, i) => (
+                      {recordings.map((rec, i) => (
                         <div key={i} className="recording-card">
                           <div className="rec-icon">▶</div>
                           <div style={{ flex: 1 }}>
@@ -135,7 +143,12 @@ export default function MyAccountPage() {
                               <span>👁 {rec.views}</span>
                             </div>
                           </div>
-                          <button className="btn btn-secondary btn-sm">Watch Video</button>
+                          <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => setActiveVideo(rec)}
+                          >
+                            Watch Video 🎬
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -203,6 +216,32 @@ export default function MyAccountPage() {
             </div>
           </div>
         </section>
+
+        {/* Video Player Modal */}
+        {activeVideo && (
+          <div style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 20
+          }}>
+            <div style={{
+              background: 'var(--surface)', border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-xl)', padding: 24, maxWidth: 800, width: '100%'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <h4 style={{ fontSize: '1.1rem' }}>{activeVideo.title}</h4>
+                <button className="btn btn-ghost btn-sm" onClick={() => setActiveVideo(null)}>✕ Close</button>
+              </div>
+              <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, borderRadius: 12, overflow: 'hidden', background: '#000' }}>
+                <iframe
+                  src={activeVideo.videoUrl}
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />
