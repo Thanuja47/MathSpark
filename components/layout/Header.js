@@ -158,12 +158,16 @@ export default function Header() {
             <div className="header-actions">
               <button
                 id="grades-sidebar-btn"
-                className="grades-btn"
+                className="grades-icon-btn"
                 onClick={() => setSidebarOpen(true)}
                 aria-label="Browse by Grade"
+                title="Browse by Grade"
               >
-                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
-                Grades
+                <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                  <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                <span className="grades-icon-label">Grades</span>
               </button>
               <button
                 id="login-btn-header"
@@ -608,13 +612,13 @@ export default function Header() {
         /* Header Actions */
         .header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
-        .grades-btn {
+        .grades-icon-btn {
           display: flex;
           align-items: center;
           gap: 6px;
           padding: 7px 14px;
-          font-size: 0.8438rem;
-          font-weight: 500;
+          font-size: 0.8125rem;
+          font-weight: 600;
           color: var(--text);
           background: var(--surface-2);
           border: 1px solid var(--rule);
@@ -622,9 +626,11 @@ export default function Header() {
           cursor: pointer;
           transition: var(--transition);
           white-space: nowrap;
+          letter-spacing: -0.01em;
         }
-        .grades-btn:hover { color: var(--paper); border-color: var(--cobalt-ring); background: var(--cobalt-glow); }
-        .grades-btn:focus-visible { outline: 2px solid var(--cobalt-light); outline-offset: 2px; }
+        .grades-icon-btn:hover { color: var(--cobalt-light); border-color: var(--cobalt-ring); background: var(--cobalt-glow); }
+        .grades-icon-btn:focus-visible { outline: 2px solid var(--cobalt-light); outline-offset: 2px; }
+        .grades-icon-label { font-size: 0.8125rem; font-weight: 600; }
 
         .login-btn {
           display: inline-flex;

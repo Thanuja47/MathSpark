@@ -144,18 +144,18 @@ export default function HeroSection() {
                 </div>
               </div>
 
-              {/* Precise tech support floating chips */}
-              <div className="precise-chip chip-1">
-                <span className="chip-accent">📚</span>
-                <span className="mono">PDF Tutes</span>
+              {/* Feature badges — deliberate glassmorphic design */}
+              <div className="feature-badge badge-top-left">
+                <span className="badge-icon">📚</span>
+                <span className="badge-text">PDF Tutes</span>
               </div>
-              <div className="precise-chip chip-2">
-                <span className="chip-accent">💻</span>
-                <span className="mono">Zoom Class</span>
+              <div className="feature-badge badge-top-right">
+                <span className="badge-icon">💻</span>
+                <span className="badge-text">Live Zoom</span>
               </div>
-              <div className="precise-chip chip-3">
-                <span className="chip-accent">✍️</span>
-                <span className="mono">OL/AL Syllabus</span>
+              <div className="feature-badge badge-bottom-left">
+                <span className="badge-icon">✅</span>
+                <span className="badge-text">O/L · A/L Syllabus</span>
               </div>
 
             </div>
@@ -410,26 +410,36 @@ export default function HeroSection() {
         }
 
         /* Float Chips */
-        .precise-chip {
+        /* ── Feature Badges (glassmorphic) ── */
+        .feature-badge {
           position: absolute;
-          background: rgba(20, 23, 32, 0.95);
-          border: 1px solid var(--rule);
-          border-radius: var(--radius-md);
-          padding: 8px 12px;
           display: flex;
           align-items: center;
-          gap: 8px;
+          gap: 7px;
+          padding: 7px 14px;
+          background: rgba(15, 18, 28, 0.75);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 999px;
           font-size: 0.78rem;
+          font-weight: 600;
           color: var(--paper);
-          box-shadow: var(--shadow-md);
           white-space: nowrap;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+          letter-spacing: 0.01em;
+          animation: badgeFloat 4s ease-in-out infinite;
+          z-index: 2;
         }
-        .chip-accent {
-          font-size: 0.9rem;
+        .badge-icon { font-size: 0.95rem; line-height: 1; }
+        .badge-text { font-size: 0.77rem; font-weight: 600; opacity: 0.92; }
+        .badge-top-left    { top: -18px;    left: 12px;   animation-delay: 0s;   }
+        .badge-top-right   { top: -18px;    right: 12px;  animation-delay: 1.4s; }
+        .badge-bottom-left { bottom: -18px; left: 12px;   animation-delay: 2.8s; }
+        @keyframes badgeFloat {
+          0%, 100% { transform: translateY(0px); }
+          50%       { transform: translateY(-5px); }
         }
-        .chip-1 { top: -20px; right: -16px; }
-        .chip-2 { bottom: 80px; left: -24px; }
-        .chip-3 { bottom: -20px; right: 24px; }
 
         @media (max-width: 960px) {
           .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 40px; }
@@ -443,7 +453,7 @@ export default function HeroSection() {
         @media (max-width: 480px) {
           .hero { padding: 80px 0 60px; }
           .hero-ctas .btn { width: 100%; justify-content: center; }
-          .precise-chip { display: none; }
+          .feature-badge { display: none; }
         }
       `}</style>
     </section>
