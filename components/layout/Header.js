@@ -113,285 +113,163 @@ export default function Header() {
 
   return (
     <>
-      {/* ── Top Info Bar ── */}
-      <div className="header-topbar">
-        <div className="container">
-          <div className="header-topbar-inner">
-            <div className="header-topbar-left">
-              <a href={`tel:${SITE.phone}`} className="topbar-link">
-                <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-                {SITE.phone}
-              </a>
-              <a href={`mailto:${SITE.email}`} className="topbar-link">
-                <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                {SITE.email}
-              </a>
-            </div>
-            <div className="header-topbar-right">
-              <span className="topbar-badge">
-                <span className="topbar-badge-dot" />
-                2026 Syllabus Classes Live
-              </span>
-              <div className="topbar-social">
-                <a href={SITE.facebook}  target="_blank" rel="noreferrer" aria-label="Facebook"  className="topbar-social-link">
-                  <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
-                </a>
-                <a href={SITE.youtube}   target="_blank" rel="noreferrer" aria-label="YouTube"   className="topbar-social-link">
-                  <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 00-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 001.46 6.42 29 29 0 001 12a29 29 0 00.46 5.58 2.78 2.78 0 001.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 001.95-1.96A29 29 0 0023 12a29 29 0 00-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="white"/></svg>
-                </a>
-                <a href={SITE.instagram} target="_blank" rel="noreferrer" aria-label="Instagram" className="topbar-social-link">
-                  <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── Main Header ── */}
+      {/* ── Single Unified Header ── */}
       <header ref={headerRef} className={`main-header${scrolled ? ' scrolled' : ''}`}>
-        <div className="container">
-          <div className="header-inner">
+        <div className="header-inner">
 
-            {/* Logo */}
-            <Link href="/" className="header-logo">
-              <div className="logo-mark">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-              </div>
-              <div className="logo-text">
-                <span className="logo-name">MathSpark</span>
-                <span className="logo-sub">Online Tuition</span>
-              </div>
-            </Link>
-
-            {/* Desktop Nav */}
-            <nav className="desktop-nav" aria-label="Main navigation">
-              <ul className="nav-list">
-                {NAV_LINKS.map((link) => (
-                  <li
-                    key={link.label}
-                    className={`nav-item${link.dropdown ? ' has-dropdown' : ''}`}
-                    onMouseEnter={() => link.dropdown && setActiveDropdown(link.label)}
-                    onMouseLeave={() => setActiveDropdown(null)}
-                  >
-                    <Link
-                      href={link.href}
-                      className="nav-link"
-                      target={link.external ? '_blank' : undefined}
-                      rel={link.external ? 'noreferrer' : undefined}
-                    >
-                      {/* ap.lk style gradient SVG icons */}
-                      {link.icon === 'home' && (
-                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
-                          <defs>
-                            <linearGradient id="grad-home" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#38bdf8" />
-                              <stop offset="100%" stopColor="#2563eb" />
-                            </linearGradient>
-                          </defs>
-                          <path fill="url(#grad-home)" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                        </svg>
-                      )}
-                      {link.icon === 'classes' && (
-                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
-                          <defs>
-                            <linearGradient id="grad-classes" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#fbbf24" />
-                              <stop offset="100%" stopColor="#d97706" />
-                            </linearGradient>
-                          </defs>
-                          <path fill="url(#grad-classes)" d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
-                        </svg>
-                      )}
-                      {link.icon === 'timetable' && (
-                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
-                          <defs>
-                            <linearGradient id="grad-tt" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#a78bfa" />
-                              <stop offset="100%" stopColor="#7c3aed" />
-                            </linearGradient>
-                          </defs>
-                          <path fill="url(#grad-tt)" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm-7-9h5v5h-5z"/>
-                        </svg>
-                      )}
-                      {link.icon === 'exams' && (
-                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
-                          <defs>
-                            <linearGradient id="grad-exams" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#f472b6" />
-                              <stop offset="100%" stopColor="#db2777" />
-                            </linearGradient>
-                          </defs>
-                          <path fill="url(#grad-exams)" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                        </svg>
-                      )}
-                      {link.icon === 'store' && (
-                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
-                          <defs>
-                            <linearGradient id="grad-store" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#34d399" />
-                              <stop offset="100%" stopColor="#059669" />
-                            </linearGradient>
-                          </defs>
-                          <path fill="url(#grad-store)" d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h6v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/>
-                        </svg>
-                      )}
-                      {link.icon === 'results' && (
-                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
-                          <defs>
-                            <linearGradient id="grad-results" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#fbbf24" />
-                              <stop offset="100%" stopColor="#ea580c" />
-                            </linearGradient>
-                          </defs>
-                          <path fill="url(#grad-results)" d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V18H8v2h8v-2h-3v-2.1c2.12-.41 3.73-2.07 3.96-4.16C19.33 11.4 21 9.38 21 7V6c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
-                        </svg>
-                      )}
-                      {link.icon === 'tracking' && (
-                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
-                          <defs>
-                            <linearGradient id="grad-tracking" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#60a5fa" />
-                              <stop offset="100%" stopColor="#1d4ed8" />
-                            </linearGradient>
-                          </defs>
-                          <path fill="url(#grad-tracking)" d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-3.5H18V9.5h2.47L22.25 12h-2.75v3zm-1.5 3.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
-                        </svg>
-                      )}
-                      {link.icon === 'contact' && (
-                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
-                          <defs>
-                            <linearGradient id="grad-contact" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#f87171" />
-                              <stop offset="100%" stopColor="#dc2626" />
-                            </linearGradient>
-                          </defs>
-                          <path fill="url(#grad-contact)" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                        </svg>
-                      )}
-                      <span className="nav-label">{link.label}</span>
-                      {link.dropdown && (
-                        <svg
-                          className={`nav-chevron${activeDropdown === link.label ? ' open' : ''}`}
-                          width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"
-                        >
-                          <polyline points="6 9 12 15 18 9"/>
-                        </svg>
-                      )}
-                    </Link>
-                    {link.dropdown && activeDropdown === link.label && (
-                      <div className="nav-dropdown">
-                        <div className="nav-dropdown-inner">
-                          {link.dropdown.map((item) => (
-                            <Link key={item.label} href={item.href} className="dropdown-item">
-                              <span className="dropdown-item-text">{item.label}</span>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </nav>
-
-            {/* Header Actions */}
-            <div className="header-actions">
-              {/* Grades sidebar trigger */}
-              <button
-                id="grades-sidebar-btn"
-                className="grades-icon-btn"
-                onClick={() => setSidebarOpen(true)}
-                aria-label="Browse by Grade"
-                title="Browse by Grade"
-              >
-                <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                  <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-                </svg>
-                <span className="grades-icon-label">Grades</span>
-              </button>
-
-              {/* Separator */}
-              <span className="actions-separator" aria-hidden="true" />
-
-              {/* Auth: User menu OR Login button */}
-              {authChecked && (
-                user ? (
-                  /* ── Logged-in user menu ── */
-                  <div className="user-menu-wrap" ref={userMenuRef}>
-                    <button
-                      id="user-menu-btn"
-                      className="user-menu-btn"
-                      onClick={() => setUserMenuOpen(o => !o)}
-                      aria-expanded={userMenuOpen}
-                      aria-label="User menu"
-                    >
-                      <span className="user-avatar">{getInitials(user.name, user.phone)}</span>
-                      <span className="user-name-text">{displayName.split(' ')[0] || displayName}</span>
-                      <svg
-                        className={`nav-chevron${userMenuOpen ? ' open' : ''}`}
-                        width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"
-                      >
-                        <polyline points="6 9 12 15 18 9"/>
-                      </svg>
-                    </button>
-
-                    {userMenuOpen && (
-                      <div className="user-dropdown">
-                        <div className="user-dropdown-header">
-                          <span className="user-dropdown-name">{displayName}</span>
-                          <span className="user-dropdown-role">{user.role === 'admin' ? 'Administrator' : `Grade ${user.grade || ''} Student`}</span>
-                        </div>
-                        <div className="user-dropdown-divider" />
-                        <Link
-                          href={dashboardHref}
-                          className="user-dropdown-item"
-                          onClick={() => setUserMenuOpen(false)}
-                        >
-                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                          Dashboard
-                        </Link>
-                        <button
-                          className="user-dropdown-item user-dropdown-logout"
-                          onClick={handleLogout}
-                        >
-                          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                          Logout
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  /* ── Logged-out Login button ── */
-                  <button
-                    id="login-btn-header"
-                    className="login-btn"
-                    onClick={() => setLoginOpen(true)}
-                  >
-                    Login
-                    <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                  </button>
-                )
-              )}
-
-              {/* Mobile hamburger */}
-              <button
-                id="mobile-menu-btn"
-                className="mobile-menu-btn"
-                onClick={() => setMobileOpen(true)}
-                aria-label="Open menu"
-                aria-expanded={mobileOpen}
-              >
-                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <line x1="3" y1="6"  x2="21" y2="6"/>
-                  <line x1="3" y1="12" x2="21" y2="12"/>
-                  <line x1="3" y1="18" x2="21" y2="18"/>
-                </svg>
-              </button>
+          {/* Logo — gem mark + MathSpark */}
+          <Link href="/" className="header-logo">
+            <div className="logo-gem">
+              {/* Red/orange faceted gem "M" icon */}
+              <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
+                <polygon points="18,2 34,10 34,26 18,34 2,26 2,10" fill="url(#gem-grad)" />
+                <polygon points="18,2 34,10 18,18" fill="rgba(255,255,255,0.18)" />
+                <polygon points="2,10 18,18 18,34 2,26" fill="rgba(0,0,0,0.18)" />
+                <text x="18" y="23" textAnchor="middle" fill="white" fontSize="14" fontWeight="900" fontFamily="Arial,sans-serif">M</text>
+                <defs>
+                  <linearGradient id="gem-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#ff6b35"/>
+                    <stop offset="50%" stopColor="#f7c948"/>
+                    <stop offset="100%" stopColor="#e53e3e"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              {/* Sparkle stars */}
+              <svg className="gem-stars" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <text x="0" y="12" fontSize="10" fill="#f7c948">✦</text>
+                <text x="8" y="6" fontSize="6" fill="#fbbf24">✦</text>
+              </svg>
             </div>
+            <span className="logo-name">MathSpark</span>
+          </Link>
 
+          {/* ── Floating pill nav container ── */}
+          <nav className="pill-nav-container" aria-label="Main navigation">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="pill-nav-item"
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noreferrer' : undefined}
+              >
+                {/* Colored circular icon badge */}
+                <span className={`pill-icon-badge pill-icon-${link.icon}`}>
+                  {link.icon === 'home' && (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+                      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                    </svg>
+                  )}
+                  {link.icon === 'classes' && (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+                      <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+                    </svg>
+                  )}
+                  {link.icon === 'timetable' && (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+                      <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm-7-9h5v5h-5z"/>
+                    </svg>
+                  )}
+                  {link.icon === 'exams' && (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                  )}
+                  {link.icon === 'store' && (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+                      <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h6v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/>
+                    </svg>
+                  )}
+                  {link.icon === 'results' && (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+                      <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V18H8v2h8v-2h-3v-2.1c2.12-.41 3.73-2.07 3.96-4.16C19.33 11.4 21 9.38 21 7V6c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+                    </svg>
+                  )}
+                  {link.icon === 'tracking' && (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+                      <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"/>
+                    </svg>
+                  )}
+                  {link.icon === 'contact' && (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+                      <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                    </svg>
+                  )}
+                </span>
+                <span className="pill-nav-label">{link.label}</span>
+              </Link>
+            ))}
+          </nav>
+
+          {/* Header Actions */}
+          <div className="header-actions">
+            <button
+              id="grades-sidebar-btn"
+              className="grades-icon-btn"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Browse by Grade"
+            >
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+              </svg>
+              <span className="grades-icon-label">Grades</span>
+            </button>
+
+            <span className="actions-separator" aria-hidden="true" />
+
+            {authChecked && (
+              user ? (
+                <div className="user-menu-wrap" ref={userMenuRef}>
+                  <button
+                    id="user-menu-btn"
+                    className="user-menu-btn"
+                    onClick={() => setUserMenuOpen(o => !o)}
+                    aria-expanded={userMenuOpen}
+                    aria-label="User menu"
+                  >
+                    <span className="user-avatar">{getInitials(user.name, user.phone)}</span>
+                    <span className="user-name-text">{displayName.split(' ')[0] || displayName}</span>
+                    <svg className={`nav-chevron${userMenuOpen ? ' open' : ''}`} width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                      <polyline points="6 9 12 15 18 9"/>
+                    </svg>
+                  </button>
+                  {userMenuOpen && (
+                    <div className="user-dropdown">
+                      <div className="user-dropdown-header">
+                        <span className="user-dropdown-name">{displayName}</span>
+                        <span className="user-dropdown-role">{user.role === 'admin' ? 'Administrator' : `Grade ${user.grade || ''} Student`}</span>
+                      </div>
+                      <div className="user-dropdown-divider" />
+                      <Link href={dashboardHref} className="user-dropdown-item" onClick={() => setUserMenuOpen(false)}>
+                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                        Dashboard
+                      </Link>
+                      <button className="user-dropdown-item user-dropdown-logout" onClick={handleLogout}>
+                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <button id="login-btn-header" className="login-btn" onClick={() => setLoginOpen(true)}>
+                  Login
+                  <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </button>
+              )
+            )}
+
+            {/* Mobile hamburger */}
+            <button id="mobile-menu-btn" className="mobile-menu-btn" onClick={() => setMobileOpen(true)} aria-label="Open menu" aria-expanded={mobileOpen}>
+              <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <line x1="3" y1="6"  x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
           </div>
+
         </div>
       </header>
 
@@ -646,95 +524,29 @@ export default function Header() {
       </div>
 
       <style jsx>{`
-        /* ── Top Bar ── */
-        .header-topbar {
-          background: var(--surface);
-          border-bottom: 1px solid var(--rule-light);
-          height: var(--header-top-h);
-          display: flex;
-          align-items: center;
+        /* ── Main Header — Single Row ── */
+        .main-header {
+          background: #0d0f14;
+          border-bottom: 1px solid rgba(255,255,255,0.06);
           position: sticky;
           top: 0;
           z-index: 100;
-        }
-        .header-topbar-inner {
+          height: 68px;
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          width: 100%;
-        }
-        .header-topbar-left  { display: flex; align-items: center; gap: 18px; }
-        .header-topbar-right { display: flex; align-items: center; gap: 14px; }
-
-        .topbar-link {
-          font-size: 0.75rem;
-          color: var(--muted);
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          transition: color 0.2s;
-          font-family: var(--font-mono);
-        }
-        .topbar-link:hover { color: var(--paper); }
-
-        .topbar-badge {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 0.72rem;
-          font-weight: 600;
-          color: var(--emerald);
-          background: rgba(16,185,129,0.08);
-          border: 1px solid rgba(16,185,129,0.18);
-          padding: 3px 10px;
-          border-radius: var(--radius-full);
-          letter-spacing: 0.01em;
-        }
-        .topbar-badge-dot {
-          width: 6px; height: 6px;
-          border-radius: 50%;
-          background: var(--emerald);
-          animation: pulse-glow 2s ease-in-out infinite;
-          flex-shrink: 0;
-        }
-
-        .topbar-social { display: flex; align-items: center; gap: 8px; }
-        .topbar-social-link {
-          width: 26px; height: 26px;
-          border-radius: var(--radius-sm);
-          display: flex; align-items: center; justify-content: center;
-          color: var(--muted);
-          transition: color 0.2s, background 0.2s;
-        }
-        .topbar-social-link:hover { color: var(--paper); background: var(--rule); }
-
-        /* ── Main Header ── */
-        .main-header {
-          background: rgba(13,15,20,0.80);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border-bottom: 1px solid var(--rule-light);
-          position: sticky;
-          top: var(--header-top-h);
-          z-index: 90;
-          height: var(--header-main-h);
-          display: flex;
-          align-items: center;
-          transition: background 0.3s var(--ease), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
-          padding: 0 32px !important;
+          transition: background 0.3s, box-shadow 0.3s;
         }
         .main-header.scrolled {
-          background: rgba(13,15,20,0.96);
-          border-bottom-color: var(--rule);
-          box-shadow: 0 1px 0 var(--rule), 0 4px 24px rgba(0,0,0,0.4);
+          background: rgba(10,12,16,0.98);
+          box-shadow: 0 2px 24px rgba(0,0,0,0.5);
         }
         .header-inner {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 16px;
+          gap: 12px;
           width: 100%;
-          padding: 0 16px;
+          padding: 0 28px;
         }
 
         /* Logo */
@@ -744,93 +556,96 @@ export default function Header() {
           gap: 10px;
           text-decoration: none;
           flex-shrink: 0;
-          margin-left: 12px;
         }
-        .logo-mark {
-          width: 36px; height: 36px;
-          background: var(--cobalt);
-          border-radius: var(--radius-md);
-          display: flex; align-items: center; justify-content: center;
-          box-shadow: 0 2px 12px rgba(37,99,235,0.35);
+        .logo-gem {
+          position: relative;
+          display: flex;
+          align-items: center;
           flex-shrink: 0;
         }
+        .gem-stars {
+          position: absolute;
+          top: -6px;
+          right: -6px;
+          pointer-events: none;
+        }
         .logo-name {
-          display: block;
           font-family: var(--font-body);
           font-weight: 800;
           font-size: 1.0625rem;
           color: var(--paper);
-          line-height: 1.1;
           letter-spacing: -0.02em;
         }
-        .logo-sub {
-          display: block;
-          font-size: 0.6rem;
-          color: var(--muted);
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          margin-top: 1px;
-        }
 
-        /* Header actions margin from right edge */
-        .header-actions {
-          margin-right: 12px;
-        }
-
-        /* Desktop Nav */
-        .desktop-nav { display: flex; flex: 1; justify-content: center; overflow: hidden; }
-        .nav-list { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
-        .nav-item { position: relative; }
-
-        .nav-link {
+        /* ── Pill Nav Container ── */
+        .pill-nav-container {
           display: flex;
           align-items: center;
-          padding: 6px 10px;
-          font-size: 0.8rem;
-          font-weight: 500;
-          color: var(--muted);
+          gap: 5px;
+          background: #1a1c22;
+          border: 1px solid rgba(255,255,255,0.08);
           border-radius: 999px;
-          transition: color 0.2s, background 0.2s, transform 0.2s;
-          white-space: nowrap;
-          border: 1px solid transparent;
-          background: none;
-          cursor: pointer;
-          text-decoration: none;
-          letter-spacing: -0.02em;
-        }
-        .nav-link:hover {
-          color: var(--paper);
-          background: rgba(255, 255, 255, 0.08);
-          border-color: rgba(255, 255, 255, 0.12);
-        }
-        .nav-icon {
-          flex-shrink: 0;
-          filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
-          transition: transform 0.2s;
-        }
-        .nav-label {
-          margin-left: 8px !important;
-          display: inline-block;
-        }
-        .nav-link:hover .nav-icon {
-          transform: scale(1.15);
+          padding: 5px 8px;
+          flex: 1;
+          justify-content: center;
+          margin: 0 16px;
+          box-shadow: 0 2px 16px rgba(0,0,0,0.3);
+          overflow: hidden;
         }
 
-        @media (max-width: 1366px) {
-          .nav-link {
-            padding: 5px 8px;
-            font-size: 0.77rem;
-          }
-          .nav-label {
-            margin-left: 6px !important;
-          }
-          .nav-list {
-            gap: 3px;
-          }
+        /* Individual pill nav item */
+        .pill-nav-item {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          padding: 5px 11px 5px 6px;
+          background: #27292f;
+          border-radius: 999px;
+          text-decoration: none;
+          color: rgba(255,255,255,0.88);
+          font-size: 0.785rem;
+          font-weight: 500;
+          white-space: nowrap;
+          border: 1px solid rgba(255,255,255,0.07);
+          transition: background 0.2s, border-color 0.2s, transform 0.15s;
+          letter-spacing: -0.01em;
         }
-        .nav-link:focus-visible {
-          outline: 2px solid var(--cobalt-light);
-          outline-offset: 2px;
+        .pill-nav-item:hover {
+          background: #35373f;
+          border-color: rgba(255,255,255,0.15);
+          transform: translateY(-1px);
+          color: #fff;
+        }
+        .pill-nav-label {
+          line-height: 1;
+        }
+
+        /* Circular color badge */
+        .pill-icon-badge {
+          width: 22px;
+          height: 22px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        /* Each icon gets its own color */
+        .pill-icon-home     { background: linear-gradient(135deg, #06b6d4, #2563eb); }
+        .pill-icon-classes  { background: linear-gradient(135deg, #a855f7, #7c3aed); }
+        .pill-icon-timetable{ background: linear-gradient(135deg, #22c55e, #16a34a); }
+        .pill-icon-exams    { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .pill-icon-store    { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .pill-icon-results  { background: linear-gradient(135deg, #ec4899, #db2777); }
+        .pill-icon-tracking { background: linear-gradient(135deg, #84cc16, #65a30d); }
+        .pill-icon-contact  { background: linear-gradient(135deg, #38bdf8, #0284c7); }
+
+        /* Responsive: tighter at 1366px */
+        @media (max-width: 1366px) {
+          .pill-nav-container { gap: 3px; padding: 4px 6px; margin: 0 10px; }
+          .pill-nav-item { padding: 4px 8px 4px 5px; font-size: 0.74rem; gap: 5px; }
+          .pill-icon-badge { width: 20px; height: 20px; }
+          .header-inner { padding: 0 16px; }
         }
 
         .nav-chevron {
