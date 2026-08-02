@@ -117,7 +117,7 @@ export default function RedesignedHomepage() {
             <div className="hero-image-side">
               <div className="hero-image-card">
                 <img
-                  src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&auto=format&fit=crop&q=80"
+                  src="/ishan_teaching.jpg"
                   alt="Ishan Maduranga Mathematics"
                   className="hero-main-img"
                 />
@@ -211,7 +211,7 @@ export default function RedesignedHomepage() {
             <div className="instructor-photo-side">
               <div className="instructor-photo-wrapper">
                 <img
-                  src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&auto=format&fit=crop&q=80"
+                  src="/ishan_portrait.jpg"
                   alt="Ishan Maduranga"
                   className="instructor-img"
                 />
