@@ -182,7 +182,7 @@ export default function Header() {
                     >
                       {/* ap.lk style gradient SVG icons */}
                       {link.icon === 'home' && (
-                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
                           <defs>
                             <linearGradient id="grad-home" x1="0%" y1="0%" x2="100%" y2="100%">
                               <stop offset="0%" stopColor="#38bdf8" />
@@ -193,7 +193,7 @@ export default function Header() {
                         </svg>
                       )}
                       {link.icon === 'classes' && (
-                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
                           <defs>
                             <linearGradient id="grad-classes" x1="0%" y1="0%" x2="100%" y2="100%">
                               <stop offset="0%" stopColor="#fbbf24" />
@@ -204,7 +204,7 @@ export default function Header() {
                         </svg>
                       )}
                       {link.icon === 'timetable' && (
-                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
                           <defs>
                             <linearGradient id="grad-tt" x1="0%" y1="0%" x2="100%" y2="100%">
                               <stop offset="0%" stopColor="#a78bfa" />
@@ -215,7 +215,7 @@ export default function Header() {
                         </svg>
                       )}
                       {link.icon === 'exams' && (
-                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
                           <defs>
                             <linearGradient id="grad-exams" x1="0%" y1="0%" x2="100%" y2="100%">
                               <stop offset="0%" stopColor="#f472b6" />
@@ -226,7 +226,7 @@ export default function Header() {
                         </svg>
                       )}
                       {link.icon === 'store' && (
-                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
                           <defs>
                             <linearGradient id="grad-store" x1="0%" y1="0%" x2="100%" y2="100%">
                               <stop offset="0%" stopColor="#34d399" />
@@ -237,7 +237,7 @@ export default function Header() {
                         </svg>
                       )}
                       {link.icon === 'results' && (
-                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
                           <defs>
                             <linearGradient id="grad-results" x1="0%" y1="0%" x2="100%" y2="100%">
                               <stop offset="0%" stopColor="#fbbf24" />
@@ -248,7 +248,7 @@ export default function Header() {
                         </svg>
                       )}
                       {link.icon === 'tracking' && (
-                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
                           <defs>
                             <linearGradient id="grad-tracking" x1="0%" y1="0%" x2="100%" y2="100%">
                               <stop offset="0%" stopColor="#60a5fa" />
@@ -259,7 +259,7 @@ export default function Header() {
                         </svg>
                       )}
                       {link.icon === 'contact' && (
-                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                        <svg className="nav-icon" width="15" height="15" viewBox="0 0 24 24">
                           <defs>
                             <linearGradient id="grad-contact" x1="0%" y1="0%" x2="100%" y2="100%">
                               <stop offset="0%" stopColor="#f87171" />
@@ -721,6 +721,7 @@ export default function Header() {
           display: flex;
           align-items: center;
           transition: background 0.3s var(--ease), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+          padding: 0 16px;
         }
         .main-header.scrolled {
           background: rgba(13,15,20,0.96);
@@ -733,6 +734,7 @@ export default function Header() {
           justify-content: space-between;
           gap: 16px;
           width: 100%;
+          padding: 0 16px;
         }
 
         /* Logo */
@@ -777,9 +779,9 @@ export default function Header() {
         .nav-link {
           display: flex;
           align-items: center;
-          gap: 6px;
-          padding: 6px 10px;
-          font-size: 0.8125rem;
+          gap: 7px;
+          padding: 6px 9px;
+          font-size: 0.8rem;
           font-weight: 500;
           color: var(--muted);
           border-radius: 999px;
@@ -789,7 +791,7 @@ export default function Header() {
           background: none;
           cursor: pointer;
           text-decoration: none;
-          letter-spacing: -0.01em;
+          letter-spacing: -0.02em;
         }
         .nav-link:hover {
           color: var(--paper);
@@ -798,11 +800,23 @@ export default function Header() {
         }
         .nav-icon {
           flex-shrink: 0;
+          margin-right: 1px;
           filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
           transition: transform 0.2s;
         }
         .nav-link:hover .nav-icon {
           transform: scale(1.15);
+        }
+
+        @media (max-width: 1366px) {
+          .nav-link {
+            padding: 5px 7px;
+            font-size: 0.77rem;
+            gap: 6px;
+          }
+          .nav-list {
+            gap: 2px;
+          }
         }
         .nav-link:focus-visible {
           outline: 2px solid var(--cobalt-light);
