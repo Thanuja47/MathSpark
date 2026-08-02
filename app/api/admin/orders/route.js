@@ -3,17 +3,21 @@ import { NextResponse } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
 import { db } from '@/lib/db';
 
-function verifyAdmin(request) {
+async function verifyAdmin(request) {
   const user = getUserFromRequest(request);
-  if (!user || user.role !== 'admin') {
-    return false;
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+  if (user.id) {
+    const dbUser = await db.students.findById(user.id);
+    return dbUser?.role === 'admin';
   }
-  return true;
+  return false;
 }
 
 // GET /api/admin/orders — fetch all orders
 export async function GET(request) {
-  if (!verifyAdmin(request)) {
+  const isAdmin = await verifyAdmin(request);
+  if (!isAdmin) {
     return NextResponse.json({ error: 'Unauthorized. Admin access required.' }, { status: 401 });
   }
 

@@ -3,17 +3,21 @@ import { NextResponse } from 'next/server';
 import { getUserFromRequest } from '@/lib/auth';
 import { db } from '@/lib/db';
 
-function verifyAdmin(request) {
+async function verifyAdmin(request) {
   const user = getUserFromRequest(request);
-  if (!user || user.role !== 'admin') {
-    return false;
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+  if (user.id) {
+    const dbUser = await db.students.findById(user.id);
+    return dbUser?.role === 'admin';
   }
-  return true;
+  return false;
 }
 
 // PUT /api/admin/orders/[id] — update order status
 export async function PUT(request, { params }) {
-  if (!verifyAdmin(request)) {
+  const isAdmin = await verifyAdmin(request);
+  if (!isAdmin) {
     return NextResponse.json({ error: 'Unauthorized. Admin access required.' }, { status: 401 });
   }
 
@@ -36,7 +40,8 @@ export async function PUT(request, { params }) {
 
 // DELETE /api/admin/orders/[id] — delete order
 export async function DELETE(request, { params }) {
-  if (!verifyAdmin(request)) {
+  const isAdmin = await verifyAdmin(request);
+  if (!isAdmin) {
     return NextResponse.json({ error: 'Unauthorized. Admin access required.' }, { status: 401 });
   }
 

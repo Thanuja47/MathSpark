@@ -28,12 +28,13 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Incorrect password. Please try again.' }, { status: 401 });
     }
 
-    // Sign JWT
+    // Sign JWT (include role so verifyAdmin helper receives it)
     const token = signToken({
       id: student.id,
       name: student.name,
       phone: student.phone,
       grade: student.grade,
+      role: student.role || 'student',
     });
 
     // Return response with HttpOnly cookie
