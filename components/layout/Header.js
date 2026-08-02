@@ -180,6 +180,95 @@ export default function Header() {
                       target={link.external ? '_blank' : undefined}
                       rel={link.external ? 'noreferrer' : undefined}
                     >
+                      {/* ap.lk style gradient SVG icons */}
+                      {link.icon === 'home' && (
+                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                          <defs>
+                            <linearGradient id="grad-home" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#38bdf8" />
+                              <stop offset="100%" stopColor="#2563eb" />
+                            </linearGradient>
+                          </defs>
+                          <path fill="url(#grad-home)" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                        </svg>
+                      )}
+                      {link.icon === 'classes' && (
+                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                          <defs>
+                            <linearGradient id="grad-classes" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#fbbf24" />
+                              <stop offset="100%" stopColor="#d97706" />
+                            </linearGradient>
+                          </defs>
+                          <path fill="url(#grad-classes)" d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+                        </svg>
+                      )}
+                      {link.icon === 'timetable' && (
+                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                          <defs>
+                            <linearGradient id="grad-tt" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#a78bfa" />
+                              <stop offset="100%" stopColor="#7c3aed" />
+                            </linearGradient>
+                          </defs>
+                          <path fill="url(#grad-tt)" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm-7-9h5v5h-5z"/>
+                        </svg>
+                      )}
+                      {link.icon === 'exams' && (
+                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                          <defs>
+                            <linearGradient id="grad-exams" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#f472b6" />
+                              <stop offset="100%" stopColor="#db2777" />
+                            </linearGradient>
+                          </defs>
+                          <path fill="url(#grad-exams)" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        </svg>
+                      )}
+                      {link.icon === 'store' && (
+                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                          <defs>
+                            <linearGradient id="grad-store" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#34d399" />
+                              <stop offset="100%" stopColor="#059669" />
+                            </linearGradient>
+                          </defs>
+                          <path fill="url(#grad-store)" d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h2v2c0 .55.45 1 1 1s1-.45 1-1V8h6v2c0 .55.45 1 1 1s1-.45 1-1V8h2v12z"/>
+                        </svg>
+                      )}
+                      {link.icon === 'results' && (
+                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                          <defs>
+                            <linearGradient id="grad-results" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#fbbf24" />
+                              <stop offset="100%" stopColor="#ea580c" />
+                            </linearGradient>
+                          </defs>
+                          <path fill="url(#grad-results)" d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V18H8v2h8v-2h-3v-2.1c2.12-.41 3.73-2.07 3.96-4.16C19.33 11.4 21 9.38 21 7V6c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
+                        </svg>
+                      )}
+                      {link.icon === 'tracking' && (
+                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                          <defs>
+                            <linearGradient id="grad-tracking" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#60a5fa" />
+                              <stop offset="100%" stopColor="#1d4ed8" />
+                            </linearGradient>
+                          </defs>
+                          <path fill="url(#grad-tracking)" d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-3.5H18V9.5h2.47L22.25 12h-2.75v3zm-1.5 3.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+                        </svg>
+                      )}
+                      {link.icon === 'contact' && (
+                        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24">
+                          <defs>
+                            <linearGradient id="grad-contact" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#f87171" />
+                              <stop offset="100%" stopColor="#dc2626" />
+                            </linearGradient>
+                          </defs>
+                          <path fill="url(#grad-contact)" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                        </svg>
+                      )}
                       {link.label}
                       {link.dropdown && (
                         <svg
@@ -688,15 +777,15 @@ export default function Header() {
         .nav-link {
           display: flex;
           align-items: center;
-          gap: 4px;
-          padding: 6px 9px;
+          gap: 6px;
+          padding: 6px 10px;
           font-size: 0.8125rem;
           font-weight: 500;
           color: var(--muted);
-          border-radius: var(--radius-sm);
-          transition: color 0.2s, background 0.2s;
+          border-radius: 999px;
+          transition: color 0.2s, background 0.2s, transform 0.2s;
           white-space: nowrap;
-          border: none;
+          border: 1px solid transparent;
           background: none;
           cursor: pointer;
           text-decoration: none;
@@ -704,7 +793,16 @@ export default function Header() {
         }
         .nav-link:hover {
           color: var(--paper);
-          background: var(--rule);
+          background: rgba(255, 255, 255, 0.08);
+          border-color: rgba(255, 255, 255, 0.12);
+        }
+        .nav-icon {
+          flex-shrink: 0;
+          filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+          transition: transform 0.2s;
+        }
+        .nav-link:hover .nav-icon {
+          transform: scale(1.15);
         }
         .nav-link:focus-visible {
           outline: 2px solid var(--cobalt-light);
