@@ -269,7 +269,7 @@ export default function Header() {
                           <path fill="url(#grad-contact)" d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                         </svg>
                       )}
-                      {link.label}
+                      <span className="nav-label">{link.label}</span>
                       {link.dropdown && (
                         <svg
                           className={`nav-chevron${activeDropdown === link.label ? ' open' : ''}`}
@@ -721,7 +721,7 @@ export default function Header() {
           display: flex;
           align-items: center;
           transition: background 0.3s var(--ease), border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
-          padding: 0 16px;
+          padding: 0 32px !important;
         }
         .main-header.scrolled {
           background: rgba(13,15,20,0.96);
@@ -744,6 +744,7 @@ export default function Header() {
           gap: 10px;
           text-decoration: none;
           flex-shrink: 0;
+          margin-left: 12px;
         }
         .logo-mark {
           width: 36px; height: 36px;
@@ -771,16 +772,20 @@ export default function Header() {
           margin-top: 1px;
         }
 
+        /* Header actions margin from right edge */
+        .header-actions {
+          margin-right: 12px;
+        }
+
         /* Desktop Nav */
         .desktop-nav { display: flex; flex: 1; justify-content: center; overflow: hidden; }
-        .nav-list { display: flex; align-items: center; gap: 4px; flex-wrap: nowrap; }
+        .nav-list { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
         .nav-item { position: relative; }
 
         .nav-link {
           display: flex;
           align-items: center;
-          gap: 7px;
-          padding: 6px 9px;
+          padding: 6px 10px;
           font-size: 0.8rem;
           font-weight: 500;
           color: var(--muted);
@@ -800,9 +805,12 @@ export default function Header() {
         }
         .nav-icon {
           flex-shrink: 0;
-          margin-right: 1px;
           filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
           transition: transform 0.2s;
+        }
+        .nav-label {
+          margin-left: 8px !important;
+          display: inline-block;
         }
         .nav-link:hover .nav-icon {
           transform: scale(1.15);
@@ -810,12 +818,14 @@ export default function Header() {
 
         @media (max-width: 1366px) {
           .nav-link {
-            padding: 5px 7px;
+            padding: 5px 8px;
             font-size: 0.77rem;
-            gap: 6px;
+          }
+          .nav-label {
+            margin-left: 6px !important;
           }
           .nav-list {
-            gap: 2px;
+            gap: 3px;
           }
         }
         .nav-link:focus-visible {
