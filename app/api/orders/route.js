@@ -10,10 +10,17 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Please log in to place an order.' }, { status: 401 });
     }
 
-    const student = await db.students.findById(authUser.id);
-    if (!student) {
-      return NextResponse.json({ error: 'Student profile not found.' }, { status: 404 });
+    let student = null;
+    if (authUser.id) {
+      student = await db.students.findById(authUser.id);
     }
+    if (!student && authUser.phone) {
+      student = await db.students.findByPhone(authUser.phone);
+    }
+    if (!student) {
+      student = { name: authUser.name || 'Student', phone: authUser.phone || '' };
+    }
+
 
     const body = await request.json();
     const { storeItemId, itemTitle, itemPrice, quantity = 1 } = body;
