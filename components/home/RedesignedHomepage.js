@@ -117,21 +117,40 @@ export default function RedesignedHomepage() {
             </div>
 
             <div className="hero-image-side">
-              <div className="hero-image-card">
+              <div className="hero-image-card animated-hero-glow">
+                {/* Decorative floating math particle badges */}
+                <div className="hero-floating-particle particle-1 font-mono">∑x²</div>
+                <div className="hero-floating-particle particle-2 font-mono">πr²</div>
+                <div className="hero-floating-particle particle-3 font-mono">∫dx</div>
+
                 <img
                   src="/ishan_teaching.jpg"
                   alt="Ishan Maduranga Mathematics"
                   className="hero-main-img"
                 />
-                <div className="floating-stat-card card-top">
-                  <div className="stat-icon-bg">🎓</div>
+                
+                {/* Floating Stat Card 1 with animated 3D Grad Cap Badge */}
+                <div className="floating-stat-card card-top float-card-1">
+                  <div className="stat-icon-bg bg-gradient-blue animated-badge">
+                    <svg className="badge-3d-svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    </svg>
+                  </div>
                   <div>
                     <div className="stat-number">15,000+</div>
                     <div className="stat-desc">{t('hero.statStudents')}</div>
                   </div>
                 </div>
-                <div className="floating-stat-card card-bottom">
-                  <div className="stat-icon-bg">🏆</div>
+
+                {/* Floating Stat Card 2 with animated 3D Medal #1 Badge */}
+                <div className="floating-stat-card card-bottom float-card-2">
+                  <div className="stat-icon-bg bg-gradient-purple animated-badge">
+                    <div className="ap-medal-badge small-medal">
+                      <span className="medal-number small-num">1</span>
+                      <div className="medal-ribbon small-ribbon" />
+                    </div>
+                  </div>
                   <div>
                     <div className="stat-number">98%</div>
                     <div className="stat-desc">{t('hero.statPass')}</div>
@@ -472,39 +491,125 @@ export default function RedesignedHomepage() {
           color: #475569;
         }
 
-        /* Hero Image Container */
+        /* Hero Image Container & AP.LK Animated Elements */
         .hero-image-card {
           position: relative;
           border-radius: 24px;
           padding: 10px;
           background: #ffffff;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+          box-shadow: 0 20px 50px rgba(37,99,235,0.12);
+          transition: transform 0.3s ease;
+        }
+        .animated-hero-glow {
+          animation: heroGlowPulse 4s ease-in-out infinite alternate;
+        }
+        @keyframes heroGlowPulse {
+          0% { box-shadow: 0 20px 50px rgba(37,99,235,0.12), 0 0 0 0px rgba(37,99,235,0.1); }
+          50% { box-shadow: 0 25px 60px rgba(124,58,237,0.18), 0 0 0 8px rgba(124,58,237,0.08); }
+          100% { box-shadow: 0 20px 50px rgba(37,99,235,0.12), 0 0 0 0px rgba(37,99,235,0.1); }
         }
         .hero-main-img {
           width: 100%;
           height: 420px;
           object-fit: cover;
           border-radius: 18px;
+          transition: transform 0.4s ease;
         }
+        .hero-image-card:hover .hero-main-img {
+          transform: scale(1.015);
+        }
+
+        /* Floating particles */
+        .hero-floating-particle {
+          position: absolute;
+          background: rgba(255,255,255,0.92);
+          border: 1px solid rgba(226,232,240,0.8);
+          backdrop-filter: blur(8px);
+          padding: 6px 12px;
+          border-radius: 12px;
+          font-size: 0.82rem;
+          font-weight: 800;
+          color: #2563eb;
+          box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+          z-index: 5;
+          pointer-events: none;
+        }
+        .particle-1 {
+          top: 40px; left: -24px;
+          animation: floatParticle1 5s ease-in-out infinite alternate;
+          color: #2563eb;
+        }
+        .particle-2 {
+          bottom: 80px; right: -20px;
+          animation: floatParticle2 6s ease-in-out infinite alternate;
+          color: #7c3aed;
+        }
+        .particle-3 {
+          top: 180px; left: -30px;
+          animation: floatParticle1 4.5s ease-in-out infinite alternate-reverse;
+          color: #ec4899;
+        }
+        @keyframes floatParticle1 {
+          0% { transform: translateY(0px) rotate(-3deg); }
+          100% { transform: translateY(-12px) rotate(4deg); }
+        }
+        @keyframes floatParticle2 {
+          0% { transform: translateY(0px) rotate(4deg); }
+          100% { transform: translateY(-15px) rotate(-2deg); }
+        }
+
         .floating-stat-card {
           position: absolute;
-          background: #ffffff;
+          background: rgba(255,255,255,0.95);
+          backdrop-filter: blur(12px);
           padding: 12px 20px;
-          border-radius: 16px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+          border-radius: 18px;
+          box-shadow: 0 12px 35px rgba(0,0,0,0.12);
           display: flex;
           align-items: center;
           gap: 12px;
-          border: 1px solid #f1f5f9;
+          border: 1px solid rgba(255,255,255,0.8);
+          z-index: 6;
+          transition: transform 0.3s ease;
         }
-        .card-top { top: -20px; right: -20px; }
-        .card-bottom { bottom: -20px; left: -20px; }
+        .float-card-1 {
+          top: -22px; right: -22px;
+          animation: floatCardTop 4s ease-in-out infinite alternate;
+        }
+        .float-card-2 {
+          bottom: -22px; left: -22px;
+          animation: floatCardBottom 4.5s ease-in-out infinite alternate;
+        }
+        @keyframes floatCardTop {
+          0% { transform: translateY(0px); }
+          100% { transform: translateY(-10px); }
+        }
+        @keyframes floatCardBottom {
+          0% { transform: translateY(0px); }
+          100% { transform: translateY(-8px); }
+        }
+        .floating-stat-card:hover {
+          transform: scale(1.05) translateY(-4px) !important;
+        }
+
         .stat-icon-bg {
-          width: 44px; height: 44px;
-          border-radius: 12px;
-          background: #eff6ff;
+          width: 46px; height: 46px;
+          border-radius: 14px;
           display: flex; align-items: center; justify-content: center;
-          font-size: 1.3rem;
+          flex-shrink: 0;
+        }
+        .small-medal {
+          width: 32px; height: 32px;
+          border-width: 2px;
+        }
+        .small-num {
+          font-size: 1.1rem;
+        }
+        .small-ribbon {
+          bottom: -8px;
+          border-left-width: 9px;
+          border-right-width: 9px;
+          border-top-width: 9px;
         }
         .stat-number { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
         .stat-desc { font-size: 0.75rem; color: #64748b; font-weight: 600; }
