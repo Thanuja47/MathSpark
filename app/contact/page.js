@@ -4,8 +4,10 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import { SITE } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function ContactPage() {
+  const { t } = useLanguage();
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e) => {
@@ -20,11 +22,11 @@ export default function ContactPage() {
         <section className="page-hero">
           <div className="container">
             <div className="breadcrumb">
-              <a href="/">Home</a> <span>/</span> <span>Contact</span>
+              <a href="/">{t('nav.home')}</a> <span>/</span> <span>{t('nav.contact')}</span>
             </div>
-            <div className="section-tag page-hero-tag">Get In Touch</div>
+            <div className="section-tag page-hero-tag">{t('common.contactUs')}</div>
             <h1 className="page-hero-title">
-              We&apos;re Here to <span className="theme-gradient">Help</span>
+              {t('common.contactUs')}
             </h1>
             <p className="page-hero-desc">
               Have questions about class schedules, payments, or enrollment? Contact our support team.
@@ -40,7 +42,7 @@ export default function ContactPage() {
                 <div className="contact-info-item">
                   <div className="contact-icon">📞</div>
                   <div>
-                    <div className="contact-info-label">Call Us</div>
+                    <div className="contact-info-label">{t('common.contactUs')}</div>
                     <div className="contact-info-value">
                       <a href={`tel:${SITE.phone}`}>{SITE.phone}</a>
                     </div>
@@ -94,15 +96,15 @@ export default function ContactPage() {
                 ) : (
                   <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                      <label className="form-label">Your Name</label>
+                      <label className="form-label">{t('auth.nameLabel')}</label>
                       <input type="text" className="form-input" placeholder="Ex: Kavindi Perera" required />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">WhatsApp Number</label>
+                      <label className="form-label">{t('auth.phoneLabel')}</label>
                       <input type="number" className="form-input" placeholder="Ex: 0712345678" required />
                     </div>
                     <div className="form-group">
-                      <label className="form-label">Student Grade</label>
+                      <label className="form-label">{t('auth.gradeLabel')}</label>
                       <select className="form-input">
                         <option value="6">Grade 06</option>
                         <option value="7">Grade 07</option>
@@ -117,7 +119,7 @@ export default function ContactPage() {
                       <textarea className="form-input" rows="4" placeholder="How can we help you?" required />
                     </div>
                     <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }}>
-                      Send Message 🚀
+                      {t('common.contactUs')} 🚀
                     </button>
                   </form>
                 )}

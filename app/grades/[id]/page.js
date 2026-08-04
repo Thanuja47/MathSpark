@@ -4,8 +4,10 @@ import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import CourseCard from '@/components/courses/CourseCard';
 import { COURSES, GRADES } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function GradeFilteredPage({ params }) {
+  const { t } = useLanguage();
   const gradeId = parseInt(params.id, 10);
   const gradeObj = GRADES.find((g) => g.id === gradeId) || { label: `Grade ${gradeId}` };
   const filteredCourses = COURSES.filter((c) => c.grade === gradeId);
@@ -17,11 +19,11 @@ export default function GradeFilteredPage({ params }) {
         <section className="page-hero">
           <div className="container">
             <div className="breadcrumb">
-              <a href="/">Home</a> <span>/</span> <a href="/courses">Classes</a> <span>/</span> <span>{gradeObj.label}</span>
+              <a href="/">{t('nav.home')}</a> <span>/</span> <a href="/courses">{t('nav.classes')}</a> <span>/</span> <span>{gradeObj.label}</span>
             </div>
             <div className="section-tag page-hero-tag">{gradeObj.label} Mathematics</div>
             <h1 className="page-hero-title">
-              <span className="theme-gradient">{gradeObj.label}</span> Classes
+              <span className="theme-gradient">{gradeObj.label}</span> {t('nav.classes')}
             </h1>
             <p className="page-hero-desc">
               All live interactive sessions, lesson recordings, and tute materials for {gradeObj.label}.

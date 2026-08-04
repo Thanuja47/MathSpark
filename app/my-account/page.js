@@ -4,8 +4,10 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import { COURSES } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function MyAccountPage() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('courses');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -53,17 +55,17 @@ export default function MyAccountPage() {
                 </p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                    Approved Grade Access:
+                    {t('common.approvedAccess')}:
                   </span>
                   {user && user.approvedGrades && user.approvedGrades.length > 0 ? (
                     user.approvedGrades.sort((a,b)=>a-b).map(g => (
                       <span key={g} className="badge badge-green" style={{ fontSize: '0.75rem' }}>
-                        ✓ Grade {g} Access
+                        Grade {g}
                       </span>
                     ))
                   ) : (
                     <span className="badge badge-accent" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', fontSize: '0.75rem' }}>
-                      No Approved Grade Access Yet
+                      {t('common.noAccessGranted')}
                     </span>
                   )}
                 </div>

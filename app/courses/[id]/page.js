@@ -7,6 +7,7 @@ import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import AccessLockedModal from '@/components/AccessLockedModal';
 import { COURSES, SITE } from '@/lib/data';
 import { ROLES } from '@/utils/constants';
+import { useLanguage } from '@/context/LanguageContext';
 
 const STATIC_SYLLABUS = [
   { unit: '01', title: 'Number Systems & Operations', description: 'Fundamental number properties, indices, and arithmetic operations.', pdfUrl: null, videoUrl: null },
@@ -20,6 +21,7 @@ const STATIC_SYLLABUS = [
 ];
 
 export default function CourseDetailPage({ params }) {
+  const { t } = useLanguage();
   const { id } = params;
   const course = COURSES.find((c) => c.id.toString() === id) || COURSES[0];
 
@@ -108,14 +110,14 @@ export default function CourseDetailPage({ params }) {
                     <span className="quick-stat-icon">📚</span>
                     <div>
                       <div className="quick-stat-val">{displayedLessons.length}</div>
-                      <div className="quick-stat-lbl">Lessons</div>
+                      <div className="quick-stat-lbl">{t('sections.whatYouLearn').split(" ")[0]}</div>
                     </div>
                   </div>
                   <div className="quick-stat">
                     <span className="quick-stat-icon">👥</span>
                     <div>
                       <div className="quick-stat-val">{course.students.toLocaleString()}</div>
-                      <div className="quick-stat-lbl">Enrolled</div>
+                      <div className="quick-stat-lbl">{t('common.enrollNow').split(" ")[0]}</div>
                     </div>
                   </div>
                   <div className="quick-stat">
@@ -128,7 +130,7 @@ export default function CourseDetailPage({ params }) {
                   <div className="quick-stat">
                     <span className="quick-stat-icon">🌐</span>
                     <div>
-                      <div className="quick-stat-val">{course.medium === 'english' ? 'English' : 'Sinhala'}</div>
+                      <div className="quick-stat-val">{course.medium === 'english' ? 'English' : 'සිංහල'}</div>
                       <div className="quick-stat-lbl">Language</div>
                     </div>
                   </div>
@@ -179,10 +181,10 @@ export default function CourseDetailPage({ params }) {
                     className="btn btn-accent btn-lg"
                     style={{ width: '100%', justifyContent: 'center', marginBottom: 12 }}
                   >
-                    💬 Enroll via WhatsApp
+                    💬 {t('common.whatsAppEnroll')}
                   </a>
                   <a href={`tel:${SITE.phone}`} className="btn btn-outline" style={{ width: '100%', justifyContent: 'center' }}>
-                    📞 Call to Enroll
+                    📞 {t('common.callToEnroll')}
                   </a>
 
                   <ul className="enroll-includes">
@@ -208,8 +210,8 @@ export default function CourseDetailPage({ params }) {
           <div className="container">
             <div className="course-syllabus-wrap">
               <div className="text-center" style={{ marginBottom: 40 }}>
-                <div className="section-tag">Full Curriculum</div>
-                <h2 className="section-title">What You&apos;ll <span className="theme-gradient">Learn</span></h2>
+                <div className="section-tag">{t('sections.fullCurriculum')}</div>
+                <h2 className="section-title">{t('sections.whatYouLearn')}</h2>
               </div>
 
               <div className="syllabus-list">

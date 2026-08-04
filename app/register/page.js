@@ -4,10 +4,11 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
-
 import useAuth from '@/hooks/useAuth';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function RegisterPage() {
+  const { t } = useLanguage();
   const { register: performRegister, error, setError, loading } = useAuth();
   const [step, setStep] = useState(1);
   const [phone, setPhone] = useState('');
@@ -53,7 +54,7 @@ export default function RegisterPage() {
           <div className="register-box">
             <div className="register-header">
               <div className="register-logo">⚡</div>
-              <h2>Create Your <span className="theme-gradient">MathSpark</span> Account</h2>
+              <h2>{t('auth.registerTitle')}</h2>
               <p className="text-secondary text-sm" style={{ marginTop: 8 }}>Join 5,200+ students mastering Maths across Sri Lanka</p>
             </div>
 
@@ -88,12 +89,12 @@ export default function RegisterPage() {
             ) : step === 1 ? (
               <form onSubmit={handleStep1}>
                 <div className="form-group">
-                  <label className="form-label">Full Name</label>
+                  <label className="form-label">{t('auth.nameLabel')}</label>
                   <input type="text" className="form-input" placeholder="Ex: Kavindi Perera"
                     value={name} onChange={e => { setName(e.target.value); setError(''); }} required />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">WhatsApp Number</label>
+                  <label className="form-label">{t('auth.phoneLabel')}</label>
                   <div style={{ position: 'relative' }}>
                     <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 600 }}>+94</span>
                     <input type="number" className="form-input" placeholder="712 345 678"
@@ -105,7 +106,7 @@ export default function RegisterPage() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                   <div className="form-group">
-                    <label className="form-label">Grade</label>
+                    <label className="form-label">{t('auth.gradeLabel')}</label>
                     <select className="form-input" value={grade} onChange={e => setGrade(e.target.value)}>
                       {[6, 7, 8, 9, 10, 11].map(g => <option key={g} value={g}>Grade {g}</option>)}
                     </select>
@@ -119,7 +120,7 @@ export default function RegisterPage() {
                   </div>
                 </div>
                 <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                  Continue →
+                  {t('auth.registerBtn').split(' ')[0]} →
                 </button>
               </form>
             ) : (
@@ -133,25 +134,25 @@ export default function RegisterPage() {
                   </div>
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Create Password</label>
+                  <label className="form-label">{t('auth.passwordLabel')}</label>
                   <input type="password" className="form-input" placeholder="At least 6 characters"
                     value={password} onChange={e => { setPassword(e.target.value); setError(''); }} required />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Confirm Password</label>
+                  <label className="form-label">{t('auth.passwordLabel')} (Confirm)</label>
                   <input type="password" className="form-input" placeholder="Re-enter your password"
                     value={confirmPassword} onChange={e => { setConfirmPassword(e.target.value); setError(''); }} required />
                 </div>
                 <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
-                  {loading ? 'Creating Account...' : 'Create Account 🚀'}
+                  {loading ? t('common.loading') : t('auth.registerBtn')}
                 </button>
               </form>
             )}
 
             {!success && (
               <p className="text-center text-sm text-muted" style={{ marginTop: 24 }}>
-                Already have an account?{' '}
-                <span style={{ color: 'var(--primary-light)', fontWeight: 600, cursor: 'pointer' }}>Login here</span>
+                {t('auth.alreadyHaveAccount').split('?')[0]}?{' '}
+                <span style={{ color: 'var(--primary-light)', fontWeight: 600, cursor: 'pointer' }}>{t('auth.signInBtn')}</span>
               </p>
             )}
           </div>

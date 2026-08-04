@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import AccessLockedModal from '@/components/AccessLockedModal';
+import { useLanguage } from '@/context/LanguageContext';
 
 const STATIC_QUIZZES = [
   {
@@ -64,6 +65,7 @@ function formatTime(s) {
 }
 
 export default function ExamsPage() {
+  const { t } = useLanguage();
   const [quizzes, setQuizzes] = useState(STATIC_QUIZZES);
   const [view, setView] = useState('list'); // list | quiz | result
   const [selected, setSelected] = useState(null);
@@ -181,8 +183,8 @@ export default function ExamsPage() {
           <>
             <section className="page-hero">
               <div className="container">
-                <div className="section-tag page-hero-tag">🎯 Online Tests</div>
-                <h1 className="page-hero-title">MCQ Exam <span className="theme-gradient">Practice</span></h1>
+                <div className="section-tag page-hero-tag">🎯 {t('nav.exams')}</div>
+                <h1 className="page-hero-title">{t('nav.exams')}</h1>
                 <p className="page-hero-desc">Speed tests, monthly papers & O/L prep — with instant marks and step-by-step explanations.</p>
               </div>
             </section>

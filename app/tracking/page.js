@@ -6,8 +6,10 @@ import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import useTracking from '@/hooks/useTracking';
 import { formatDate } from '@/utils/formatDate';
 import { getOrderWhatsAppLink } from '@/utils/whatsapp';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function TrackingPage() {
+  const { t } = useLanguage();
   const [trackingNo, setTrackingNo] = useState('');
   const { record, fetchTracking, loading, error } = useTracking();
 
@@ -39,11 +41,11 @@ export default function TrackingPage() {
         <section className="page-hero">
           <div className="container">
             <div className="breadcrumb">
-              <a href="/">Home</a> <span>/</span> <span>Tute Tracking</span>
+              <a href="/">{t('nav.home')}</a> <span>/</span> <span>{t('nav.tracking')}</span>
             </div>
-            <div className="section-tag page-hero-tag">Delivery Tracking</div>
+            <div className="section-tag page-hero-tag">{t('nav.tracking')}</div>
             <h1 className="page-hero-title">
-              Track Your <span className="theme-gradient">Tute Pack</span>
+              {t('nav.tracking')}
             </h1>
             <p className="page-hero-desc">
               Enter your mobile number or tracking code to check the real-time delivery status of your study pack.
@@ -56,7 +58,7 @@ export default function TrackingPage() {
             <div className="tracking-box">
               <form onSubmit={handleTrack}>
                 <div className="form-group" style={{ textAlign: 'left' }}>
-                  <label className="form-label">Phone Number or Tracking ID</label>
+                  <label className="form-label">{t('common.search')}</label>
                   <input
                     type="text"
                     placeholder="Ex: MSP-9842 or 0712345678"
@@ -69,7 +71,7 @@ export default function TrackingPage() {
                 </div>
 
                 <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: '16px' }} disabled={loading}>
-                  {loading ? 'Searching Database...' : 'Track Package 🚚'}
+                  {loading ? t('common.loading') : 'Track Package 🚚'}
                 </button>
               </form>
 

@@ -5,10 +5,12 @@ import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import LiveScheduleWidget, { SCHEDULE, DAYS } from '@/components/tracking/LiveScheduleWidget';
 import AccessLockedModal from '@/components/AccessLockedModal';
+import { useLanguage } from '@/context/LanguageContext';
 
 const COLORS = ['#0052FF', '#7B2FFF', '#FF6B00', '#00C896', '#FF3D9A'];
 
 export default function TimetablePage() {
+  const { t } = useLanguage();
   const [user, setUser] = useState(null);
   const [lockedGrade, setLockedGrade] = useState(null);
 
@@ -39,8 +41,8 @@ export default function TimetablePage() {
       <main>
         <section className="page-hero">
           <div className="container">
-            <div className="section-tag page-hero-tag">📅 Weekly Schedule</div>
-            <h1 className="page-hero-title">Live Class <span className="theme-gradient">Timetable</span></h1>
+            <div className="section-tag page-hero-tag">📅 {t('nav.timetable')}</div>
+            <h1 className="page-hero-title">{t('nav.timetable')}</h1>
             <p className="page-hero-desc">Check today's live sessions and join with one click. New classes every week.</p>
           </div>
         </section>

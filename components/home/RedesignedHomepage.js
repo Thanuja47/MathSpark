@@ -2,8 +2,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { SITE, GRADES } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function RedesignedHomepage() {
+  const { t } = useLanguage();
   const [openFaq, setOpenFaq] = useState(null);
 
   const toggleFaq = (index) => {
@@ -97,13 +99,13 @@ export default function RedesignedHomepage() {
               {/* CTA Buttons */}
               <div className="hero-actions">
                 <Link href="/courses" className="btn-light-primary">
-                  <span>Explore Classes</span>
+                  <span>{t('common.exploreClasses')}</span>
                   <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                   </svg>
                 </Link>
                 <Link href="/contact" className="btn-light-secondary">
-                  Contact Us
+                  {t('common.contactUs')}
                 </Link>
               </div>
 

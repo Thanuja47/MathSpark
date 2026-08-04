@@ -1,7 +1,9 @@
 'use client';
 import Link from 'next/link';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function CourseCard({ course }) {
+  const { t } = useLanguage();
   const {
     id, title, grade, medium, lessons, students,
     price, currency, isFree, badge, description,
@@ -67,7 +69,7 @@ export default function CourseCard({ course }) {
       <div className="course-card-footer">
         <div className="course-price">
           {isFree ? (
-            <span className="free-badge">FREE</span>
+            <span className="free-badge">{t('common.free')}</span>
           ) : (
             <>
               <span className="currency">{currency}</span>
@@ -77,7 +79,7 @@ export default function CourseCard({ course }) {
           )}
         </div>
         <Link href={`/courses/${id}`} className="course-link">
-          Learn More
+          {t('common.viewDetails')}
           <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
             <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
           </svg>

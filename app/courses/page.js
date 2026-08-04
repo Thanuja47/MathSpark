@@ -5,8 +5,10 @@ import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import CourseCard from '@/components/courses/CourseCard';
 import { courseService } from '@/services/courseService';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function CoursesPage() {
+  const { t } = useLanguage();
   const [coursesList, setCoursesList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedGrade, setSelectedGrade] = useState('all');
@@ -55,11 +57,11 @@ export default function CoursesPage() {
         <section className="page-hero">
           <div className="container">
             <div className="breadcrumb">
-              <a href="/">Home</a> <span>/</span> <span>Classes</span>
+              <a href="/">{t('nav.home')}</a> <span>/</span> <span>{t('nav.classes')}</span>
             </div>
-            <div className="section-tag page-hero-tag">All Online Classes</div>
+            <div className="section-tag page-hero-tag">{t('sections.popularCourses')}</div>
             <h1 className="page-hero-title">
-              Explore Our <span className="theme-gradient">Mathematics</span> Courses
+              {t('nav.classes')}
             </h1>
             <p className="page-hero-desc">
               Choose from Grade 6 to Grade 11 live interactive classes in Sinhala and English Medium.

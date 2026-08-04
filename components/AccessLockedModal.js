@@ -1,7 +1,10 @@
 'use client';
 import { SITE } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function AccessLockedModal({ grade, onClose }) {
+  const { t } = useLanguage();
+
   return (
     <div
       style={{
@@ -33,10 +36,10 @@ export default function AccessLockedModal({ grade, onClose }) {
       >
         <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🔒</div>
         <h3 style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 700, marginBottom: '12px' }}>
-          Access Required for Grade {grade}
+          {t('common.accessRequired')} (Grade {grade})
         </h3>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', lineHeight: '1.5', marginBottom: '24px' }}>
-          You don&apos;t have access to <strong>Grade {grade}</strong> content yet — contact us to request access.
+          {t('common.requiredGradeAccess')}
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -47,7 +50,7 @@ export default function AccessLockedModal({ grade, onClose }) {
             className="btn btn-accent btn-lg"
             style={{ width: '100%', justifyContent: 'center', fontWeight: 600, textDecoration: 'none' }}
           >
-            💬 Contact via WhatsApp
+            💬 {t('common.contactViaWhatsApp')}
           </a>
 
           <button
@@ -55,7 +58,7 @@ export default function AccessLockedModal({ grade, onClose }) {
             className="btn btn-outline"
             style={{ width: '100%', justifyContent: 'center', color: 'rgba(255,255,255,0.7)' }}
           >
-            Close
+            {t('common.close')}
           </button>
         </div>
       </div>

@@ -1,8 +1,10 @@
 'use client';
 import Link from 'next/link';
 import { SITE, GRADES, NAV_LINKS } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Footer() {
+  const { t } = useLanguage();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -12,17 +14,17 @@ export default function Footer() {
         <div className="container">
           <div className="footer-cta-inner">
             <div className="footer-cta-content">
-              <div className="section-tag">Join MathSpark Today</div>
+              <div className="section-tag">{t('sections.whyMathSpark')}</div>
               <h2>Ready to Ignite Your<br /><span className="theme-gradient">Math Journey?</span></h2>
-              <p>Join 5,200+ students achieving A passes in Mathematics. Live classes, full recordings, WhatsApp support — all in one place.</p>
+              <p>{t('hero.description')}</p>
             </div>
             <div className="footer-cta-actions">
               <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer" className="btn btn-accent btn-lg">
-                <span>💬</span> WhatsApp Now
+                <span>💬</span> {t('common.whatsAppInquiry')}
               </a>
               <a href={`tel:${SITE.phone}`} className="btn btn-outline btn-lg">
                 <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.63A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-                Call Us
+                {t('common.contactUs')}
               </a>
             </div>
           </div>
@@ -43,7 +45,7 @@ export default function Footer() {
                 </div>
               </Link>
               <p className="footer-desc">
-                Sri Lanka&apos;s most result-oriented online Mathematics platform for Grades 6–11. Sinhala &amp; English medium classes with live sessions and full recordings.
+                {t('footer.about')}
               </p>
               <div className="footer-social">
                 <a href={SITE.facebook} target="_blank" rel="noreferrer" className="footer-social-link" aria-label="Facebook">
@@ -63,11 +65,11 @@ export default function Footer() {
 
             {/* Quick Links */}
             <div className="footer-col">
-              <h5 className="footer-col-title">Quick Links</h5>
+              <h5 className="footer-col-title">{t('footer.quickLinks')}</h5>
               <ul className="footer-links">
-                <li><Link href="/">Home</Link></li>
-                <li><Link href="/courses">Classes</Link></li>
-                <li><Link href="/store">Store</Link></li>
+                <li><Link href="/">{t('nav.home')}</Link></li>
+                <li><Link href="/courses">{t('nav.classes')}</Link></li>
+                <li><Link href="/store">{t('nav.store')}</Link></li>
                 <li><Link href="/instructors">Instructors</Link></li>
                 <li><Link href="/contact">Contact</Link></li>
                 <li><Link href="/tracking">Tute Tracking</Link></li>

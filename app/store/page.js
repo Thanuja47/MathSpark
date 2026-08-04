@@ -4,8 +4,10 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import { STORE_ITEMS as STATIC_STORE_ITEMS } from '@/lib/data';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function StorePage() {
+  const { t } = useLanguage();
   const [storeItems, setStoreItems] = useState(STATIC_STORE_ITEMS);
   const [orderingItem, setOrderingItem] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -96,11 +98,11 @@ export default function StorePage() {
         <section className="page-hero">
           <div className="container">
             <div className="breadcrumb">
-              <a href="/">Home</a> <span>/</span> <span>Store</span>
+              <a href="/">{t('nav.home')}</a> <span>/</span> <span>{t('nav.store')}</span>
             </div>
-            <div className="section-tag page-hero-tag">Study Materials &amp; Tutes</div>
+            <div className="section-tag page-hero-tag">{t('nav.store')}</div>
             <h1 className="page-hero-title">
-              MathSpark <span className="theme-gradient">Store</span>
+              MathSpark <span className="theme-gradient">{t('nav.store')}</span>
             </h1>
             <p className="page-hero-desc">
               Get official revision books, formula sheets, workbooks, and past paper packs delivered to your doorstep.
@@ -161,7 +163,7 @@ export default function StorePage() {
                       disabled={!item.inStock}
                       onClick={() => handleOpenOrderModal(item)}
                     >
-                      {item.inStock ? 'Order Now 🛒' : 'Out of Stock'}
+                      {item.inStock ? `${t('common.enrollNow').replace('Enroll','Order')} 🛒` : 'Out of Stock'}
                     </button>
                   </div>
                 </div>
@@ -196,7 +198,7 @@ export default function StorePage() {
 
               <form onSubmit={handlePlaceOrder}>
                 <div className="form-group" style={{ marginBottom: 16 }}>
-                  <label className="form-label" style={{ color: 'var(--text)' }}>Student Name</label>
+                  <label className="form-label" style={{ color: 'var(--text)' }}>{t('auth.nameLabel')}</label>
                   <input
                     type="text"
                     className="form-input"
@@ -206,7 +208,7 @@ export default function StorePage() {
                   />
                 </div>
                 <div className="form-group" style={{ marginBottom: 16 }}>
-                  <label className="form-label" style={{ color: 'var(--text)' }}>WhatsApp Phone Number</label>
+                  <label className="form-label" style={{ color: 'var(--text)' }}>{t('auth.phoneLabel')}</label>
                   <input
                     type="text"
                     className="form-input"
@@ -232,10 +234,10 @@ export default function StorePage() {
                 </div>
                 <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
                   <button type="button" className="btn btn-ghost" onClick={() => setOrderingItem(null)} disabled={submitting}>
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button type="submit" className="btn btn-primary" disabled={submitting}>
-                    {submitting ? 'Placing Order...' : 'Confirm Order 🚀'}
+                    {submitting ? t('common.loading') : 'Confirm Order 🚀'}
                   </button>
                 </div>
               </form>

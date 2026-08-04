@@ -3,8 +3,10 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { NAV_LINKS, GRADES, SITE } from '@/lib/data';
 import { login as loginService } from '@/services/authService';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Header() {
+  const { lang, toggleLanguage, t } = useLanguage();
   const [scrolled, setScrolled]             = useState(false);
   const [mobileOpen, setMobileOpen]         = useState(false);
   const [loginOpen, setLoginOpen]           = useState(false);
@@ -196,23 +198,23 @@ export default function Header() {
                     </svg>
                   )}
                 </span>
-                <span className="pill-nav-label">{link.label}</span>
+                <span className="pill-nav-label">{t(`nav.${link.icon}`)}</span>
               </Link>
             ))}
           </nav>
 
           {/* Header Actions */}
           <div className="header-actions">
-            {/* Sinhala Converter Button */}
+            {/* Sinhala / English Toggle Button */}
             <button
               id="sinhala-converter-btn"
               className="sinhala-icon-btn"
-              onClick={() => alert('Sinhala Converter coming soon!')}
-              aria-label="Sinhala Converter"
-              title="Sinhala Converter"
+              onClick={toggleLanguage}
+              aria-label="Toggle Language"
+              title="Toggle Language"
             >
-              <span className="sinhala-badge">සිං</span>
-              <span className="sinhala-icon-label">Sinhala</span>
+              <span className="sinhala-badge">{lang === 'en' ? 'සිං' : 'EN'}</span>
+              <span className="sinhala-icon-label">{lang === 'en' ? 'සිංහල' : 'English'}</span>
             </button>
 
             <span className="actions-separator" aria-hidden="true" />
@@ -228,7 +230,7 @@ export default function Header() {
                 <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
                 <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
               </svg>
-              <span className="grades-icon-label">Grades</span>
+              <span className="grades-icon-label">{t('nav.grades')}</span>
             </button>
 
             <span className="actions-separator" aria-hidden="true" />
@@ -258,18 +260,18 @@ export default function Header() {
                       <div className="user-dropdown-divider" />
                       <Link href={dashboardHref} className="user-dropdown-item" onClick={() => setUserMenuOpen(false)}>
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                        Dashboard
+                        {t('nav.dashboard')}
                       </Link>
                       <button className="user-dropdown-item user-dropdown-logout" onClick={handleLogout}>
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        Logout
+                        {t('nav.logout')}
                       </button>
                     </div>
                   )}
                 </div>
               ) : (
                 <button id="login-btn-header" className="login-btn" onClick={() => setLoginOpen(true)}>
-                  Login
+                  {t('nav.login')}
                   <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </button>
               )
@@ -344,7 +346,7 @@ export default function Header() {
                   }
                 }}
               >
-                <span>{link.label}</span>
+                <span>{t(`nav.${link.icon}`)}</span>
                 {link.dropdown && (
                   <svg
                     className={`mobile-chevron${expandedMobile === link.label ? ' open' : ''}`}
@@ -384,7 +386,7 @@ export default function Header() {
                 onClick={handleLogout}
               >
                 <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                Logout
+                {t('nav.logout')}
               </button>
             </div>
           ) : (
@@ -394,7 +396,7 @@ export default function Header() {
               style={{ width:'100%', justifyContent:'center' }}
               onClick={() => { closeMobile(); setLoginOpen(true); }}
             >
-              Login to Your Account
+              {t('nav.login')}
               <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </button>
           )}
@@ -447,11 +449,11 @@ export default function Header() {
               <span className="logo-name" style={{fontSize:'1rem'}}>MathSpark</span>
             </div>
             <h3 className="modal-title">
-              {step === 1 ? 'Welcome back' : 'Enter password'}
+              {step === 1 ? t('auth.signInTitle').replace('Sign In to MathSpark','Welcome back') : t('auth.passwordLabel')}
             </h3>
             <p className="modal-subtitle">
               {step === 1
-                ? 'Sign in with your registered WhatsApp number'
+                ? `${t('auth.signInBtn')} — ${t('auth.phoneLabel')}`
                 : <span>Signing in as <strong style={{color:'var(--paper)'}}>{phone}</strong></span>
               }
             </p>
@@ -479,7 +481,7 @@ export default function Header() {
           {step === 1 && (
             <form id="login-step1-form" onSubmit={handleStep1}>
               <div className="form-group">
-                <label className="form-label" htmlFor="login-phone">WhatsApp Number</label>
+                <label className="form-label" htmlFor="login-phone">{t('auth.phoneLabel')}</label>
                 <input
                   id="login-phone"
                   type="tel"
@@ -500,7 +502,7 @@ export default function Header() {
           {step === 2 && (
             <form id="login-step2-form" onSubmit={handleLogin}>
               <div className="form-group">
-                <label className="form-label">Password</label>
+                <label className="form-label">{t('auth.passwordLabel')}</label>
                 <input
                   id="login-password"
                   type="password"
@@ -530,7 +532,7 @@ export default function Header() {
           )}
 
           <p className="modal-footer-text">
-            Don&apos;t have an account?{' '}
+            {t('auth.dontHaveAccount').split('?')[0]}?{' '}
             <Link href="/register" style={{color:'var(--cobalt-light)', fontWeight:600}} onClick={closeLogin}>
               Register here
             </Link>

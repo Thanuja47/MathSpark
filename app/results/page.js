@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
+import { useLanguage } from '@/context/LanguageContext';
 
 const STATIC_RESULTS = [
   { year: '2025', grade: 'O/L (Grade 11)', aPass: 3682, total: 3950, percentage: '93%', topScorer: 'Kavindi P. — 100/100', medium: 'Sinhala & English' },
@@ -18,6 +19,7 @@ const STATIC_TOPPERS = [
 ];
 
 export default function ResultsPage() {
+  const { t } = useLanguage();
   const [liveResults, setLiveResults] = useState([]);
 
   useEffect(() => {
@@ -50,9 +52,9 @@ export default function ResultsPage() {
         {/* Hero */}
         <section className="page-hero">
           <div className="container">
-            <div className="section-tag page-hero-tag">Proven Track Record</div>
+            <div className="section-tag page-hero-tag">{t('nav.results')}</div>
             <h1 className="page-hero-title">
-              Our Students&apos; <span className="theme-gradient">Results</span>
+              {t('nav.results')}
             </h1>
             <p className="page-hero-desc">
               Real results from real students. See why MathSpark is Sri Lanka&apos;s most result-oriented online Maths platform.

@@ -4,11 +4,13 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import { uploadImage } from '@/utils/uploadImage';
+import { useLanguage } from '@/context/LanguageContext';
 
 /* ─── tiny helpers ─────────────────────────────────── */
 const apiFetch = (url, opts) => fetch(url, { ...opts, headers: { 'Content-Type': 'application/json', ...(opts?.headers || {}) } });
 
 export default function AdminPage() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('courses');
 
   /* ════════════════════════════════════════════════════
@@ -539,14 +541,14 @@ export default function AdminPage() {
      NAV TABS CONFIG
   ════════════════════════════════════════════════════ */
   const tabs = [
-    { key: 'students',  label: '👥 Students',   count: studentsList.length },
-    { key: 'courses',   label: '📚 Courses',   count: coursesList.length },
-    { key: 'timetable', label: '📅 Timetable',  count: ttList.length },
-    { key: 'exams',     label: '📝 MCQ Tests',  count: examList.length },
-    { key: 'store',     label: '🛒 Store',      count: storeList.length },
-    { key: 'orders',    label: '📦 Orders',     count: ordersList.length },
-    { key: 'results',   label: '🏆 Results',    count: resultsList.length },
-    { key: 'grades',    label: '🎓 Grades',     count: gradesList.length },
+    { key: 'students',  label: `👥 ${t('admin.tabStudents')}`,   count: studentsList.length },
+    { key: 'courses',   label: `📚 ${t('admin.tabCourses')}`,    count: coursesList.length },
+    { key: 'timetable', label: `📅 ${t('admin.tabTimetable')}`,  count: ttList.length },
+    { key: 'exams',     label: `📝 ${t('admin.tabExams')}`,      count: examList.length },
+    { key: 'store',     label: `🛒 ${t('admin.tabStore')}`,      count: storeList.length },
+    { key: 'orders',    label: `📦 ${t('admin.tabOrders')}`,     count: ordersList.length },
+    { key: 'results',   label: `🏆 ${t('admin.tabResults')}`,    count: resultsList.length },
+    { key: 'grades',    label: `🎓 ${t('admin.tabGrades')}`,     count: gradesList.length },
   ];
 
 

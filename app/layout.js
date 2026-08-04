@@ -19,6 +19,8 @@ export const metadata = {
   themeColor: '#0052FF',
 };
 
+import { LanguageProvider } from '@/context/LanguageContext';
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -27,7 +29,9 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body>
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );
