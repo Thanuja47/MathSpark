@@ -203,6 +203,21 @@ export default function Header() {
 
           {/* Header Actions */}
           <div className="header-actions">
+            {/* Sinhala Converter Button */}
+            <button
+              id="sinhala-converter-btn"
+              className="sinhala-icon-btn"
+              onClick={() => alert('Sinhala Converter coming soon!')}
+              aria-label="Sinhala Converter"
+              title="Sinhala Converter"
+            >
+              <span className="sinhala-badge">සිං</span>
+              <span className="sinhala-icon-label">Sinhala</span>
+            </button>
+
+            <span className="actions-separator" aria-hidden="true" />
+
+            {/* Grades sidebar trigger */}
             <button
               id="grades-sidebar-btn"
               className="grades-icon-btn"
@@ -593,31 +608,30 @@ export default function Header() {
           overflow: hidden;
         }
 
-        /* Individual pill nav item */
+        /* Individual pill nav item — Icon on top of text */
         .pill-nav-item {
           display: flex;
+          flex-direction: column;
           align-items: center;
-          gap: 7px;
-          padding: 5px 11px 5px 6px;
-          background: #27292f;
-          border-radius: 999px;
+          justify-content: center;
+          gap: 3px;
+          padding: 6px 10px;
+          border-radius: var(--radius-md);
           text-decoration: none;
-          color: rgba(255,255,255,0.88);
-          font-size: 0.785rem;
+          color: rgba(255,255,255,0.85);
+          font-size: 0.72rem;
           font-weight: 500;
           white-space: nowrap;
-          border: 1px solid rgba(255,255,255,0.07);
-          transition: background 0.2s, border-color 0.2s, transform 0.15s;
+          transition: color 0.2s, transform 0.15s;
           letter-spacing: -0.01em;
         }
         .pill-nav-item:hover {
-          background: #35373f;
-          border-color: rgba(255,255,255,0.15);
-          transform: translateY(-1px);
-          color: #fff;
+          transform: translateY(-2px);
+          color: #ffffff;
         }
         .pill-nav-label {
           line-height: 1;
+          font-size: 0.73rem;
         }
 
         /* Circular color badge */
@@ -713,6 +727,37 @@ export default function Header() {
           background: var(--rule);
           flex-shrink: 0;
         }
+
+        .sinhala-icon-btn {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          padding: 7px 14px;
+          font-size: 0.8125rem;
+          font-weight: 600;
+          color: var(--text);
+          background: var(--surface-2);
+          border: 1px solid var(--rule);
+          border-radius: var(--radius-sm);
+          cursor: pointer;
+          transition: var(--transition);
+          white-space: nowrap;
+          letter-spacing: -0.01em;
+        }
+        .sinhala-icon-btn:hover { color: #f59e0b; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.1); }
+        .sinhala-badge {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          background: linear-gradient(135deg, #f59e0b, #d97706);
+          color: white;
+          font-size: 0.75rem;
+          font-weight: 700;
+          border-radius: 4px;
+        }
+        .sinhala-icon-label { font-size: 0.8125rem; font-weight: 600; }
 
         .grades-icon-btn {
           display: flex;
