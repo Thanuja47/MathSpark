@@ -1246,13 +1246,76 @@ export default function Header() {
           animation: spin 0.7s linear infinite;
         }
 
-        /* Responsive */
+        /* ── Responsive: Tablet ── */
         @media (max-width: 900px) {
           .desktop-nav { display: none; }
           .grades-icon-btn { display: none; }
           .actions-separator { display: none; }
           .mobile-menu-btn { display: flex; }
           .user-name-text { display: none; }
+        }
+
+        /* ── Responsive: Mobile ── */
+        @media (max-width: 768px) {
+          /* Hide the pill nav feature bar entirely on mobile */
+          .pill-nav-container { display: none; }
+
+          /* Keep the language toggle icon but hide the text label */
+          .sinhala-icon-label { display: none; }
+
+          /* Tighten the language button — icon only on mobile */
+          .sinhala-icon-btn {
+            padding: 7px 10px;
+            gap: 0;
+          }
+
+          /* Clean up header inner: logo left, actions right, tight padding */
+          .header-inner {
+            padding: 0 14px;
+            gap: 8px;
+          }
+
+          /* Actions row: snug spacing */
+          .header-actions {
+            gap: 8px;
+          }
+
+          /* Hamburger: always clearly visible, larger tap target */
+          .mobile-menu-btn {
+            display: flex !important;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.07);
+            border: 1.5px solid rgba(255,255,255,0.18);
+            border-radius: 8px;
+            color: #ffffff;
+            flex-shrink: 0;
+          }
+          .mobile-menu-btn svg {
+            stroke: #ffffff;
+            width: 22px;
+            height: 22px;
+          }
+
+          /* Login button: compact on mobile */
+          .login-btn {
+            padding: 7px 14px;
+            font-size: 0.8125rem;
+            white-space: nowrap;
+          }
+
+          /* User avatar button: no name, just avatar */
+          .user-name-text { display: none; }
+          .user-menu-btn { padding: 4px 8px 4px 4px; }
+        }
+
+        /* ── Responsive: Small Mobile (≤480px) ── */
+        @media (max-width: 480px) {
+          .header-inner { padding: 0 10px; gap: 6px; }
+          .header-actions { gap: 6px; }
+          .logo-name { font-size: 0.9375rem; }
+          .login-btn { padding: 6px 12px; font-size: 0.75rem; }
+          .mobile-menu-btn { width: 38px; height: 38px; }
         }
 
         @keyframes fadeInUp {
