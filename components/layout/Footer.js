@@ -15,7 +15,7 @@ export default function Footer() {
           <div className="footer-cta-inner">
             <div className="footer-cta-content">
               <div className="section-tag">{t('sections.whyMathSpark')}</div>
-              <h2>Ready to Ignite Your<br /><span className="theme-gradient">Math Journey?</span></h2>
+              <h2>{t('footer.ctaTitle1')}<br /><span className="theme-gradient">{t('footer.ctaTitle2')}</span></h2>
               <p>{t('hero.description')}</p>
             </div>
             <div className="footer-cta-actions">
@@ -70,15 +70,15 @@ export default function Footer() {
                 <li><Link href="/">{t('nav.home')}</Link></li>
                 <li><Link href="/courses">{t('nav.classes')}</Link></li>
                 <li><Link href="/store">{t('nav.store')}</Link></li>
-                <li><Link href="/instructors">Instructors</Link></li>
-                <li><Link href="/contact">Contact</Link></li>
-                <li><Link href="/tracking">Tute Tracking</Link></li>
+                <li><Link href="/instructors">{t('footer.instructors')}</Link></li>
+                <li><Link href="/contact">{t('nav.contact')}</Link></li>
+                <li><Link href="/tracking">{t('footer.tuteTracking')}</Link></li>
               </ul>
             </div>
 
             {/* Grades */}
             <div className="footer-col">
-              <h5 className="footer-col-title">Grades</h5>
+              <h5 className="footer-col-title">{t('nav.grades')}</h5>
               <ul className="footer-links">
                 {GRADES.map(g => (
                   <li key={g.id}>
@@ -90,27 +90,27 @@ export default function Footer() {
 
             {/* Contact */}
             <div className="footer-col">
-              <h5 className="footer-col-title">Contact Us</h5>
+              <h5 className="footer-col-title">{t('common.contactUs')}</h5>
               <ul className="footer-contact-list">
                 <li>
                   <span className="footer-contact-icon">📞</span>
                   <div>
-                    <div className="footer-contact-label">Phone / WhatsApp</div>
+                    <div className="footer-contact-label">{t('footer.phoneWhatsapp')}</div>
                     <a href={`tel:${SITE.phone}`} className="footer-contact-val">{SITE.phone}</a>
                   </div>
                 </li>
                 <li>
                   <span className="footer-contact-icon">✉️</span>
                   <div>
-                    <div className="footer-contact-label">Email</div>
+                    <div className="footer-contact-label">{t('footer.email')}</div>
                     <a href={`mailto:${SITE.email}`} className="footer-contact-val">{SITE.email}</a>
                   </div>
                 </li>
                 <li>
                   <span className="footer-contact-icon">🕐</span>
                   <div>
-                    <div className="footer-contact-label">Support Hours</div>
-                    <span className="footer-contact-val">Mon–Sat, 9am–6pm</span>
+                    <div className="footer-contact-label">{t('footer.supportHours')}</div>
+                    <span className="footer-contact-val">{t('footer.supportHoursVal')}</span>
                   </div>
                 </li>
               </ul>
@@ -124,12 +124,12 @@ export default function Footer() {
         <div className="container">
           <div className="footer-bottom-inner">
             <p className="footer-copyright">
-              © {currentYear} MathSpark. All rights reserved. Built with ❤️ for Sri Lankan students.
+              © {currentYear} MathSpark. {t('footer.copyright')} {t('footer.builtWith')}
             </p>
             <ul className="footer-policy-links">
-              <li><Link href="/terms">Terms of Service</Link></li>
-              <li><Link href="/privacy">Privacy Policy</Link></li>
-              <li><Link href="/refund">Refund Policy</Link></li>
+              <li><Link href="/terms">{t('footer.terms')}</Link></li>
+              <li><Link href="/privacy">{t('footer.privacy')}</Link></li>
+              <li><Link href="/refund">{t('footer.refund')}</Link></li>
             </ul>
           </div>
         </div>
