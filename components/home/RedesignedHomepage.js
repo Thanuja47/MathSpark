@@ -15,24 +15,24 @@ export default function RedesignedHomepage() {
   const processSteps = [
     {
       step: '01',
-      title: 'Theory & Concept Mastery',
-      desc: 'Deep-dive into core mathematical concepts with step-by-step proofs, visual aids, and interactive breakdown of complex syllabus topics.',
+      title: t('sections.step1Title'),
+      desc: t('sections.step1Desc'),
       icon: '💡',
       color: '#e0e7ff',
       textColor: '#3730a3',
     },
     {
       step: '02',
-      title: 'Structured Practice & Tests',
-      desc: 'Targeted model papers, past O/L & A/L examination papers, timed MCQ tests, and monthly progress evaluations to build accuracy.',
+      title: t('sections.step2Title'),
+      desc: t('sections.step2Desc'),
       icon: '✍️',
       color: '#f3e8ff',
       textColor: '#6b21a8',
     },
     {
       step: '03',
-      title: 'Live Interactive Classes',
-      desc: 'Engaging real-time online streams with direct voice Q&A, instant doubt resolution, and full HD recording access for revision anytime.',
+      title: t('sections.step3Title'),
+      desc: t('sections.step3Desc'),
       icon: '🚀',
       color: '#fce7f3',
       textColor: '#9d174d',
@@ -41,24 +41,24 @@ export default function RedesignedHomepage() {
 
   const faqs = [
     {
-      q: 'How do I enroll in Ishan Maduranga’s Mathematics classes?',
-      a: 'You can register a free account on MathSpark, select your grade under the Classes section, and choose your preferred batch (Sinhala or English Medium). Complete payment via online gateway or bank transfer to unlock live stream links & tutes.',
+      q: t('sections.faq1Q'),
+      a: t('sections.faq1A'),
     },
     {
-      q: 'How are physical tutes and revision packs delivered?',
-      a: 'Printed revision workbooks, past paper collections, and tute packs are dispatched via Domex Express courier to your home address in Sri Lanka. You can track your shipment anytime on our Tracking page.',
+      q: t('sections.faq2Q'),
+      a: t('sections.faq2A'),
     },
     {
-      q: 'What if I miss a live online class?',
-      a: 'Every live session is recorded in High Definition and uploaded to your student portal within 24 hours. You can re-watch any lesson as many times as you like until your final examinations.',
+      q: t('sections.faq3Q'),
+      a: t('sections.faq3A'),
     },
     {
-      q: 'Can I ask questions during live online streams?',
-      a: 'Yes! Our custom virtual classroom includes a live Q&A panel and audio mic access during designated Q&A segments so you can clarify any doubts directly with Ishan sir.',
+      q: t('sections.faq4Q'),
+      a: t('sections.faq4A'),
     },
     {
-      q: 'Are classes available in both Sinhala and English medium?',
-      a: 'Yes, we conduct separate dedicated streams for Sinhala medium and English medium students across Grades 6 to 11 and A/L classes.',
+      q: t('sections.faq5Q'),
+      a: t('sections.faq5A'),
     },
   ];
 
@@ -151,9 +151,9 @@ export default function RedesignedHomepage() {
               <div className="feature-icon-wrapper bg-blue-light">
                 <span>📚</span>
               </div>
-              <h3 className="feature-card-title">Live &amp; Recorded Classes</h3>
+              <h3 className="feature-card-title">{t('sections.feat1Title')}</h3>
               <p className="feature-card-desc">
-                High-definition live interactive lectures with instant video replay access available 24/7 on your personal dashboard.
+                {t('sections.feat1Desc')}
               </p>
             </div>
 
@@ -161,9 +161,9 @@ export default function RedesignedHomepage() {
               <div className="feature-icon-wrapper bg-purple-light">
                 <span>🏆</span>
               </div>
-              <h3 className="feature-card-title">Proven Top Results</h3>
+              <h3 className="feature-card-title">{t('sections.feat2Title')}</h3>
               <p className="feature-card-desc">
-                Consistent track record of island-best and district-best rankings in G.C.E. O/L and A/L Mathematics examinations.
+                {t('sections.feat2Desc')}
               </p>
             </div>
 
@@ -171,9 +171,9 @@ export default function RedesignedHomepage() {
               <div className="feature-icon-wrapper bg-pink-light">
                 <span>📝</span>
               </div>
-              <h3 className="feature-card-title">Timed MCQ &amp; Model Exams</h3>
+              <h3 className="feature-card-title">{t('sections.feat3Title')}</h3>
               <p className="feature-card-desc">
-                Interactive digital exam portal with automated marking, detailed paper solutions, and performance analytics.
+                {t('sections.feat3Desc')}
               </p>
             </div>
           </div>
@@ -184,10 +184,10 @@ export default function RedesignedHomepage() {
       <section className="section-light bg-slate">
         <div className="container">
           <div className="section-header-center">
-            <span className="section-badge">METHODOLOGY</span>
-            <h2 className="section-title-dark">Our 3-Step Learning Process</h2>
+            <span className="section-badge">{t('sections.methodology')}</span>
+            <h2 className="section-title-dark">{t('sections.processTitle')}</h2>
             <p className="section-subtitle-dark">
-              A systematic teaching methodology crafted to make even the hardest calculus and algebra concepts intuitive.
+              {t('sections.processSubtitle')}
             </p>
           </div>
 
@@ -219,35 +219,35 @@ export default function RedesignedHomepage() {
                 />
                 <div className="instructor-experience-badge">
                   <span className="exp-years">10+</span>
-                  <span className="exp-text">Years of Excellence</span>
+                  <span className="exp-text">{t('sections.expYears')}</span>
                 </div>
               </div>
             </div>
 
             <div className="instructor-info-side">
-              <span className="section-badge">MEET YOUR TEACHER</span>
+              <span className="section-badge">{t('sections.meetTeacherTag')}</span>
               <h2 className="instructor-name">Ishan Maduranga</h2>
-              <div className="instructor-qual">B.Sc (Hons) Mathematics · Lead Educator</div>
+              <div className="instructor-qual">{t('sections.instructorTitle')}</div>
               
               <p className="instructor-bio-p">
-                Ishan Maduranga is one of Sri Lanka&apos;s most celebrated and sought-after Mathematics educators. Known for his clarity, logical approach, and engaging teaching style, he has guided thousands of students to achieve top distinction grades in G.C.E. Ordinary Level and Advanced Level exams.
+                {t('sections.instructorBio1')}
               </p>
               <p className="instructor-bio-p">
-                His unique framework breaks down intimidating mathematical equations into simple, digestible mental models. Whether you are aiming for an &apos;A&apos; grade or building fundamental confidence, his structured methodology delivers results.
+                {t('sections.instructorBio2')}
               </p>
 
               <div className="instructor-highlights">
                 <div className="highlight-item">
                   <span className="check-icon">✓</span>
-                  <span>Specialized in O/L &amp; A/L Mathematics</span>
+                  <span>{t('sections.instructorHighlight1')}</span>
                 </div>
                 <div className="highlight-item">
                   <span className="check-icon">✓</span>
-                  <span>10,000+ Hours of Live Teaching</span>
+                  <span>{t('sections.instructorHighlight2')}</span>
                 </div>
                 <div className="highlight-item">
                   <span className="check-icon">✓</span>
-                  <span>Author of Official MathSpark Workbooks</span>
+                  <span>{t('sections.instructorHighlight3')}</span>
                 </div>
               </div>
             </div>
@@ -259,10 +259,10 @@ export default function RedesignedHomepage() {
       <section className="section-light bg-slate">
         <div className="container" style={{ maxWidth: 840 }}>
           <div className="section-header-center">
-            <span className="section-badge">FREQUENTLY ASKED QUESTIONS</span>
-            <h2 className="section-title-dark">Got Questions? We Have Answers.</h2>
+            <span className="section-badge">{t('sections.faq').toUpperCase()}</span>
+            <h2 className="section-title-dark">{t('sections.faq')}</h2>
             <p className="section-subtitle-dark">
-              Everything you need to know about joining MathSpark online classes and receiving study materials.
+              {t('sections.faqSubtitle')}
             </p>
           </div>
 
