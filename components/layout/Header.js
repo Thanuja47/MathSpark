@@ -638,7 +638,7 @@ export default function Header() {
           line-height: 1;
         }
 
-        /* Circular color badge */
+        /* Circular color badge with AP.lk style micro-animations */
         .pill-icon-badge {
           width: 20px;
           height: 20px;
@@ -647,17 +647,28 @@ export default function Header() {
           align-items: center;
           justify-content: center;
           flex-shrink: 0;
+          transition: transform 0.25s ease, box-shadow 0.25s ease;
+          animation: pillIconFloat 4s ease-in-out infinite alternate;
+        }
+        .pill-nav-item:hover .pill-icon-badge {
+          transform: scale(1.2) rotate(6deg);
+          box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+        }
+        @keyframes pillIconFloat {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(-1.5px); }
+          100% { transform: translateY(0px); }
         }
         /* Each icon gets its own color */
-        .pill-icon-home     { background: linear-gradient(135deg, #06b6d4, #2563eb); }
-        .pill-icon-classes  { background: linear-gradient(135deg, #a855f7, #7c3aed); }
-        .pill-icon-timetable{ background: linear-gradient(135deg, #22c55e, #16a34a); }
-        .pill-icon-exams    { background: linear-gradient(135deg, #f97316, #ea580c); }
-        .pill-icon-store    { background: linear-gradient(135deg, #ef4444, #dc2626); }
-        .pill-icon-results  { background: linear-gradient(135deg, #ec4899, #db2777); }
-        .pill-icon-tute     { background: linear-gradient(135deg, #eab308, #ca8a04); }
-        .pill-icon-tracking { background: linear-gradient(135deg, #84cc16, #65a30d); }
-        .pill-icon-contact  { background: linear-gradient(135deg, #38bdf8, #0284c7); }
+        .pill-icon-home     { background: linear-gradient(135deg, #06b6d4, #2563eb); box-shadow: 0 2px 6px rgba(6,182,212,0.3); }
+        .pill-icon-classes  { background: linear-gradient(135deg, #a855f7, #7c3aed); box-shadow: 0 2px 6px rgba(168,85,247,0.3); }
+        .pill-icon-timetable{ background: linear-gradient(135deg, #22c55e, #16a34a); box-shadow: 0 2px 6px rgba(34,197,94,0.3); }
+        .pill-icon-exams    { background: linear-gradient(135deg, #f97316, #ea580c); box-shadow: 0 2px 6px rgba(249,115,22,0.3); }
+        .pill-icon-store    { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 2px 6px rgba(239,68,68,0.3); }
+        .pill-icon-results  { background: linear-gradient(135deg, #ec4899, #db2777); box-shadow: 0 2px 6px rgba(236,72,153,0.3); }
+        .pill-icon-tute     { background: linear-gradient(135deg, #eab308, #ca8a04); box-shadow: 0 2px 6px rgba(234,179,8,0.3); }
+        .pill-icon-tracking { background: linear-gradient(135deg, #84cc16, #65a30d); box-shadow: 0 2px 6px rgba(132,204,22,0.3); }
+        .pill-icon-contact  { background: linear-gradient(135deg, #38bdf8, #0284c7); box-shadow: 0 2px 6px rgba(56,189,248,0.3); }
 
         /* Responsive: tighter at 1366px */
         @media (max-width: 1366px) {

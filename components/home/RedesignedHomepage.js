@@ -204,16 +204,41 @@ export default function RedesignedHomepage() {
           </div>
 
           <div className="process-grid">
-            {processSteps.map((p) => (
-              <div key={p.step} className="process-card">
-                <div className="process-step-pill" style={{ background: p.color, color: p.textColor }}>
-                  {p.step}
-                </div>
-                <div className="process-icon">{p.icon}</div>
-                <h3 className="process-title">{p.title}</h3>
-                <p className="process-desc">{p.desc}</p>
+            <div className="process-card">
+              <div className="process-step-pill" style={{ background: '#e0e7ff', color: '#3730a3' }}>01</div>
+              <div className="process-icon-wrapper bg-gradient-yellow animated-badge">
+                <svg className="badge-3d-svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/>
+                  <path d="M9 18h6"/>
+                  <path d="M10 22h4"/>
+                </svg>
               </div>
-            ))}
+              <h3 className="process-title">{t('sections.step1Title')}</h3>
+              <p className="process-desc">{t('sections.step1Desc')}</p>
+            </div>
+
+            <div className="process-card">
+              <div className="process-step-pill" style={{ background: '#f3e8ff', color: '#6b21a8' }}>02</div>
+              <div className="process-icon-wrapper bg-gradient-orange animated-badge">
+                <svg className="badge-3d-svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </div>
+              <h3 className="process-title">{t('sections.step2Title')}</h3>
+              <p className="process-desc">{t('sections.step2Desc')}</p>
+            </div>
+
+            <div className="process-card">
+              <div className="process-step-pill" style={{ background: '#fce7f3', color: '#9d174d' }}>03</div>
+              <div className="process-icon-wrapper bg-gradient-rocket animated-badge">
+                <svg className="badge-3d-svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.71 1.26-1.5 1.76-2.31M12 15l-3-3M8.5 8.5l3 3M15 12l.55.55A6 6 0 0 0 21 7.5V3h-4.5a6 6 0 0 0-5.05 5.45L12 9"/>
+                </svg>
+              </div>
+              <h3 className="process-title">{t('sections.step3Title')}</h3>
+              <p className="process-desc">{t('sections.step3Desc')}</p>
+            </div>
           </div>
         </div>
       </section>
@@ -612,7 +637,7 @@ export default function RedesignedHomepage() {
         .feature-card-title { font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; }
         .feature-card-desc { font-size: 0.95rem; color: #64748b; line-height: 1.6; }
 
-        /* ── PROCESS GRID ── */
+        /* ── PROCESS GRID & ANIMATED 3D BADGES ── */
         .process-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -621,20 +646,47 @@ export default function RedesignedHomepage() {
         .process-card {
           background: #ffffff;
           border: 1px solid #e2e8f0;
-          border-radius: 20px;
+          border-radius: 24px;
           padding: 36px 28px;
           position: relative;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+          transition: all 0.3s ease;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .process-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 16px 36px rgba(37,99,235,0.08);
+          border-color: #cbd5e1;
         }
         .process-step-pill {
           position: absolute;
           top: 24px; right: 24px;
           font-size: 0.8rem; font-weight: 800;
-          padding: 4px 10px; border-radius: 999px;
+          padding: 4px 12px; border-radius: 999px;
         }
-        .process-icon { font-size: 2rem; margin-bottom: 20px; }
-        .process-title { font-size: 1.2rem; font-weight: 700; color: #0f172a; margin-bottom: 12px; }
-        .process-desc { font-size: 0.9rem; color: #64748b; line-height: 1.6; }
+        .process-icon-wrapper {
+          width: 64px; height: 64px;
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          margin-bottom: 20px;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        .bg-gradient-yellow {
+          background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+          color: #ffffff;
+        }
+        .bg-gradient-orange {
+          background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+          color: #ffffff;
+        }
+        .bg-gradient-rocket {
+          background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+          color: #ffffff;
+        }
+        .process-title { font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; }
+        .process-desc { font-size: 0.92rem; color: #64748b; line-height: 1.6; }
 
         /* ── INSTRUCTOR BIO ── */
         .instructor-bio-grid {
