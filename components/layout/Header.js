@@ -119,30 +119,31 @@ export default function Header() {
       <header ref={headerRef} className={`main-header${scrolled ? ' scrolled' : ''}`}>
         <div className="header-inner">
 
-          {/* Logo — gem mark + MathSpark */}
+          {/* ── Unified Premium Logo ── */}
           <Link href="/" className="header-logo">
-            <div className="logo-gem">
-              {/* Red/orange faceted gem "M" icon */}
-              <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
-                <polygon points="18,2 34,10 34,26 18,34 2,26 2,10" fill="url(#gem-grad)" />
-                <polygon points="18,2 34,10 18,18" fill="rgba(255,255,255,0.18)" />
-                <polygon points="2,10 18,18 18,34 2,26" fill="rgba(0,0,0,0.18)" />
-                <text x="18" y="23" textAnchor="middle" fill="white" fontSize="14" fontWeight="900" fontFamily="Arial,sans-serif">M</text>
-                <defs>
-                  <linearGradient id="gem-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#ff6b35"/>
-                    <stop offset="50%" stopColor="#f7c948"/>
-                    <stop offset="100%" stopColor="#e53e3e"/>
-                  </linearGradient>
-                </defs>
-              </svg>
-              {/* Sparkle stars */}
-              <svg className="gem-stars" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <text x="0" y="12" fontSize="10" fill="#f7c948">✦</text>
-                <text x="8" y="6" fontSize="6" fill="#fbbf24">✦</text>
-              </svg>
+            <svg className="logo-mark-svg" width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="logo-grad-hdr" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#6366f1"/>
+                  <stop offset="100%" stopColor="#8b5cf6"/>
+                </linearGradient>
+                <filter id="logo-glow-hdr" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              {/* Rounded square base */}
+              <rect width="40" height="40" rx="10" fill="#13141a"/>
+              <rect x="0.5" y="0.5" width="39" height="39" rx="9.5" stroke="url(#logo-grad-hdr)" strokeOpacity="0.5"/>
+              {/* Lightning M mark */}
+              <path d="M10 28 L16 12 L20 22 L24 12 L30 28" stroke="url(#logo-grad-hdr)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" filter="url(#logo-glow-hdr)"/>
+              {/* Spark dot */}
+              <circle cx="20" cy="20" r="1.5" fill="#8b5cf6" opacity="0.7"/>
+            </svg>
+            <div className="logo-wordmark">
+              <span className="logo-name">MathSpark</span>
+              <span className="logo-tagline">Online Academy</span>
             </div>
-            <span className="logo-name">MathSpark</span>
           </Link>
 
           {/* ── Floating pill nav container ── */}
@@ -301,12 +302,25 @@ export default function Header() {
       <div className={`mobile-menu${mobileOpen ? ' open' : ''}`} aria-hidden={!mobileOpen} role="dialog" aria-label="Navigation menu">
         <div className="mobile-menu-header">
           <Link href="/" className="header-logo" onClick={closeMobile}>
-            <div className="logo-mark">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-            </div>
-            <div className="logo-text">
+            <svg className="logo-mark-svg" width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="logo-grad-mob" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#6366f1"/>
+                  <stop offset="100%" stopColor="#8b5cf6"/>
+                </linearGradient>
+                <filter id="logo-glow-mob" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+              </defs>
+              <rect width="40" height="40" rx="10" fill="#13141a"/>
+              <rect x="0.5" y="0.5" width="39" height="39" rx="9.5" stroke="url(#logo-grad-mob)" strokeOpacity="0.5"/>
+              <path d="M10 28 L16 12 L20 22 L24 12 L30 28" stroke="url(#logo-grad-mob)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" filter="url(#logo-glow-mob)"/>
+              <circle cx="20" cy="20" r="1.5" fill="#8b5cf6" opacity="0.7"/>
+            </svg>
+            <div className="logo-wordmark">
               <span className="logo-name">MathSpark</span>
-              <span className="logo-sub">Online Tuition</span>
+              <span className="logo-tagline">Online Academy</span>
             </div>
           </Link>
           <button id="mobile-close-btn" className="icon-btn" onClick={closeMobile} aria-label="Close menu">
@@ -574,17 +588,18 @@ export default function Header() {
           text-decoration: none;
           flex-shrink: 0;
         }
-        .logo-gem {
-          position: relative;
-          display: flex;
-          align-items: center;
+        .logo-mark-svg {
           flex-shrink: 0;
+          transition: transform 0.3s ease, filter 0.3s ease;
         }
-        .gem-stars {
-          position: absolute;
-          top: -6px;
-          right: -6px;
-          pointer-events: none;
+        .header-logo:hover .logo-mark-svg {
+          transform: scale(1.06) rotate(-2deg);
+          filter: drop-shadow(0 0 8px rgba(139,92,246,0.6));
+        }
+        .logo-wordmark {
+          display: flex;
+          flex-direction: column;
+          gap: 1px;
         }
         .logo-name {
           font-family: var(--font-body);
@@ -592,6 +607,15 @@ export default function Header() {
           font-size: 1.0625rem;
           color: var(--paper);
           letter-spacing: -0.02em;
+          line-height: 1.1;
+        }
+        .logo-tagline {
+          font-size: 0.6rem;
+          font-weight: 500;
+          color: rgba(255,255,255,0.35);
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          line-height: 1;
         }
 
         /* ── Pill Nav Container ── */

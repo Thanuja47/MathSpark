@@ -38,10 +38,25 @@ export default function Footer() {
             {/* Brand Column */}
             <div className="footer-brand">
               <Link href="/" className="footer-logo">
-                <div className="footer-logo-mark">⚡</div>
+                <svg className="footer-logo-svg" width="38" height="38" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="logo-grad-footer" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stopColor="#6366f1"/>
+                      <stop offset="100%" stopColor="#8b5cf6"/>
+                    </linearGradient>
+                    <filter id="logo-glow-footer" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                  </defs>
+                  <rect width="40" height="40" rx="10" fill="#13141a"/>
+                  <rect x="0.5" y="0.5" width="39" height="39" rx="9.5" stroke="url(#logo-grad-footer)" strokeOpacity="0.4"/>
+                  <path d="M10 28 L16 12 L20 22 L24 12 L30 28" stroke="url(#logo-grad-footer)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" filter="url(#logo-glow-footer)"/>
+                  <circle cx="20" cy="20" r="1.5" fill="#8b5cf6" opacity="0.7"/>
+                </svg>
                 <div>
                   <span className="footer-logo-name">MathSpark</span>
-                  <span className="footer-logo-sub">Online School</span>
+                  <span className="footer-logo-sub">Online Academy</span>
                 </div>
               </Link>
               <p className="footer-desc">
@@ -123,9 +138,26 @@ export default function Footer() {
       <div className="footer-bottom">
         <div className="container">
           <div className="footer-bottom-inner">
-            <p className="footer-copyright">
-              © {currentYear} MathSpark. {t('footer.copyright')} {t('footer.builtWith')}
-            </p>
+            <div className="footer-copyright-block">
+              <p className="footer-copyright">
+                © {currentYear} <span className="footer-brand-accent">MathSpark</span>. All rights reserved.
+              </p>
+              <p className="footer-powered-by">
+                Designed &amp; Developed by
+                <span className="fillex-badge">
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                    <polygon points="6,1 11,4 11,8 6,11 1,8 1,4" fill="url(#fx-grad)" opacity="0.9"/>
+                    <defs>
+                      <linearGradient id="fx-grad" x1="0" y1="0" x2="12" y2="12">
+                        <stop offset="0%" stopColor="#6366f1"/>
+                        <stop offset="100%" stopColor="#8b5cf6"/>
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  FILLEX360 Solutions
+                </span>
+              </p>
+            </div>
             <ul className="footer-policy-links">
               <li><Link href="/terms">{t('footer.terms')}</Link></li>
               <li><Link href="/privacy">{t('footer.privacy')}</Link></li>
@@ -165,15 +197,19 @@ export default function Footer() {
 
         /* Brand */
         .footer-logo {
-          display: flex; align-items: center; gap: 10px;
+          display: flex; align-items: center; gap: 12px;
           margin-bottom: 20px;
+          text-decoration: none;
+          transition: opacity 0.2s;
         }
-        .footer-logo-mark {
-          width: 38px; height: 38px;
-          background: var(--gradient-blue);
-          border-radius: 10px;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 1.2rem;
+        .footer-logo:hover { opacity: 0.85; }
+        .footer-logo-svg {
+          flex-shrink: 0;
+          transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .footer-logo:hover .footer-logo-svg {
+          transform: scale(1.05) rotate(-2deg);
+          filter: drop-shadow(0 0 8px rgba(139,92,246,0.5));
         }
         .footer-logo-name { display: block; font-family: var(--font-heading); font-weight: 800; font-size: 1.1rem; }
         .footer-logo-sub  { display: block; font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
@@ -227,7 +263,41 @@ export default function Footer() {
           gap: 20px;
           flex-wrap: wrap;
         }
+        .footer-copyright-block { display: flex; flex-direction: column; gap: 4px; }
         .footer-copyright { font-size: 0.82rem; color: var(--text-muted); }
+        .footer-brand-accent {
+          font-weight: 700;
+          background: linear-gradient(90deg, #6366f1, #8b5cf6);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .footer-powered-by {
+          font-size: 0.75rem;
+          color: rgba(255,255,255,0.25);
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .fillex-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 2px 8px;
+          background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.12));
+          border: 1px solid rgba(139,92,246,0.25);
+          border-radius: 999px;
+          color: rgba(139,92,246,0.9);
+          font-size: 0.72rem;
+          font-weight: 600;
+          letter-spacing: 0.01em;
+          transition: border-color 0.2s, background 0.2s;
+        }
+        .fillex-badge:hover {
+          border-color: rgba(139,92,246,0.5);
+          background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2));
+          color: #a78bfa;
+        }
         .footer-policy-links { display: flex; gap: 20px; }
         .footer-policy-links a { font-size: 0.82rem; color: var(--text-muted); transition: color 0.2s; }
         .footer-policy-links a:hover { color: var(--primary-light); }
