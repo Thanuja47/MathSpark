@@ -1,8 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
+import AccessLockedModal from '@/components/AccessLockedModal';
 
 // Sample tute packs available to student
 const TUTES = [
@@ -14,8 +15,31 @@ const TUTES = [
 
 export default function TuteViewerPage() {
   const [selectedTute, setSelectedTute] = useState(null);
-  const [studentName] = useState('Kavindi Perera');
-  const [studentPhone] = useState('0712345678');
+  const [user, setUser] = useState(null);
+  const [lockedGrade, setLockedGrade] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => { if (data.user) setUser(data.user); })
+      .catch(() => {});
+  }, []);
+
+  const handleViewTute = (tute) => {
+    if (!user) {
+      alert('Please log in to view tute materials.');
+      return;
+    }
+    const approved = user.approvedGrades || [];
+    if (!approved.includes(Number(tute.grade))) {
+      setLockedGrade(tute.grade);
+      return;
+    }
+    setSelectedTute(tute);
+  };
+
+  const studentName = user ? user.name : 'MathSpark Student';
+  const studentPhone = user ? user.phone : '';
 
   return (
     <>
@@ -47,7 +71,7 @@ export default function TuteViewerPage() {
                       </div>
                       <button
                         className="btn btn-primary btn-sm"
-                        onClick={() => setSelectedTute(tute)}
+                        onClick={() => handleViewTute(tute)}
                         style={{ marginTop: 16, width: '100%' }}
                       >
                         📖 View PDF
@@ -99,6 +123,10 @@ export default function TuteViewerPage() {
       </main>
       <Footer />
       <FloatingWidgets />
+
+      {lockedGrade && (
+        <AccessLockedModal grade={lockedGrade} onClose={() => setLockedGrade(null)} />
+      )}
 
       <style jsx>{`
         .tute-card {

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
+import AccessLockedModal from '@/components/AccessLockedModal';
 
 const STATIC_QUIZZES = [
   {
@@ -132,7 +133,18 @@ export default function ExamsPage() {
     return () => clearTimeout(t);
   }, [view, timeLeft, endQuiz]);
 
+  const [lockedGrade, setLockedGrade] = useState(null);
+
   const startQuiz = (quiz) => {
+    if (!user) {
+      alert('Please log in to take exams.');
+      return;
+    }
+    const approved = user.approvedGrades || [];
+    if (!approved.includes(Number(quiz.grade))) {
+      setLockedGrade(quiz.grade);
+      return;
+    }
     setSelected(quiz);
     setCurrent(0);
     setAnswers([]);
@@ -310,6 +322,10 @@ export default function ExamsPage() {
 
       <Footer />
       <FloatingWidgets />
+
+      {lockedGrade && (
+        <AccessLockedModal grade={lockedGrade} onClose={() => setLockedGrade(null)} />
+      )}
 
       <style jsx>{`
         .quiz-card {

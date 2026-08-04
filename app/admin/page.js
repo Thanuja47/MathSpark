@@ -101,6 +101,16 @@ export default function AdminPage() {
   const [orderMsg, setOrderMsg]     = useState('');
 
   /* ════════════════════════════════════════════════════
+     STUDENTS STATE
+  ════════════════════════════════════════════════════ */
+  const [studentsList, setStudentsList]     = useState([]);
+  const [studentSearch, setStudentSearch]   = useState('');
+  const [managingStudent, setManagingStudent] = useState(null);
+  const [selectedGrades, setSelectedGrades] = useState([]);
+  const [studentMsg, setStudentMsg]         = useState('');
+  const [savingGrades, setSavingGrades]     = useState(false);
+
+  /* ════════════════════════════════════════════════════
      INITIAL DATA LOAD
   ════════════════════════════════════════════════════ */
   useEffect(() => {
@@ -111,6 +121,7 @@ export default function AdminPage() {
     fetch('/api/admin/results').then(r => r.json()).then(d => Array.isArray(d) && setResultsList(d)).catch(() => {});
     fetch('/api/admin/grades').then(r => r.json()).then(d => Array.isArray(d) && setGradesList(d)).catch(() => {});
     fetch('/api/admin/orders').then(r => r.json()).then(d => d?.orders && Array.isArray(d.orders) && setOrdersList(d.orders)).catch(() => {});
+    fetch('/api/admin/students').then(r => r.json()).then(d => d?.students && Array.isArray(d.students) && setStudentsList(d.students)).catch(() => {});
   }, []);
 
 
@@ -373,9 +384,57 @@ export default function AdminPage() {
   };
 
   /* ════════════════════════════════════════════════════
+     STUDENTS MANAGING
+  ════════════════════════════════════════════════════ */
+  const openStudentModal = (student) => {
+    setManagingStudent(student);
+    setSelectedGrades(student.approvedGrades || []);
+    setStudentMsg('');
+  };
+
+  const toggleGradeSelection = (g) => {
+    const numG = Number(g);
+    setSelectedGrades(prev =>
+      prev.includes(numG) ? prev.filter(x => x !== numG) : [...prev, numG]
+    );
+  };
+
+  const saveStudentGrades = async () => {
+    if (!managingStudent) return;
+    setSavingGrades(true);
+    setStudentMsg('');
+    try {
+      const res = await apiFetch(`/api/admin/students/${managingStudent.id}/grades`, {
+        method: 'PUT',
+        body: JSON.stringify({ gradeIds: selectedGrades }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update access');
+      
+      setStudentsList(prev => prev.map(s => s.id === managingStudent.id ? { ...s, approvedGrades: data.approvedGrades } : s));
+      setStudentMsg('✅ Grade access updated successfully!');
+      setTimeout(() => {
+        setManagingStudent(null);
+        setStudentMsg('');
+      }, 1000);
+    } catch (err) {
+      setStudentMsg(`❌ ${err.message}`);
+    } finally {
+      setSavingGrades(false);
+    }
+  };
+
+  const filteredStudents = studentsList.filter(s => {
+    const q = studentSearch.toLowerCase().trim();
+    if (!q) return true;
+    return s.name.toLowerCase().includes(q) || s.phone.includes(q);
+  });
+
+  /* ════════════════════════════════════════════════════
      NAV TABS CONFIG
   ════════════════════════════════════════════════════ */
   const tabs = [
+    { key: 'students',  label: '👥 Students',   count: studentsList.length },
     { key: 'courses',   label: '📚 Courses',   count: coursesList.length },
     { key: 'timetable', label: '📅 Timetable',  count: ttList.length },
     { key: 'exams',     label: '📝 MCQ Tests',  count: examList.length },
@@ -421,6 +480,81 @@ export default function AdminPage() {
 
               {/* Content Area */}
               <div className="admin-content">
+
+                {/* ── STUDENTS TAB ── */}
+                {activeTab === 'students' && (
+                  <div>
+                    <div className="tab-header" style={{ marginBottom: 20 }}>
+                      <div>
+                        <h3 style={{ margin: 0 }}>Student Grade Access</h3>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
+                          Search students and manage which Grade contents (G6–G11) they are authorized to access.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: 20 }}>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="🔍 Search students by name or phone number..."
+                        value={studentSearch}
+                        onChange={e => setStudentSearch(e.target.value)}
+                        style={{ maxWidth: 400 }}
+                      />
+                    </div>
+
+                    {filteredStudents.length === 0 ? (
+                      <div className="admin-empty-box">No students found matching your query.</div>
+                    ) : (
+                      <table className="admin-table">
+                        <thead>
+                          <tr>
+                            <th>Student Name</th>
+                            <th>Phone</th>
+                            <th>Reg. Date</th>
+                            <th>Approved Grade Access</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredStudents.map(student => (
+                            <tr key={student.id}>
+                              <td style={{ fontWeight: 600 }}>{student.name}</td>
+                              <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>{student.phone}</td>
+                              <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                {new Date(student.createdAt).toLocaleDateString()}
+                              </td>
+                              <td>
+                                {(!student.approvedGrades || student.approvedGrades.length === 0) ? (
+                                  <span className="badge badge-accent" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>
+                                    No Access Granted
+                                  </span>
+                                ) : (
+                                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                                    {student.approvedGrades.sort((a,b)=>a-b).map(g => (
+                                      <span key={g} className="badge badge-green" style={{ fontSize: '0.75rem' }}>
+                                        Grade {g}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </td>
+                              <td>
+                                <button
+                                  className="btn btn-outline btn-sm"
+                                  onClick={() => openStudentModal(student)}
+                                >
+                                  ⚙️ Manage Access
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
+                )}
 
                 {/* ── COURSES TAB ── */}
                 {activeTab === 'courses' && (
@@ -871,6 +1005,112 @@ export default function AdminPage() {
       </main>
       <Footer />
       <FloatingWidgets />
+
+      {/* ── Manage Student Grade Access Modal ── */}
+      {managingStudent && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(6px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+          }}
+          onClick={() => setManagingStudent(null)}
+        >
+          <div
+            style={{
+              background: '#181a20',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: 16,
+              padding: '28px 24px',
+              maxWidth: 480,
+              width: '100%',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
+              position: 'relative',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#fff' }}>Manage Grade Access</h3>
+              <button
+                onClick={() => setManagingStudent(null)}
+                style={{ background: 'none', border: 'none', color: '#aaa', fontSize: '1.2rem', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ marginBottom: 20, padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div style={{ fontWeight: 700, color: '#fff', fontSize: '1rem' }}>{managingStudent.name}</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Phone: {managingStudent.phone}</div>
+            </div>
+
+            <p style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.8)', marginBottom: 14 }}>
+              Select which grades this student is approved to access:
+            </p>
+
+            {studentMsg && (
+              <div style={{ marginBottom: 16, padding: '8px 12px', borderRadius: 6, fontSize: '0.85rem', background: studentMsg.startsWith('✅') ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)', color: studentMsg.startsWith('✅') ? '#4ade80' : '#f87171' }}>
+                {studentMsg}
+              </div>
+            )}
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 24 }}>
+              {[6, 7, 8, 9, 10, 11].map(gradeNum => {
+                const checked = selectedGrades.includes(gradeNum);
+                return (
+                  <label
+                    key={gradeNum}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      padding: '10px 14px',
+                      borderRadius: 8,
+                      border: checked ? '1px solid var(--cobalt)' : '1px solid rgba(255,255,255,0.08)',
+                      background: checked ? 'rgba(37, 99, 235, 0.15)' : 'rgba(255,255,255,0.02)',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleGradeSelection(gradeNum)}
+                      style={{ width: 16, height: 16, accentColor: 'var(--cobalt)', cursor: 'pointer' }}
+                    />
+                    <span style={{ fontWeight: 600, color: '#fff', fontSize: '0.9rem' }}>
+                      Grade {gradeNum}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+              <button
+                className="btn btn-outline"
+                onClick={() => setManagingStudent(null)}
+                disabled={savingGrades}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={saveStudentGrades}
+                disabled={savingGrades}
+              >
+                {savingGrades ? 'Saving...' : '💾 Save Access'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style>{`
         .admin-grid {

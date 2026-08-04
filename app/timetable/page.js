@@ -1,12 +1,38 @@
 'use client';
+import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import LiveScheduleWidget, { SCHEDULE, DAYS } from '@/components/tracking/LiveScheduleWidget';
+import AccessLockedModal from '@/components/AccessLockedModal';
 
 const COLORS = ['#0052FF', '#7B2FFF', '#FF6B00', '#00C896', '#FF3D9A'];
 
 export default function TimetablePage() {
+  const [user, setUser] = useState(null);
+  const [lockedGrade, setLockedGrade] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => { if (data.user) setUser(data.user); })
+      .catch(() => {});
+  }, []);
+
+  const handleJoinZoom = (e, grade, zoomUrl) => {
+    e.preventDefault();
+    if (!user) {
+      alert('Please log in to join live sessions.');
+      return;
+    }
+    const approved = user.approvedGrades || [];
+    if (!approved.includes(Number(grade))) {
+      setLockedGrade(grade);
+      return;
+    }
+    window.open(zoomUrl, '_blank');
+  };
+
   return (
     <>
       <Header />
@@ -56,11 +82,13 @@ export default function TimetablePage() {
                             <span>Grade {cls.grade}</span>
                             <span>{cls.medium}</span>
                           </div>
-                          <a href={cls.zoom} target="_blank" rel="noreferrer"
+                          <button
+                            onClick={(e) => handleJoinZoom(e, cls.grade, cls.zoom)}
                             className="btn btn-ghost btn-sm"
-                            style={{ marginTop: 10, width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}>
+                            style={{ marginTop: 10, width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
+                          >
                             📹 Join Zoom
-                          </a>
+                          </button>
                         </div>
                       ))
                     )}
@@ -73,6 +101,10 @@ export default function TimetablePage() {
       </main>
       <Footer />
       <FloatingWidgets />
+
+      {lockedGrade && (
+        <AccessLockedModal grade={lockedGrade} onClose={() => setLockedGrade(null)} />
+      )}
 
       <style jsx>{`
         .timetable-grid {

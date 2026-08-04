@@ -9,16 +9,27 @@ generator client {
 }
 
 model Student {
-  id              String   @id @default(uuid())
+  id              String               @id @default(uuid())
   name            String
-  phone           String   @unique
+  phone           String               @unique
   passwordHash    String
   grade           Int
-  medium          String   @default("sinhala")
-  role            String   @default("student")
-  enrolledCourses String   @default("[]")
-  createdAt       DateTime @default(now())
-  isActive        Boolean  @default(true)
+  medium          String               @default("sinhala")
+  role            String               @default("student")
+  enrolledCourses String               @default("[]")
+  createdAt       DateTime             @default(now())
+  isActive        Boolean              @default(true)
+  gradeAccess     StudentGradeAccess[]
+}
+
+model StudentGradeAccess {
+  id        String   @id @default(uuid())
+  studentId String
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  gradeId   Int
+  grantedAt DateTime @default(now())
+
+  @@unique([studentId, gradeId])
 }
 
 model Tracking {

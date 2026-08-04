@@ -49,8 +49,24 @@ export default function MyAccountPage() {
                   Welcome back, <span className="theme-gradient">{user ? user.name : 'Student'}!</span>
                 </h2>
                 <p className="text-secondary text-sm">
-                  {user ? `Grade ${user.grade} · ${user.medium.toUpperCase()} Medium · WhatsApp: ${user.phone}` : 'Grade 10 · Sinhala Medium'}
+                  {user ? `Registered Grade: Grade ${user.grade} · ${user.medium.toUpperCase()} Medium · WhatsApp: ${user.phone}` : 'Grade 10 · Sinhala Medium'}
                 </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>
+                    Approved Grade Access:
+                  </span>
+                  {user && user.approvedGrades && user.approvedGrades.length > 0 ? (
+                    user.approvedGrades.sort((a,b)=>a-b).map(g => (
+                      <span key={g} className="badge badge-green" style={{ fontSize: '0.75rem' }}>
+                        ✓ Grade {g} Access
+                      </span>
+                    ))
+                  ) : (
+                    <span className="badge badge-accent" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', fontSize: '0.75rem' }}>
+                      No Approved Grade Access Yet
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </div>

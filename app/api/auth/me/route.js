@@ -9,10 +9,12 @@ export async function GET(request) {
   if (!user) {
     return NextResponse.json({ error: 'Not authenticated.' }, { status: 401 });
   }
-  const student = await db.students.findById(user.id);
+  const student = await db.students.findByIdWithGrades(user.id);
   if (!student) {
     return NextResponse.json({ error: 'User not found.' }, { status: 404 });
   }
+  const approvedGrades = (student.gradeAccess || []).map(g => g.gradeId);
+
   return NextResponse.json({
     user: {
       id:              student.id,
@@ -22,6 +24,7 @@ export async function GET(request) {
       medium:          student.medium,
       role:            student.role,
       enrolledCourses: student.enrolledCourses,
+      approvedGrades,
     },
   });
 }
