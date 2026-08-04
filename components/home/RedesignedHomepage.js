@@ -71,22 +71,22 @@ export default function RedesignedHomepage() {
             <div className="hero-text-side">
               <div className="trust-badge-pill">
                 <span className="badge-dot" />
-                Sri Lanka&apos;s #1 Trusted Math Platform
+                {t('hero.tag')}
               </div>
 
               <h1 className="hero-headline">
-                <span className="accent-tag">A/L &amp; O/L Mathematics</span>
+                <span className="accent-tag">A/L &amp; O/L MATHEMATICS</span>
                 <br />
-                Master Math with <span className="highlight-blue">Ishan Maduranga</span>
+                {t('hero.title')} <span className="highlight-blue">{t('hero.titleGradient')}</span>
               </h1>
 
               <p className="hero-subtitle">
-                Transform your understanding of Mathematics through interactive live streams, structured problem-solving, and proven exam paper strategies.
+                {t('hero.description')}
               </p>
 
               {/* Grade Selector Pills */}
               <div className="hero-grades-wrapper">
-                <span className="grades-label">Select Grade:</span>
+                <span className="grades-label">{t('sections.browseByGrade')}:</span>
                 <div className="grades-pills">
                   {GRADES.map(g => (
                     <Link key={g.id} href={`/grades/${g.id}`} className="grade-pill-item">
@@ -112,7 +112,7 @@ export default function RedesignedHomepage() {
               {/* Trust indicator */}
               <div className="hero-trust-row">
                 <span className="stars">⭐⭐⭐⭐⭐</span>
-                <span className="trust-text"><strong>98% A-Pass Rate</strong> across 15,000+ Students nationwide</span>
+                <span className="trust-text"><strong>98% {t('hero.statPass')}</strong> ({t('hero.statStudents')})</span>
               </div>
             </div>
 
@@ -127,14 +127,14 @@ export default function RedesignedHomepage() {
                   <div className="stat-icon-bg">🎓</div>
                   <div>
                     <div className="stat-number">15,000+</div>
-                    <div className="stat-desc">Enrolled Students</div>
+                    <div className="stat-desc">{t('hero.statStudents')}</div>
                   </div>
                 </div>
                 <div className="floating-stat-card card-bottom">
                   <div className="stat-icon-bg">🏆</div>
                   <div>
                     <div className="stat-number">98%</div>
-                    <div className="stat-desc">A/B Pass Accuracy</div>
+                    <div className="stat-desc">{t('hero.statPass')}</div>
                   </div>
                 </div>
               </div>
