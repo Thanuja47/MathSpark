@@ -1461,6 +1461,11 @@ export default function AdminPage() {
           border-radius: 12px;
           padding: 24px;
         }
+        @media (max-width: 900px) {
+          .admin-grid { grid-template-columns: 1fr; }
+          .admin-sidebar { display: flex; flex-direction: row; overflow-x: auto; padding-bottom: 8px; white-space: nowrap; gap: 6px; }
+          .admin-nav-item { flex-shrink: 0; padding: 8px 14px; }
+        }
         .tab-header {
           display: flex;
           align-items: center;
@@ -1469,9 +1474,9 @@ export default function AdminPage() {
         }
         .tab-header h3 { margin: 0; }
         .admin-form-box {
-          background: var(--bg);
-          border: 1px solid var(--border);
-          border-radius: 10px;
+          background: var(--surface);
+          border: 1px solid var(--rule);
+          border-radius: var(--radius-md);
           padding: 20px;
           margin-bottom: 24px;
         }

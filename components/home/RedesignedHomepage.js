@@ -800,6 +800,38 @@ export default function RedesignedHomepage() {
           gap: 60px;
           align-items: center;
         }
+
+        /* ── RESPONSIVE MEDIA QUERIES ── */
+        @media (max-width: 1024px) {
+          .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+          .hero-text-side { text-align: center; display: flex; flex-direction: column; align-items: center; }
+          .hero-subtitle { margin: 0 auto 28px; }
+          .hero-grades-wrapper { justify-content: center; }
+          .hero-actions { justify-content: center; }
+          .feature-cards-grid { grid-template-columns: 1fr; gap: 20px; }
+          .process-grid { grid-template-columns: 1fr; gap: 20px; }
+          .instructor-bio-grid { grid-template-columns: 1fr; text-align: center; }
+          .instructor-highlights { justify-content: center; text-align: left; }
+        }
+
+        @media (max-width: 640px) {
+          .hero-light { padding: 40px 0 60px; }
+          .hero-headline { font-size: 1.8rem; }
+          .accent-tag { font-size: 1rem; }
+          .hero-subtitle { font-size: 0.95rem; }
+          .hero-actions { flex-direction: column; width: 100%; gap: 10px; }
+          .btn-light-primary, .btn-light-secondary { width: 100%; justify-content: center; }
+          .hero-image-card { padding: 6px; }
+          .hero-main-img { height: 300px; }
+          .card-top { top: -15px; right: -10px; padding: 8px 12px; }
+          .card-bottom { bottom: -15px; left: -10px; padding: 8px 12px; }
+          .stat-number { font-size: 0.95rem; }
+          .stat-desc { font-size: 0.65rem; }
+          .stat-icon-bg { width: 36px; height: 36px; }
+          .particle-1, .particle-2, .particle-3 { display: none; }
+          .feature-card, .process-card { padding: 24px 18px; }
+        }
+
         .instructor-photo-wrapper {
           position: relative;
           border-radius: 24px;
