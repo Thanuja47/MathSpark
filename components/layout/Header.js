@@ -185,9 +185,14 @@ export default function Header() {
                       <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V18H8v2h8v-2h-3v-2.1c2.12-.41 3.73-2.07 3.96-4.16C19.33 11.4 21 9.38 21 7V6c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>
                     </svg>
                   )}
+                  {link.icon === 'tute' && (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                    </svg>
+                  )}
                   {link.icon === 'tracking' && (
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="white">
-                      <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"/>
+                      <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
                     </svg>
                   )}
                   {link.icon === 'contact' && (
@@ -608,36 +613,38 @@ export default function Header() {
           overflow: hidden;
         }
 
-        /* Individual pill nav item — Icon on top of text */
+        /* Individual pill nav item — Icon on left side of text */
         .pill-nav-item {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           align-items: center;
-          justify-content: center;
-          gap: 3px;
-          padding: 6px 10px;
-          border-radius: var(--radius-md);
+          gap: 6px;
+          padding: 4px 10px 4px 5px;
+          background: #27292f;
+          border-radius: 999px;
           text-decoration: none;
-          color: rgba(255,255,255,0.85);
-          font-size: 0.72rem;
+          color: rgba(255,255,255,0.9);
+          font-size: 0.78rem;
           font-weight: 500;
           white-space: nowrap;
-          transition: color 0.2s, transform 0.15s;
+          border: 1px solid rgba(255,255,255,0.08);
+          transition: background 0.2s, border-color 0.2s, transform 0.15s;
           letter-spacing: -0.01em;
         }
         .pill-nav-item:hover {
-          transform: translateY(-2px);
+          background: #35373f;
+          border-color: rgba(255,255,255,0.2);
+          transform: translateY(-1px);
           color: #ffffff;
         }
         .pill-nav-label {
           line-height: 1;
-          font-size: 0.73rem;
         }
 
         /* Circular color badge */
         .pill-icon-badge {
-          width: 22px;
-          height: 22px;
+          width: 20px;
+          height: 20px;
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -651,15 +658,16 @@ export default function Header() {
         .pill-icon-exams    { background: linear-gradient(135deg, #f97316, #ea580c); }
         .pill-icon-store    { background: linear-gradient(135deg, #ef4444, #dc2626); }
         .pill-icon-results  { background: linear-gradient(135deg, #ec4899, #db2777); }
+        .pill-icon-tute     { background: linear-gradient(135deg, #eab308, #ca8a04); }
         .pill-icon-tracking { background: linear-gradient(135deg, #84cc16, #65a30d); }
         .pill-icon-contact  { background: linear-gradient(135deg, #38bdf8, #0284c7); }
 
         /* Responsive: tighter at 1366px */
         @media (max-width: 1366px) {
-          .pill-nav-container { gap: 3px; padding: 4px 6px; margin: 0 10px; }
-          .pill-nav-item { padding: 4px 8px 4px 5px; font-size: 0.74rem; gap: 5px; }
-          .pill-icon-badge { width: 20px; height: 20px; }
-          .header-inner { padding: 0 16px; }
+          .pill-nav-container { gap: 3px; padding: 4px 6px; margin: 0 8px; }
+          .pill-nav-item { padding: 4px 8px 4px 4px; font-size: 0.73rem; gap: 4px; }
+          .pill-icon-badge { width: 18px; height: 18px; }
+          .header-inner { padding: 0 12px; }
         }
 
         .nav-chevron {
