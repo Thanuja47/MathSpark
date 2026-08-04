@@ -148,8 +148,11 @@ export default function RedesignedHomepage() {
         <div className="container">
           <div className="feature-cards-grid">
             <div className="feature-card">
-              <div className="feature-icon-wrapper bg-blue-light">
-                <span>📚</span>
+              <div className="feature-icon-wrapper bg-gradient-blue animated-badge">
+                <svg className="badge-3d-svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                  <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                </svg>
               </div>
               <h3 className="feature-card-title">{t('sections.feat1Title')}</h3>
               <p className="feature-card-desc">
@@ -158,8 +161,11 @@ export default function RedesignedHomepage() {
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon-wrapper bg-purple-light">
-                <span>🏆</span>
+              <div className="feature-icon-wrapper bg-gradient-purple animated-badge">
+                <div className="ap-medal-badge">
+                  <span className="medal-number">1</span>
+                  <div className="medal-ribbon" />
+                </div>
               </div>
               <h3 className="feature-card-title">{t('sections.feat2Title')}</h3>
               <p className="feature-card-desc">
@@ -168,8 +174,14 @@ export default function RedesignedHomepage() {
             </div>
 
             <div className="feature-card">
-              <div className="feature-icon-wrapper bg-pink-light">
-                <span>📝</span>
+              <div className="feature-icon-wrapper bg-gradient-pink animated-badge">
+                <svg className="badge-3d-svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
+                </svg>
               </div>
               <h3 className="feature-card-title">{t('sections.feat3Title')}</h3>
               <p className="feature-card-desc">
@@ -506,7 +518,7 @@ export default function RedesignedHomepage() {
           margin: 0 auto;
         }
 
-        /* ── FEATURE CARDS ── */
+        /* ── FEATURE CARDS AP.LK ANIMATED 3D BADGES ── */
         .feature-cards-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -515,28 +527,90 @@ export default function RedesignedHomepage() {
         .feature-card {
           background: #ffffff;
           border: 1px solid #e2e8f0;
-          border-radius: 20px;
-          padding: 36px 28px;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-          transition: all 0.25s;
+          border-radius: 24px;
+          padding: 40px 30px;
+          box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          position: relative;
         }
         .feature-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 12px 30px rgba(37,99,235,0.08);
-          border-color: #cbd5e1;
+          transform: translateY(-8px);
+          box-shadow: 0 20px 40px rgba(37,99,235,0.12);
+          border-color: #bfdbfe;
         }
         .feature-icon-wrapper {
-          width: 56px; height: 56px;
-          border-radius: 16px;
+          width: 80px; height: 80px;
+          border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          font-size: 1.6rem;
-          margin-bottom: 20px;
+          margin-bottom: 24px;
+          box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+          position: relative;
+          transition: transform 0.3s ease;
         }
-        .bg-blue-light { background: #eff6ff; }
-        .bg-purple-light { background: #f3e8ff; }
-        .bg-pink-light { background: #fce7f3; }
-        .feature-card-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; margin-bottom: 12px; }
-        .feature-card-desc { font-size: 0.92rem; color: #64748b; line-height: 1.6; }
+        .feature-card:hover .feature-icon-wrapper {
+          transform: scale(1.1) rotate(4deg);
+        }
+
+        /* 3D AP.LK Medal Badge Styles */
+        .bg-gradient-blue {
+          background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+          color: #ffffff;
+        }
+        .bg-gradient-purple {
+          background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+          color: #ffffff;
+        }
+        .bg-gradient-pink {
+          background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+          color: #ffffff;
+        }
+
+        .animated-badge {
+          animation: badgeFloat 3.5s ease-in-out infinite alternate;
+        }
+        @keyframes badgeFloat {
+          0% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-6px) rotate(2deg); }
+          100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Medal #1 Badge design matching AP.LK */
+        .ap-medal-badge {
+          width: 46px; height: 46px;
+          background: #fbbf24;
+          border-radius: 50%;
+          border: 3px solid #ffffff;
+          display: flex; align-items: center; justify-content: center;
+          position: relative;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .medal-number {
+          font-size: 1.6rem;
+          font-weight: 900;
+          color: #78350f;
+          font-family: var(--font-heading), sans-serif;
+          line-height: 1;
+        }
+        .medal-ribbon {
+          position: absolute;
+          bottom: -12px;
+          width: 0; height: 0;
+          border-left: 14px solid transparent;
+          border-right: 14px solid transparent;
+          border-top: 14px solid #dc2626;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        .badge-3d-svg {
+          filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+        }
+
+        .feature-card-title { font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 12px; }
+        .feature-card-desc { font-size: 0.95rem; color: #64748b; line-height: 1.6; }
 
         /* ── PROCESS GRID ── */
         .process-grid {
