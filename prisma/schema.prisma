@@ -32,6 +32,16 @@ model StudentGradeAccess {
   @@unique([studentId, gradeId])
 }
 
+model Lesson {
+  id          String   @id @default(uuid())
+  title       String
+  gradeId     Int
+  description String?
+  pdfUrl      String?
+  videoUrl    String?
+  createdAt   DateTime @default(now())
+}
+
 model Tracking {
   id        String   @id
   student   String

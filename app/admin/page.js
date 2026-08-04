@@ -111,6 +111,21 @@ export default function AdminPage() {
   const [savingGrades, setSavingGrades]     = useState(false);
 
   /* ════════════════════════════════════════════════════
+     LESSONS STATE
+  ════════════════════════════════════════════════════ */
+  const [lessonsList, setLessonsList]       = useState([]);
+  const [showLessonForm, setShowLessonForm] = useState(false);
+  const [editingLesson, setEditingLesson]   = useState(null);
+  const [lessonTitle, setLessonTitle]       = useState('');
+  const [lessonGrade, setLessonGrade]       = useState('10');
+  const [lessonDesc, setLessonDesc]         = useState('');
+  const [lessonPdfFile, setLessonPdfFile]   = useState(null);
+  const [lessonPdfUrl, setLessonPdfUrl]     = useState('');
+  const [lessonVideoUrl, setLessonVideoUrl] = useState('');
+  const [lessonUploading, setLessonUploading] = useState(false);
+  const [lessonMsg, setLessonMsg]           = useState('');
+
+  /* ════════════════════════════════════════════════════
      INITIAL DATA LOAD
   ════════════════════════════════════════════════════ */
   useEffect(() => {
@@ -122,6 +137,7 @@ export default function AdminPage() {
     fetch('/api/admin/grades').then(r => r.json()).then(d => Array.isArray(d) && setGradesList(d)).catch(() => {});
     fetch('/api/admin/orders').then(r => r.json()).then(d => d?.orders && Array.isArray(d.orders) && setOrdersList(d.orders)).catch(() => {});
     fetch('/api/admin/students').then(r => r.json()).then(d => d?.students && Array.isArray(d.students) && setStudentsList(d.students)).catch(() => {});
+    fetch('/api/admin/lessons').then(r => r.json()).then(d => Array.isArray(d) && setLessonsList(d)).catch(() => {});
   }, []);
 
 
@@ -431,10 +447,65 @@ export default function AdminPage() {
   });
 
   /* ════════════════════════════════════════════════════
+     LESSONS CRUD
+  ════════════════════════════════════════════════════ */
+  const resetLessonForm = () => {
+    setEditingLesson(null); setLessonTitle(''); setLessonGrade('10');
+    setLessonDesc(''); setLessonPdfFile(null); setLessonPdfUrl('');
+    setLessonVideoUrl(''); setShowLessonForm(false); setLessonMsg('');
+  };
+
+  const editLesson = (les) => {
+    setEditingLesson(les.id); setLessonTitle(les.title); setLessonGrade(String(les.gradeId));
+    setLessonDesc(les.description || ''); setLessonPdfUrl(les.pdfUrl || '');
+    setLessonVideoUrl(les.videoUrl || ''); setLessonPdfFile(null);
+    setShowLessonForm(true); setLessonMsg('');
+  };
+
+  const submitLesson = async (e) => {
+    e.preventDefault();
+    setLessonUploading(true);
+    try {
+      let finalPdfUrl = lessonPdfUrl;
+      if (lessonPdfFile) {
+        finalPdfUrl = await uploadImage(lessonPdfFile);
+      }
+      const payload = {
+        title: lessonTitle,
+        gradeId: Number(lessonGrade),
+        description: lessonDesc || null,
+        pdfUrl: finalPdfUrl || null,
+        videoUrl: lessonVideoUrl || null,
+      };
+      const res = editingLesson
+        ? await apiFetch(`/api/admin/lessons/${editingLesson}`, { method: 'PUT', body: JSON.stringify(payload) })
+        : await apiFetch('/api/admin/lessons', { method: 'POST', body: JSON.stringify(payload) });
+      const saved = await res.json();
+      if (!res.ok) throw new Error(saved.error || 'Failed');
+      
+      const refreshed = await fetch('/api/admin/lessons').then(r => r.json());
+      if (Array.isArray(refreshed)) setLessonsList(refreshed);
+      setLessonMsg(editingLesson ? '✅ Lesson updated!' : '✅ Lesson created!');
+      setTimeout(resetLessonForm, 1200);
+    } catch (err) {
+      setLessonMsg(`❌ ${err.message}`);
+    } finally {
+      setLessonUploading(false);
+    }
+  };
+
+  const deleteLesson = async (id) => {
+    if (!confirm('Delete this lesson?')) return;
+    await apiFetch(`/api/admin/lessons/${id}`, { method: 'DELETE' });
+    setLessonsList(p => p.filter(l => l.id !== id));
+  };
+
+  /* ════════════════════════════════════════════════════
      NAV TABS CONFIG
   ════════════════════════════════════════════════════ */
   const tabs = [
     { key: 'students',  label: '👥 Students',   count: studentsList.length },
+    { key: 'lessons',   label: '📖 Lessons',    count: lessonsList.length },
     { key: 'courses',   label: '📚 Courses',   count: coursesList.length },
     { key: 'timetable', label: '📅 Timetable',  count: ttList.length },
     { key: 'exams',     label: '📝 MCQ Tests',  count: examList.length },
@@ -552,6 +623,110 @@ export default function AdminPage() {
                           ))}
                         </tbody>
                       </table>
+                    )}
+                  </div>
+                )}
+
+                {/* ── LESSONS TAB ── */}
+                {activeTab === 'lessons' && (
+                  <div>
+                    <div className="tab-header">
+                      <h3>Lessons Management</h3>
+                      <button className="btn btn-primary btn-sm" onClick={() => showLessonForm ? resetLessonForm() : setShowLessonForm(true)}>
+                        {showLessonForm ? 'Cancel' : '+ Add Lesson'}
+                      </button>
+                    </div>
+
+                    {showLessonForm && (
+                      <form onSubmit={submitLesson} className="admin-form-box">
+                        <h4>{editingLesson ? 'Edit Lesson' : 'New Lesson'}</h4>
+                        {lessonMsg && <p className="form-msg">{lessonMsg}</p>}
+                        
+                        <div className="form-group">
+                          <label className="form-label">Title</label>
+                          <input className="form-input" value={lessonTitle} onChange={e => setLessonTitle(e.target.value)} placeholder="e.g. Lesson 01: Quadratic Equations" required />
+                        </div>
+
+                        <div className="form-group">
+                          <label className="form-label">Grade</label>
+                          <select className="form-input" value={lessonGrade} onChange={e => setLessonGrade(e.target.value)}>
+                            {[6,7,8,9,10,11].map(g => <option key={g} value={g}>Grade {g}</option>)}
+                          </select>
+                        </div>
+
+                        <div className="form-group">
+                          <label className="form-label">Description (optional)</label>
+                          <textarea className="form-input" value={lessonDesc} onChange={e => setLessonDesc(e.target.value)} placeholder="Brief summary of this lesson..." rows={3} />
+                        </div>
+
+                        <div className="form-group">
+                          <label className="form-label">Upload PDF Document (optional)</label>
+                          <input className="form-input" type="file" accept=".pdf" onChange={e => setLessonPdfFile(e.target.files[0])} />
+                          {lessonPdfUrl && <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>Current PDF: {lessonPdfUrl}</p>}
+                        </div>
+
+                        <div className="form-group">
+                          <label className="form-label">Video URL (optional — YouTube/Vimeo/Recording link)</label>
+                          <input className="form-input" value={lessonVideoUrl} onChange={e => setLessonVideoUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=..." />
+                        </div>
+
+                        <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+                          <button className="btn btn-primary btn-sm" type="submit" disabled={lessonUploading}>
+                            {lessonUploading ? 'Saving...' : editingLesson ? 'Update Lesson' : 'Create Lesson'}
+                          </button>
+                          <button className="btn btn-outline btn-sm" type="button" onClick={resetLessonForm}>Cancel</button>
+                        </div>
+                      </form>
+                    )}
+
+                    {lessonsList.length === 0 ? (
+                      <div className="admin-empty-box">No lessons created yet.</div>
+                    ) : (
+                      <div className="admin-table-wrap">
+                        <table className="admin-table">
+                          <thead>
+                            <tr>
+                              <th>Title</th>
+                              <th>Grade</th>
+                              <th>PDF Document</th>
+                              <th>Video Link</th>
+                              <th>Created At</th>
+                              <th>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {lessonsList.map(les => (
+                              <tr key={les.id}>
+                                <td style={{ fontWeight: 600 }}>{les.title}</td>
+                                <td><span className="badge badge-green">Grade {les.gradeId}</span></td>
+                                <td>
+                                  {les.pdfUrl ? (
+                                    <a href={les.pdfUrl} target="_blank" rel="noreferrer" style={{ color: '#60a5fa', textDecoration: 'underline', fontSize: '0.82rem' }}>📄 View PDF</a>
+                                  ) : (
+                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>None</span>
+                                  )}
+                                </td>
+                                <td>
+                                  {les.videoUrl ? (
+                                    <a href={les.videoUrl} target="_blank" rel="noreferrer" style={{ color: '#a855f7', textDecoration: 'underline', fontSize: '0.82rem' }}>📹 Watch Video</a>
+                                  ) : (
+                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>None</span>
+                                  )}
+                                </td>
+                                <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                  {new Date(les.createdAt).toLocaleDateString()}
+                                </td>
+                                <td>
+                                  <div style={{ display: 'flex', gap: 6 }}>
+                                    <button className="btn btn-outline btn-sm" onClick={() => editLesson(les)}>Edit</button>
+                                    <button className="btn btn-outline btn-sm" style={{ color: '#ef4444' }} onClick={() => deleteLesson(les.id)}>Delete</button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     )}
                   </div>
                 )}
