@@ -1,24 +1,79 @@
 'use client';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
+import AccessLockedModal from '@/components/AccessLockedModal';
 import { COURSES, SITE } from '@/lib/data';
+import { ROLES } from '@/utils/constants';
+
+const STATIC_SYLLABUS = [
+  { unit: '01', title: 'Number Systems & Operations', description: 'Fundamental number properties, indices, and arithmetic operations.', pdfUrl: null, videoUrl: null },
+  { unit: '02', title: 'Fractions, Decimals & Percentages', description: 'Real-world application of proportions and percentage calculations.', pdfUrl: null, videoUrl: null },
+  { unit: '03', title: 'Algebra – Expressions & Equations', description: 'Solving linear equations, factorizing algebraic expressions.', pdfUrl: null, videoUrl: null },
+  { unit: '04', title: 'Geometry – Angles, Triangles & Polygons', description: 'Geometrical theorems, angle proofs, and polygon calculations.', pdfUrl: null, videoUrl: null },
+  { unit: '05', title: 'Statistics & Probability', description: 'Data representation, mean/median/mode, and probability models.', pdfUrl: null, videoUrl: null },
+  { unit: '06', title: 'Mensuration – Area & Volume', description: '3D shapes volume calculation, total surface area theorems.', pdfUrl: null, videoUrl: null },
+  { unit: '07', title: 'Quadratic Equations & Graphs', description: 'Quadratic formula derivation, parabola sketching, and roots.', pdfUrl: null, videoUrl: null },
+  { unit: '08', title: 'Past Paper Analysis & Exam Technique', description: 'Step-by-step guidance on answering O/L paper 1 and paper 2 questions.', pdfUrl: null, videoUrl: null },
+];
 
 export default function CourseDetailPage({ params }) {
   const { id } = params;
   const course = COURSES.find((c) => c.id.toString() === id) || COURSES[0];
 
-  const syllabus = [
-    { unit: '01', title: 'Number Systems & Operations', lessons: 12, duration: '6h 20m' },
-    { unit: '02', title: 'Fractions, Decimals & Percentages', lessons: 14, duration: '7h 45m' },
-    { unit: '03', title: 'Algebra – Expressions & Equations', lessons: 18, duration: '9h 10m' },
-    { unit: '04', title: 'Geometry – Angles, Triangles & Polygons', lessons: 16, duration: '8h 30m' },
-    { unit: '05', title: 'Statistics & Probability', lessons: 10, duration: '5h 15m' },
-    { unit: '06', title: 'Mensuration – Area & Volume', lessons: 12, duration: '6h 00m' },
-    { unit: '07', title: 'Quadratic Equations & Graphs', lessons: 15, duration: '7h 50m' },
-    { unit: '08', title: 'Past Paper Analysis & Exam Technique', lessons: 8, duration: '4h 20m' },
-  ];
+  const [lessons, setLessons] = useState([]);
+  const [user, setUser] = useState(null);
+  const [lockedGrade, setLockedGrade] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((res) => res.json())
+      .then((data) => { if (data.user) setUser(data.user); })
+      .catch(() => {});
+
+    fetch(`/api/courses/${id}/lessons`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.lessons) && data.lessons.length > 0) {
+          setLessons(data.lessons);
+        }
+      })
+      .catch(() => {});
+  }, [id]);
+
+  const displayedLessons = lessons.length > 0 ? lessons : STATIC_SYLLABUS.map((s, i) => ({
+    id: `static-${i}`,
+    order: i + 1,
+    title: s.title,
+    description: s.description,
+    pdfUrl: s.pdfUrl,
+    videoUrl: s.videoUrl,
+  }));
+
+  const handleAccessAttachment = (e, type, url) => {
+    e.preventDefault();
+    if (!url) return;
+
+    if (!user) {
+      setLockedGrade(course.grade);
+      return;
+    }
+
+    if (user.role === ROLES.ADMIN) {
+      window.open(url, '_blank');
+      return;
+    }
+
+    const approved = user.approvedGrades || [];
+    if (!approved.includes(Number(course.grade))) {
+      setLockedGrade(course.grade);
+      return;
+    }
+
+    window.open(url, '_blank');
+  };
 
   return (
     <>
@@ -52,7 +107,7 @@ export default function CourseDetailPage({ params }) {
                   <div className="quick-stat">
                     <span className="quick-stat-icon">📚</span>
                     <div>
-                      <div className="quick-stat-val">{course.lessons}</div>
+                      <div className="quick-stat-val">{displayedLessons.length}</div>
                       <div className="quick-stat-lbl">Lessons</div>
                     </div>
                   </div>
@@ -91,7 +146,6 @@ export default function CourseDetailPage({ params }) {
 
               {/* Right – Enroll Card */}
               <div className="course-enroll-card">
-                {/* Video Preview Placeholder */}
                 <div className="enroll-preview">
                   <div className="enroll-preview-bg">
                     <div className="preview-play-btn">
@@ -131,7 +185,6 @@ export default function CourseDetailPage({ params }) {
                     📞 Call to Enroll
                   </a>
 
-                  {/* What's Included */}
                   <ul className="enroll-includes">
                     {[
                       '✅ Full live session access',
@@ -160,19 +213,50 @@ export default function CourseDetailPage({ params }) {
               </div>
 
               <div className="syllabus-list">
-                {syllabus.map((unit) => (
-                  <div key={unit.unit} className="syllabus-item">
-                    <div className="syllabus-unit-badge">{unit.unit}</div>
-                    <div className="syllabus-info">
-                      <div className="syllabus-title">{unit.title}</div>
-                      <div className="syllabus-meta">
-                        <span>📖 {unit.lessons} lessons</span>
-                        <span>⏱️ {unit.duration}</span>
+                {displayedLessons.map((les, index) => {
+                  const unitNum = String(les.order || index + 1).padStart(2, '0');
+                  const hasVideo = Boolean(les.videoUrl);
+                  const hasPdf = Boolean(les.pdfUrl);
+
+                  return (
+                    <div key={les.id} className="syllabus-item" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 16 }}>
+                        <div className="syllabus-unit-badge">{unitNum}</div>
+                        <div className="syllabus-info" style={{ flex: 1 }}>
+                          <div className="syllabus-title">{les.title}</div>
+                          {les.description && (
+                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                              {les.description}
+                            </div>
+                          )}
+                        </div>
                       </div>
+
+                      {(hasVideo || hasPdf) && (
+                        <div style={{ display: 'flex', gap: 10, marginTop: 4, width: '100%', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                          {hasVideo && (
+                            <button
+                              className="btn btn-primary btn-sm"
+                              onClick={(e) => handleAccessAttachment(e, 'video', les.videoUrl)}
+                              style={{ fontSize: '0.78rem', padding: '5px 12px' }}
+                            >
+                              📹 Watch Lesson Video
+                            </button>
+                          )}
+                          {hasPdf && (
+                            <button
+                              className="btn btn-outline btn-sm"
+                              onClick={(e) => handleAccessAttachment(e, 'pdf', les.pdfUrl)}
+                              style={{ fontSize: '0.78rem', padding: '5px 12px' }}
+                            >
+                              📄 Download PDF Notes
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <div className="syllabus-arrow">→</div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -207,6 +291,10 @@ export default function CourseDetailPage({ params }) {
       </main>
       <Footer />
       <FloatingWidgets />
+
+      {lockedGrade && (
+        <AccessLockedModal grade={lockedGrade} onClose={() => setLockedGrade(null)} />
+      )}
 
       <style jsx>{`
         .course-detail-hero {

@@ -32,10 +32,12 @@ model StudentGradeAccess {
   @@unique([studentId, gradeId])
 }
 
-model Lesson {
+model CourseLesson {
   id          String   @id @default(uuid())
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  order       Int      @default(0)
   title       String
-  gradeId     Int
   description String?
   pdfUrl      String?
   videoUrl    String?
@@ -53,7 +55,7 @@ model Tracking {
 }
 
 model Course {
-  id          String   @id @default(uuid())
+  id          String         @id @default(uuid())
   title       String
   grade       Int
   medium      String
@@ -61,7 +63,8 @@ model Course {
   badge       String?
   description String
   imageUrl    String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime       @default(now())
+  lessons     CourseLesson[]
 }
 
 model Timetable {

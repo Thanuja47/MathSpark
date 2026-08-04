@@ -111,19 +111,20 @@ export default function AdminPage() {
   const [savingGrades, setSavingGrades]     = useState(false);
 
   /* ════════════════════════════════════════════════════
-     LESSONS STATE
+     COURSE LESSONS STATE
   ════════════════════════════════════════════════════ */
-  const [lessonsList, setLessonsList]       = useState([]);
-  const [showLessonForm, setShowLessonForm] = useState(false);
-  const [editingLesson, setEditingLesson]   = useState(null);
-  const [lessonTitle, setLessonTitle]       = useState('');
-  const [lessonGrade, setLessonGrade]       = useState('10');
-  const [lessonDesc, setLessonDesc]         = useState('');
-  const [lessonPdfFile, setLessonPdfFile]   = useState(null);
-  const [lessonPdfUrl, setLessonPdfUrl]     = useState('');
-  const [lessonVideoUrl, setLessonVideoUrl] = useState('');
-  const [lessonUploading, setLessonUploading] = useState(false);
-  const [lessonMsg, setLessonMsg]           = useState('');
+  const [managingCourseLessons, setManagingCourseLessons] = useState(null);
+  const [courseLessonsList, setCourseLessonsList]         = useState([]);
+  const [showCourseLessonForm, setShowCourseLessonForm]   = useState(false);
+  const [editingCourseLesson, setEditingCourseLesson]     = useState(null);
+  const [cLessonTitle, setCLessonTitle]                   = useState('');
+  const [cLessonOrder, setCLessonOrder]                   = useState('1');
+  const [cLessonDesc, setCLessonDesc]                     = useState('');
+  const [cLessonPdfFile, setCLessonPdfFile]               = useState(null);
+  const [cLessonPdfUrl, setCLessonPdfUrl]                 = useState('');
+  const [cLessonVideoUrl, setCLessonVideoUrl]             = useState('');
+  const [cLessonUploading, setCLessonUploading]           = useState(false);
+  const [cLessonMsg, setCLessonMsg]                       = useState('');
 
   /* ════════════════════════════════════════════════════
      INITIAL DATA LOAD
@@ -137,7 +138,6 @@ export default function AdminPage() {
     fetch('/api/admin/grades').then(r => r.json()).then(d => Array.isArray(d) && setGradesList(d)).catch(() => {});
     fetch('/api/admin/orders').then(r => r.json()).then(d => d?.orders && Array.isArray(d.orders) && setOrdersList(d.orders)).catch(() => {});
     fetch('/api/admin/students').then(r => r.json()).then(d => d?.students && Array.isArray(d.students) && setStudentsList(d.students)).catch(() => {});
-    fetch('/api/admin/lessons').then(r => r.json()).then(d => Array.isArray(d) && setLessonsList(d)).catch(() => {});
   }, []);
 
 
@@ -447,57 +447,92 @@ export default function AdminPage() {
   });
 
   /* ════════════════════════════════════════════════════
-     LESSONS CRUD
+     COURSE LESSONS MANAGING
   ════════════════════════════════════════════════════ */
-  const resetLessonForm = () => {
-    setEditingLesson(null); setLessonTitle(''); setLessonGrade('10');
-    setLessonDesc(''); setLessonPdfFile(null); setLessonPdfUrl('');
-    setLessonVideoUrl(''); setShowLessonForm(false); setLessonMsg('');
-  };
-
-  const editLesson = (les) => {
-    setEditingLesson(les.id); setLessonTitle(les.title); setLessonGrade(String(les.gradeId));
-    setLessonDesc(les.description || ''); setLessonPdfUrl(les.pdfUrl || '');
-    setLessonVideoUrl(les.videoUrl || ''); setLessonPdfFile(null);
-    setShowLessonForm(true); setLessonMsg('');
-  };
-
-  const submitLesson = async (e) => {
-    e.preventDefault();
-    setLessonUploading(true);
+  const openCourseLessonsModal = async (course) => {
+    setManagingCourseLessons(course);
+    resetCourseLessonForm();
     try {
-      let finalPdfUrl = lessonPdfUrl;
-      if (lessonPdfFile) {
-        finalPdfUrl = await uploadImage(lessonPdfFile);
+      const res = await fetch(`/api/admin/courses/${course.id}/lessons`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.lessons)) {
+        setCourseLessonsList(data.lessons);
+        setCLessonOrder(String(data.lessons.length + 1));
       }
-      const payload = {
-        title: lessonTitle,
-        gradeId: Number(lessonGrade),
-        description: lessonDesc || null,
-        pdfUrl: finalPdfUrl || null,
-        videoUrl: lessonVideoUrl || null,
-      };
-      const res = editingLesson
-        ? await apiFetch(`/api/admin/lessons/${editingLesson}`, { method: 'PUT', body: JSON.stringify(payload) })
-        : await apiFetch('/api/admin/lessons', { method: 'POST', body: JSON.stringify(payload) });
-      const saved = await res.json();
-      if (!res.ok) throw new Error(saved.error || 'Failed');
-      
-      const refreshed = await fetch('/api/admin/lessons').then(r => r.json());
-      if (Array.isArray(refreshed)) setLessonsList(refreshed);
-      setLessonMsg(editingLesson ? '✅ Lesson updated!' : '✅ Lesson created!');
-      setTimeout(resetLessonForm, 1200);
     } catch (err) {
-      setLessonMsg(`❌ ${err.message}`);
-    } finally {
-      setLessonUploading(false);
+      console.error('Failed to load course lessons', err);
     }
   };
 
-  const deleteLesson = async (id) => {
+  const resetCourseLessonForm = () => {
+    setEditingCourseLesson(null);
+    setCLessonTitle('');
+    setCLessonOrder('1');
+    setCLessonDesc('');
+    setCLessonPdfFile(null);
+    setCLessonPdfUrl('');
+    setCLessonVideoUrl('');
+    setShowCourseLessonForm(false);
+    setCLessonMsg('');
+  };
+
+  const editCourseLesson = (les) => {
+    setEditingCourseLesson(les.id);
+    setCLessonTitle(les.title);
+    setCLessonOrder(String(les.order || 1));
+    setCLessonDesc(les.description || '');
+    setCLessonPdfUrl(les.pdfUrl || '');
+    setCLessonVideoUrl(les.videoUrl || '');
+    setCLessonPdfFile(null);
+    setShowCourseLessonForm(true);
+    setCLessonMsg('');
+  };
+
+  const submitCourseLesson = async (e) => {
+    e.preventDefault();
+    if (!managingCourseLessons) return;
+    setCLessonUploading(true);
+    try {
+      let finalPdfUrl = cLessonPdfUrl;
+      if (cLessonPdfFile) {
+        finalPdfUrl = await uploadImage(cLessonPdfFile);
+      }
+      const payload = {
+        title: cLessonTitle,
+        order: Number(cLessonOrder || 0),
+        description: cLessonDesc || null,
+        pdfUrl: finalPdfUrl || null,
+        videoUrl: cLessonVideoUrl || null,
+      };
+
+      const res = editingCourseLesson
+        ? await apiFetch(`/api/admin/courses/${managingCourseLessons.id}/lessons/${editingCourseLesson}`, { method: 'PUT', body: JSON.stringify(payload) })
+        : await apiFetch(`/api/admin/courses/${managingCourseLessons.id}/lessons`, { method: 'POST', body: JSON.stringify(payload) });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+
+      const refreshed = await fetch(`/api/admin/courses/${managingCourseLessons.id}/lessons`).then(r => r.json());
+      if (refreshed.success && Array.isArray(refreshed.lessons)) {
+        setCourseLessonsList(refreshed.lessons);
+      }
+      setCLessonMsg(editingCourseLesson ? '✅ Lesson updated!' : '✅ Lesson added!');
+      setTimeout(resetCourseLessonForm, 1000);
+    } catch (err) {
+      setCLessonMsg(`❌ ${err.message}`);
+    } finally {
+      setCLessonUploading(false);
+    }
+  };
+
+  const deleteCourseLesson = async (lessonId) => {
     if (!confirm('Delete this lesson?')) return;
-    await apiFetch(`/api/admin/lessons/${id}`, { method: 'DELETE' });
-    setLessonsList(p => p.filter(l => l.id !== id));
+    try {
+      await apiFetch(`/api/admin/courses/${managingCourseLessons.id}/lessons/${lessonId}`, { method: 'DELETE' });
+      setCourseLessonsList(prev => prev.filter(l => l.id !== lessonId));
+    } catch (err) {
+      alert(`Failed to delete lesson: ${err.message}`);
+    }
   };
 
   /* ════════════════════════════════════════════════════
@@ -505,7 +540,6 @@ export default function AdminPage() {
   ════════════════════════════════════════════════════ */
   const tabs = [
     { key: 'students',  label: '👥 Students',   count: studentsList.length },
-    { key: 'lessons',   label: '📖 Lessons',    count: lessonsList.length },
     { key: 'courses',   label: '📚 Courses',   count: coursesList.length },
     { key: 'timetable', label: '📅 Timetable',  count: ttList.length },
     { key: 'exams',     label: '📝 MCQ Tests',  count: examList.length },
@@ -627,110 +661,6 @@ export default function AdminPage() {
                   </div>
                 )}
 
-                {/* ── LESSONS TAB ── */}
-                {activeTab === 'lessons' && (
-                  <div>
-                    <div className="tab-header">
-                      <h3>Lessons Management</h3>
-                      <button className="btn btn-primary btn-sm" onClick={() => showLessonForm ? resetLessonForm() : setShowLessonForm(true)}>
-                        {showLessonForm ? 'Cancel' : '+ Add Lesson'}
-                      </button>
-                    </div>
-
-                    {showLessonForm && (
-                      <form onSubmit={submitLesson} className="admin-form-box">
-                        <h4>{editingLesson ? 'Edit Lesson' : 'New Lesson'}</h4>
-                        {lessonMsg && <p className="form-msg">{lessonMsg}</p>}
-                        
-                        <div className="form-group">
-                          <label className="form-label">Title</label>
-                          <input className="form-input" value={lessonTitle} onChange={e => setLessonTitle(e.target.value)} placeholder="e.g. Lesson 01: Quadratic Equations" required />
-                        </div>
-
-                        <div className="form-group">
-                          <label className="form-label">Grade</label>
-                          <select className="form-input" value={lessonGrade} onChange={e => setLessonGrade(e.target.value)}>
-                            {[6,7,8,9,10,11].map(g => <option key={g} value={g}>Grade {g}</option>)}
-                          </select>
-                        </div>
-
-                        <div className="form-group">
-                          <label className="form-label">Description (optional)</label>
-                          <textarea className="form-input" value={lessonDesc} onChange={e => setLessonDesc(e.target.value)} placeholder="Brief summary of this lesson..." rows={3} />
-                        </div>
-
-                        <div className="form-group">
-                          <label className="form-label">Upload PDF Document (optional)</label>
-                          <input className="form-input" type="file" accept=".pdf" onChange={e => setLessonPdfFile(e.target.files[0])} />
-                          {lessonPdfUrl && <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>Current PDF: {lessonPdfUrl}</p>}
-                        </div>
-
-                        <div className="form-group">
-                          <label className="form-label">Video URL (optional — YouTube/Vimeo/Recording link)</label>
-                          <input className="form-input" value={lessonVideoUrl} onChange={e => setLessonVideoUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=..." />
-                        </div>
-
-                        <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-                          <button className="btn btn-primary btn-sm" type="submit" disabled={lessonUploading}>
-                            {lessonUploading ? 'Saving...' : editingLesson ? 'Update Lesson' : 'Create Lesson'}
-                          </button>
-                          <button className="btn btn-outline btn-sm" type="button" onClick={resetLessonForm}>Cancel</button>
-                        </div>
-                      </form>
-                    )}
-
-                    {lessonsList.length === 0 ? (
-                      <div className="admin-empty-box">No lessons created yet.</div>
-                    ) : (
-                      <div className="admin-table-wrap">
-                        <table className="admin-table">
-                          <thead>
-                            <tr>
-                              <th>Title</th>
-                              <th>Grade</th>
-                              <th>PDF Document</th>
-                              <th>Video Link</th>
-                              <th>Created At</th>
-                              <th>Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {lessonsList.map(les => (
-                              <tr key={les.id}>
-                                <td style={{ fontWeight: 600 }}>{les.title}</td>
-                                <td><span className="badge badge-green">Grade {les.gradeId}</span></td>
-                                <td>
-                                  {les.pdfUrl ? (
-                                    <a href={les.pdfUrl} target="_blank" rel="noreferrer" style={{ color: '#60a5fa', textDecoration: 'underline', fontSize: '0.82rem' }}>📄 View PDF</a>
-                                  ) : (
-                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>None</span>
-                                  )}
-                                </td>
-                                <td>
-                                  {les.videoUrl ? (
-                                    <a href={les.videoUrl} target="_blank" rel="noreferrer" style={{ color: '#a855f7', textDecoration: 'underline', fontSize: '0.82rem' }}>📹 Watch Video</a>
-                                  ) : (
-                                    <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>None</span>
-                                  )}
-                                </td>
-                                <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                  {new Date(les.createdAt).toLocaleDateString()}
-                                </td>
-                                <td>
-                                  <div style={{ display: 'flex', gap: 6 }}>
-                                    <button className="btn btn-outline btn-sm" onClick={() => editLesson(les)}>Edit</button>
-                                    <button className="btn btn-outline btn-sm" style={{ color: '#ef4444' }} onClick={() => deleteLesson(les.id)}>Delete</button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 {/* ── COURSES TAB ── */}
                 {activeTab === 'courses' && (
                   <div>
@@ -792,6 +722,7 @@ export default function AdminPage() {
                               <td style={{ textTransform: 'capitalize' }}>{c.medium}</td>
                               <td>LKR {Number(c.price).toLocaleString()}</td>
                               <td>
+                                <button className="btn btn-sm btn-outline" style={{ marginRight: 6 }} onClick={() => openCourseLessonsModal(c)}>📖 Manage Lessons</button>
                                 <button className="btn btn-sm btn-outline" style={{ marginRight: 6 }} onClick={() => editCourse(c)}>Edit</button>
                                 <button className="btn btn-sm" style={{ background: '#ef4444', color: '#fff' }} onClick={() => deleteCourse(c.id)}>Delete</button>
                               </td>
@@ -1283,6 +1214,190 @@ export default function AdminPage() {
                 {savingGrades ? 'Saving...' : '💾 Save Access'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Manage Course Lessons Modal ── */}
+      {managingCourseLessons && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(6px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+          }}
+          onClick={() => setManagingCourseLessons(null)}
+        >
+          <div
+            style={{
+              background: '#181a20',
+              border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: 16,
+              padding: '28px 24px',
+              maxWidth: 680,
+              width: '100%',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
+              position: 'relative',
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#fff' }}>Course Lessons</h3>
+                <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                  {managingCourseLessons.title} (Grade {managingCourseLessons.grade})
+                </p>
+              </div>
+              <button
+                onClick={() => setManagingCourseLessons(null)}
+                style={{ background: 'none', border: 'none', color: '#aaa', fontSize: '1.2rem', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => showCourseLessonForm ? resetCourseLessonForm() : setShowCourseLessonForm(true)}
+              >
+                {showCourseLessonForm ? 'Cancel' : '+ Add Lesson Module'}
+              </button>
+            </div>
+
+            {showCourseLessonForm && (
+              <form onSubmit={submitCourseLesson} className="admin-form-box" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                <h4 style={{ color: '#fff', margin: '0 0 12px' }}>{editingCourseLesson ? 'Edit Lesson Module' : 'New Lesson Module'}</h4>
+                {cLessonMsg && <p className="form-msg">{cLessonMsg}</p>}
+
+                <div className="form-row-3" style={{ gridTemplateColumns: '80px 1fr' }}>
+                  <div className="form-group">
+                    <label className="form-label">Order #</label>
+                    <input
+                      className="form-input"
+                      type="number"
+                      value={cLessonOrder}
+                      onChange={e => setCLessonOrder(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Title</label>
+                    <input
+                      className="form-input"
+                      value={cLessonTitle}
+                      onChange={e => setCLessonTitle(e.target.value)}
+                      placeholder="e.g. 01 Number Systems & Operations"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Description (optional)</label>
+                  <textarea
+                    className="form-input"
+                    rows={2}
+                    value={cLessonDesc}
+                    onChange={e => setCLessonDesc(e.target.value)}
+                    placeholder="Key concepts covered in this lesson..."
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Upload PDF Document (optional)</label>
+                  <input
+                    className="form-input"
+                    type="file"
+                    accept=".pdf"
+                    onChange={e => setCLessonPdfFile(e.target.files[0])}
+                  />
+                  {cLessonPdfUrl && (
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 4 }}>
+                      Existing PDF: <a href={cLessonPdfUrl} target="_blank" rel="noreferrer" style={{ color: '#60a5fa' }}>View File</a>
+                    </p>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Video URL (optional — YouTube/Vimeo/Recording link)</label>
+                  <input
+                    className="form-input"
+                    value={cLessonVideoUrl}
+                    onChange={e => setCLessonVideoUrl(e.target.value)}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
+                  <button className="btn btn-primary btn-sm" type="submit" disabled={cLessonUploading}>
+                    {cLessonUploading ? 'Saving...' : editingCourseLesson ? 'Update Lesson' : 'Add Lesson'}
+                  </button>
+                  <button className="btn btn-outline btn-sm" type="button" onClick={resetCourseLessonForm}>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {courseLessonsList.length === 0 ? (
+              <div className="admin-empty-box">No lesson modules added for this course yet.</div>
+            ) : (
+              <div className="admin-table-wrap">
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Lesson Title</th>
+                      <th>PDF</th>
+                      <th>Video</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {courseLessonsList.map(les => (
+                      <tr key={les.id}>
+                        <td style={{ fontWeight: 700, color: 'var(--primary)' }}>
+                          {String(les.order).padStart(2, '0')}
+                        </td>
+                        <td>
+                          <strong>{les.title}</strong>
+                          {les.description && (
+                            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                              {les.description.slice(0, 60)}...
+                            </div>
+                          )}
+                        </td>
+                        <td>
+                          {les.pdfUrl ? (
+                            <a href={les.pdfUrl} target="_blank" rel="noreferrer" style={{ color: '#60a5fa', textDecoration: 'underline', fontSize: '0.8rem' }}>📄 PDF</a>
+                          ) : '—'}
+                        </td>
+                        <td>
+                          {les.videoUrl ? (
+                            <a href={les.videoUrl} target="_blank" rel="noreferrer" style={{ color: '#a855f7', textDecoration: 'underline', fontSize: '0.8rem' }}>📹 Video</a>
+                          ) : '—'}
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', gap: 6 }}>
+                            <button className="btn btn-outline btn-sm" onClick={() => editCourseLesson(les)}>Edit</button>
+                            <button className="btn btn-outline btn-sm" style={{ color: '#ef4444' }} onClick={() => deleteCourseLesson(les.id)}>Delete</button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       )}
