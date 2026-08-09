@@ -804,7 +804,7 @@ export default function RedesignedHomepage() {
           background: #ffffff;
           border-radius: 16px;
           padding: 18px 28px;
-          margin-top: 20px;
+          margin-top: 44px;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
           border: 1px solid #f1f5f9;
         }
