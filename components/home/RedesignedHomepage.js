@@ -70,10 +70,6 @@ export default function RedesignedHomepage() {
           <div className="hero-grid">
             {/* ── LEFT: Text ── */}
             <div className="hero-text-side">
-              <div className="trust-badge-pill">
-                <span className="badge-star">★</span>
-                {t('hero.tag')}
-              </div>
 
               <h1 className="hero-headline">
                 <span className="accent-tag">A/L &amp; O/L MATHEMATICS</span>
@@ -497,7 +493,7 @@ export default function RedesignedHomepage() {
         /* ── HERO LIGHT ── */
         .hero-light {
           background: linear-gradient(135deg, #f8fafc 0%, #ede9fe 60%, #e0e7ff 100%);
-          padding: 64px 0 0;
+          padding: 30px 0 0;
           position: relative;
           overflow: hidden;
         }
@@ -509,7 +505,7 @@ export default function RedesignedHomepage() {
         }
         /* LEFT */
         .hero-text-side {
-          padding-bottom: 40px;
+          padding-bottom: 12px;
         }
         .trust-badge-pill {
           display: inline-flex;
@@ -555,13 +551,13 @@ export default function RedesignedHomepage() {
           height: 4px;
           border-radius: 2px;
           background: linear-gradient(90deg, #4f46e5, #7c3aed);
-          margin-bottom: 20px;
+          margin-bottom: 12px;
         }
         .hero-subtitle {
           font-size: 1rem;
           color: #475569;
-          line-height: 1.65;
-          margin-bottom: 24px;
+          line-height: 1.55;
+          margin-bottom: 14px;
           max-width: 480px;
         }
         /* Grade pills */
@@ -569,7 +565,7 @@ export default function RedesignedHomepage() {
           display: flex;
           align-items: center;
           gap: 12px;
-          margin-bottom: 32px;
+          margin-bottom: 20px;
           flex-wrap: wrap;
         }
         .grades-label {
@@ -650,7 +646,7 @@ export default function RedesignedHomepage() {
         /* ── HERO PHOTO SIDE SCOPED STYLES (hphoto-*) ── */
         .hphoto-container-side {
           position: relative;
-          height: 460px;
+          height: 360px;
           display: flex;
           align-items: flex-end;
           justify-content: center;
@@ -660,8 +656,8 @@ export default function RedesignedHomepage() {
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          width: 360px;
-          height: 360px;
+          width: 280px;
+          height: 280px;
           border-radius: 50%;
           background: radial-gradient(circle, rgba(167, 139, 250, 0.45) 0%, rgba(139, 92, 246, 0.25) 50%, rgba(255,255,255,0) 75%);
           filter: blur(20px);
@@ -671,8 +667,8 @@ export default function RedesignedHomepage() {
           position: relative;
           z-index: 2;
           width: 100%;
-          max-width: 380px;
-          height: 440px;
+          max-width: 320px;
+          height: 340px;
           object-fit: cover;
           object-position: top center;
           border-radius: 20px;
@@ -807,8 +803,8 @@ export default function RedesignedHomepage() {
           justify-content: space-between;
           background: #ffffff;
           border-radius: 16px;
-          padding: 22px 32px;
-          margin-top: 48px;
+          padding: 18px 28px;
+          margin-top: 20px;
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
           border: 1px solid #f1f5f9;
         }
