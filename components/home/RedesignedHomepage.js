@@ -185,12 +185,14 @@ export default function RedesignedHomepage() {
 
           {/* ── Bottom Trust Bar Card ── */}
           <div className="tbar-card-container">
-            {/* 1. Expert Teachers */}
+            {/* 1. Expert Teachers (Purple/Indigo Circle Badge) */}
             <div className="tbar-item">
-              <svg className="tbar-icon text-indigo-600" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-              </svg>
+              <div className="tbar-icon-badge badge-solid-purple">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                  <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                </svg>
+              </div>
               <div>
                 <div className="tbar-title">Expert Teachers</div>
                 <div className="tbar-sub">Experienced &amp; Qualified</div>
@@ -199,13 +201,15 @@ export default function RedesignedHomepage() {
 
             <div className="tbar-divider" />
 
-            {/* 2. Result Focused */}
+            {/* 2. Result Focused (Pink/Red Circle Badge) */}
             <div className="tbar-item">
-              <svg className="tbar-icon text-pink-500" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <circle cx="12" cy="12" r="6"/>
-                <circle cx="12" cy="12" r="2"/>
-              </svg>
+              <div className="tbar-icon-badge badge-solid-pink">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <circle cx="12" cy="12" r="6"/>
+                  <circle cx="12" cy="12" r="2"/>
+                </svg>
+              </div>
               <div>
                 <div className="tbar-title">Result Focused</div>
                 <div className="tbar-sub">Proven Exam Success</div>
@@ -214,12 +218,14 @@ export default function RedesignedHomepage() {
 
             <div className="tbar-divider" />
 
-            {/* 3. Trusted by Parents */}
+            {/* 3. Trusted by Parents (Blue Circle Badge) */}
             <div className="tbar-item">
-              <svg className="tbar-icon text-blue-500" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                <polyline points="9 12 11 14 15 10"/>
-              </svg>
+              <div className="tbar-icon-badge badge-solid-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  <polyline points="9 12 11 14 15 10"/>
+                </svg>
+              </div>
               <div>
                 <div className="tbar-title">Trusted by Parents</div>
                 <div className="tbar-sub">Safe &amp; Reliable Platform</div>
@@ -228,11 +234,13 @@ export default function RedesignedHomepage() {
 
             <div className="tbar-divider" />
 
-            {/* 4. 98% A-Pass Rate (No subtitle) */}
+            {/* 4. 98% A-Pass Rate (Amber/Gold Circle Badge - No Subtitle) */}
             <div className="tbar-item">
-              <svg className="tbar-icon text-amber-500" width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-              </svg>
+              <div className="tbar-icon-badge badge-solid-amber">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+              </div>
               <div>
                 <div className="tbar-title">98% A-Pass Rate</div>
               </div>
@@ -746,8 +754,26 @@ export default function RedesignedHomepage() {
           gap: 14px;
           flex: 1;
         }
-        .tbar-icon {
+        .tbar-icon-badge {
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           flex-shrink: 0;
+        }
+        .badge-solid-pink {
+          background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+          box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+        }
+        .badge-solid-blue {
+          background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .badge-solid-amber {
+          background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+          box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
         }
         .tbar-title {
           font-size: 0.925rem;
