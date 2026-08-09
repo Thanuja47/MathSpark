@@ -353,73 +353,93 @@ export default function RedesignedHomepage() {
 
         /* ── HERO LIGHT ── */
         .hero-light {
-          background: linear-gradient(135deg, #eef2ff 0%, #f3e8ff 50%, #fce7f3 100%);
-          padding: 80px 0 90px;
+          background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 50%, #e0e7ff 100%);
+          padding: 80px 0 60px;
           position: relative;
           overflow: hidden;
         }
         .hero-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 60px;
+          grid-template-columns: 1.15fr 0.85fr;
+          gap: 48px;
           align-items: center;
         }
         .trust-badge-pill {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          background: rgba(255, 255, 255, 0.9);
-          border: 1px solid #cbd5e1;
-          padding: 6px 14px;
+          padding: 6px 16px;
+          background: rgba(255, 255, 255, 0.85);
+          border: 1px solid rgba(99, 102, 241, 0.2);
           border-radius: 999px;
-          font-size: 0.8rem;
+          font-size: 0.825rem;
           font-weight: 700;
-          color: #2563eb;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+          color: #4f46e5;
           margin-bottom: 24px;
+          backdrop-filter: blur(12px);
+          box-shadow: 0 2px 10px rgba(99, 102, 241, 0.08);
+          letter-spacing: -0.01em;
         }
         .badge-dot {
-          width: 8px; height: 8px; border-radius: 50%; background: #2563eb;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #4f46e5;
+          box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
         }
         .hero-headline {
-          font-size: clamp(2.2rem, 5vw, 3.4rem);
-          font-weight: 800;
-          line-height: 1.15;
+          font-size: clamp(2.3rem, 4.8vw, 3.5rem);
+          font-weight: 850;
+          line-height: 1.12;
           color: #0f172a;
-          letter-spacing: -0.03em;
-          margin-bottom: 20px;
+          letter-spacing: -0.035em;
+          margin-bottom: 22px;
         }
         .accent-tag {
-          font-size: 1.25rem;
+          font-size: 0.85rem;
           color: #6366f1;
-          font-weight: 700;
+          background: rgba(99, 102, 241, 0.08);
+          padding: 4px 12px;
+          border-radius: 6px;
+          border: 1px solid rgba(99, 102, 241, 0.15);
+          font-weight: 800;
           text-transform: uppercase;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.1em;
+          display: inline-block;
+          margin-bottom: 12px;
         }
         .highlight-blue {
-          color: #2563eb;
-          background: linear-gradient(120deg, #2563eb, #7c3aed);
+          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
+          font-weight: 900;
         }
         .hero-subtitle {
-          font-size: 1.1rem;
+          font-size: 1.075rem;
           color: #475569;
-          line-height: 1.6;
+          line-height: 1.65;
           margin-bottom: 28px;
           max-width: 540px;
+          font-weight: 450;
         }
         .hero-grades-wrapper {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 10px;
           margin-bottom: 32px;
           flex-wrap: wrap;
+          background: rgba(255, 255, 255, 0.6);
+          padding: 8px 16px;
+          border-radius: 14px;
+          border: 1px solid rgba(226, 232, 240, 0.8);
+          max-width: fit-content;
         }
         .grades-label {
-          font-size: 0.85rem;
+          font-size: 0.825rem;
           font-weight: 700;
           color: #64748b;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
         }
         .grades-pills {
           display: flex;
@@ -427,57 +447,63 @@ export default function RedesignedHomepage() {
           flex-wrap: wrap;
         }
         .grade-pill-item {
-          padding: 5px 12px;
+          padding: 5px 13px;
           background: #ffffff;
-          border: 1px solid #e2e8f0;
-          border-radius: 999px;
-          font-size: 0.8rem;
-          font-weight: 700;
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          font-size: 0.825rem;
+          font-weight: 800;
           color: #1e293b;
           text-decoration: none;
-          transition: all 0.2s;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 1px 2px rgba(0,0,0,0.04);
         }
         .grade-pill-item:hover {
-          background: #2563eb;
+          background: #4f46e5;
           color: #ffffff;
-          border-color: #2563eb;
+          border-color: #4f46e5;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
         .hero-actions {
           display: flex;
-          gap: 16px;
-          margin-bottom: 32px;
+          gap: 14px;
+          margin-bottom: 36px;
+          flex-wrap: wrap;
         }
         .btn-light-primary {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          background: #2563eb;
+          background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
           color: #ffffff;
-          padding: 14px 28px;
+          padding: 14px 30px;
           border-radius: 12px;
-          font-size: 1rem;
-          font-weight: 700;
+          font-size: 0.975rem;
+          font-weight: 750;
           text-decoration: none;
-          box-shadow: 0 4px 20px rgba(37,99,235,0.3);
-          transition: all 0.2s;
+          box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .btn-light-primary:hover {
-          background: #1d4ed8;
+          background: linear-gradient(135deg, #4338ca 0%, #312e81 100%);
           transform: translateY(-2px);
-          box-shadow: 0 6px 24px rgba(37,99,235,0.4);
+          box-shadow: 0 8px 26px rgba(79, 70, 229, 0.45);
+          color: #ffffff;
         }
         .btn-light-secondary {
           display: inline-flex;
           align-items: center;
           background: #ffffff;
-          color: #0f172a;
-          border: 1px solid #cbd5e1;
+          color: #1e293b;
+          border: 1.5px solid #cbd5e1;
           padding: 14px 28px;
           border-radius: 12px;
-          font-size: 1rem;
-          font-weight: 700;
+          font-size: 0.975rem;
+          font-weight: 750;
           text-decoration: none;
-          transition: all 0.2s;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.03);
         }
         .btn-light-secondary:hover {
           background: #f8fafc;
