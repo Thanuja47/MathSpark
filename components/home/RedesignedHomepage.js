@@ -512,50 +512,53 @@ export default function RedesignedHomepage() {
         .hero-grades-wrapper {
           display: flex;
           align-items: center;
-          gap: 10px;
-          margin-bottom: 28px;
+          gap: 12px;
+          margin-bottom: 32px;
           flex-wrap: wrap;
         }
         .grades-label {
-          font-size: 0.82rem;
+          font-size: 0.85rem;
           font-weight: 700;
-          color: #64748b;
+          color: #475569;
         }
-        .grades-pills { display:flex;gap:6px;flex-wrap:wrap; }
+        .grades-pills { display:flex;gap:8px;flex-wrap:wrap; }
         .grade-pill-item {
-          padding: 5px 14px;
-          background: #ffffff;
-          border: 1.5px solid #cbd5e1;
-          border-radius: 8px;
+          padding: 6px 16px;
+          background: #f3e8ff;
+          border: 1px solid #e9d5ff;
+          border-radius: 9999px;
           font-size: 0.82rem;
           font-weight: 800;
-          color: #1e293b;
+          color: #6b21a8;
           text-decoration: none;
           transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
-          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+          box-shadow: 0 1px 2px rgba(107,33,168,0.05);
         }
         .grade-pill-item:hover {
-          background: #4f46e5;
-          color: #fff;
-          border-color: #4f46e5;
+          background: #7c3aed;
+          color: #ffffff;
+          border-color: #7c3aed;
           transform: translateY(-2px);
-          box-shadow: 0 4px 10px rgba(79,70,229,0.3);
+          box-shadow: 0 4px 12px rgba(124,58,237,0.3);
         }
         /* Buttons */
-        .hero-actions { display:flex;gap:14px;margin-bottom:0;flex-wrap:wrap; }
+        .hero-actions { display:flex;align-items:center;gap:14px;margin-bottom:0;flex-wrap:wrap; }
         .btn-light-primary {
           display: inline-flex;
           align-items: center;
+          justify-content: center;
           gap: 10px;
+          height: 48px;
           background: linear-gradient(90deg, #2563eb 0%, #7c3aed 100%);
           color: #ffffff;
-          padding: 13px 28px;
+          padding: 0 28px;
           border-radius: 12px;
           font-size: 0.95rem;
           font-weight: 700;
           text-decoration: none;
           box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
           transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+          box-sizing: border-box;
         }
         .btn-light-primary:hover {
           background: linear-gradient(90deg, #1d4ed8 0%, #6d28d9 100%);
@@ -566,21 +569,26 @@ export default function RedesignedHomepage() {
         .btn-light-secondary {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          justify-content: center;
+          gap: 10px;
+          height: 48px;
           background: #ffffff;
           color: #1e293b;
           border: 1.5px solid #cbd5e1;
-          padding: 13px 24px;
+          padding: 0 24px;
           border-radius: 12px;
           font-size: 0.95rem;
           font-weight: 700;
           text-decoration: none;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+          box-shadow: 0 2px 6px rgba(0,0,0,0.04);
           transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+          box-sizing: border-box;
         }
         .btn-light-secondary:hover {
-          background: #f1f5f9;
+          background: #f8fafc;
           border-color: #94a3b8;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         /* ── HERO PHOTO SIDE SCOPED STYLES (hphoto-*) ── */
