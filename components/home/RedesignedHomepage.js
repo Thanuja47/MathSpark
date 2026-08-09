@@ -113,47 +113,66 @@ export default function RedesignedHomepage() {
               </div>
             </div>
 
-            {/* ── RIGHT: Image with floating cards ── */}
-            <div className="hero-image-side">
-              <div className="hero-image-card animated-hero-glow">
-                {/* Decorative floating math particle badges */}
-                <div className="hero-floating-particle particle-1 font-mono">∑x²</div>
-                <div className="hero-floating-particle particle-2 font-mono">πr²</div>
-                <div className="hero-floating-particle particle-3 font-mono">∫dx</div>
+            {/* ── RIGHT: Image with floating cards & soft purple glow ── */}
+            <div className="hphoto-container-side">
+              {/* Soft purple background glow */}
+              <div className="hphoto-glow-bg" />
 
-                <img
-                  src="/ishan_teaching.jpg"
-                  alt="Ishan Maduranga Mathematics"
-                  className="hero-main-img"
-                />
-                
-                {/* Floating Stat Card 1 with animated 3D Grad Cap Badge */}
-                <div className="floating-stat-card card-top float-card-1">
-                  <div className="stat-icon-bg bg-gradient-blue animated-badge">
-                    <svg className="badge-3d-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="stat-number">5,200+</div>
-                    <div className="stat-desc">{t('hero.statStudents')}</div>
-                  </div>
-                </div>
+              {/* Decorative math elements near top right */}
+              <div className="hphoto-math-badge font-mono">a² + b² = c²</div>
+              <div className="hphoto-math-symbol font-mono">+</div>
+              <div className="hphoto-math-symbol-sub font-mono">∫dx</div>
 
-                {/* Floating Stat Card 2 with animated 3D Medal #1 Badge */}
-                <div className="floating-stat-card card-bottom float-card-2">
-                  <div className="stat-icon-bg bg-gradient-purple animated-badge">
-                    <div className="ap-medal-badge small-medal">
-                      <span className="medal-number small-num">1</span>
-                      <div className="medal-ribbon small-ribbon" />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="stat-number">98%</div>
-                    <div className="stat-desc">{t('hero.statPass')}</div>
-                  </div>
+              {/* Floating feature card 1: Live Classes */}
+              <div className="hphoto-float-card fc-pos-live">
+                <div className="hphoto-card-icon bg-purple-100 text-purple-600">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                  </svg>
                 </div>
+                <div>
+                  <div className="hphoto-card-title">Live Classes</div>
+                  <div className="hphoto-card-sub">Interactive &amp; Engaging</div>
+                </div>
+              </div>
+
+              {/* Floating feature card 2: Video Recordings */}
+              <div className="hphoto-float-card fc-pos-video">
+                <div className="hphoto-card-icon bg-amber-100 text-amber-600">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+                  </svg>
+                </div>
+                <div>
+                  <div className="hphoto-card-title">Video Recordings</div>
+                  <div className="hphoto-card-sub">Learn at your pace</div>
+                </div>
+              </div>
+
+              {/* Floating feature card 3: 24/7 Support */}
+              <div className="hphoto-float-card fc-pos-support">
+                <div className="hphoto-card-icon bg-emerald-100 text-emerald-600">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a11.945 11.945 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.855L.057 23.633a.5.5 0 00.609.61l5.879-1.464A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.001-1.369l-.36-.214-3.713.924.951-3.62-.234-.372A9.818 9.818 0 1112 21.818z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div className="hphoto-card-title">24/7 Support</div>
+                  <div className="hphoto-card-sub">We&apos;re here for you!</div>
+                </div>
+              </div>
+
+              {/* Main Photo */}
+              <img
+                src="/ishan_teaching.jpg"
+                alt="Ishan Maduranga Mathematics"
+                className="hphoto-main-img"
+              />
+
+              {/* Stat card showing "98% A-Pass Rate" (no Active Students text) */}
+              <div className="hphoto-stat-badge">
+                <div className="hphoto-stat-stars">★★★★★</div>
+                <div className="hphoto-stat-val">98% A-Pass Rate</div>
               </div>
             </div>
           </div>
@@ -543,6 +562,148 @@ export default function RedesignedHomepage() {
         .btn-light-secondary:hover {
           background: #f1f5f9;
           border-color: #94a3b8;
+        }
+
+        /* ── HERO PHOTO SIDE SCOPED STYLES (hphoto-*) ── */
+        .hphoto-container-side {
+          position: relative;
+          height: 460px;
+          display: flex;
+          align-items: flex-end;
+          justify-content: center;
+        }
+        .hphoto-glow-bg {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 360px;
+          height: 360px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(167, 139, 250, 0.45) 0%, rgba(139, 92, 246, 0.25) 50%, rgba(255,255,255,0) 75%);
+          filter: blur(20px);
+          pointer-events: none;
+        }
+        .hphoto-main-img {
+          position: relative;
+          z-index: 2;
+          width: 100%;
+          max-width: 380px;
+          height: 440px;
+          object-fit: cover;
+          object-position: top center;
+          border-radius: 20px;
+          display: block;
+          box-shadow: 0 20px 40px rgba(124, 58, 237, 0.15);
+        }
+        .hphoto-math-badge {
+          position: absolute;
+          top: 8%;
+          right: 2%;
+          z-index: 3;
+          background: rgba(255, 255, 255, 0.9);
+          border: 1px solid rgba(196, 181, 253, 0.8);
+          backdrop-filter: blur(8px);
+          padding: 6px 14px;
+          border-radius: 12px;
+          font-size: 0.82rem;
+          font-weight: 800;
+          color: #7c3aed;
+          box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1);
+        }
+        .hphoto-math-symbol {
+          position: absolute;
+          top: 22%;
+          right: 0%;
+          z-index: 3;
+          font-size: 1.6rem;
+          color: #a78bfa;
+          opacity: 0.6;
+        }
+        .hphoto-math-symbol-sub {
+          position: absolute;
+          bottom: 35%;
+          right: -2%;
+          z-index: 3;
+          font-size: 0.9rem;
+          color: #7c3aed;
+          opacity: 0.5;
+        }
+        .hphoto-float-card {
+          position: absolute;
+          z-index: 4;
+          background: #ffffff;
+          border-radius: 14px;
+          padding: 10px 16px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+          border: 1px solid rgba(226, 232, 240, 0.8);
+          white-space: nowrap;
+          animation: floatCardHero 3.5s ease-in-out infinite alternate;
+        }
+        @keyframes floatCardHero {
+          0% { transform: translateY(0); }
+          100% { transform: translateY(-8px); }
+        }
+        .fc-pos-live {
+          top: 28%;
+          left: -4%;
+          animation-delay: 0s;
+        }
+        .fc-pos-video {
+          bottom: 22%;
+          left: -2%;
+          animation-delay: 1.2s;
+        }
+        .fc-pos-support {
+          top: 48%;
+          right: -4%;
+          animation-delay: 0.6s;
+        }
+        .hphoto-card-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+        .hphoto-card-title {
+          font-size: 0.85rem;
+          font-weight: 800;
+          color: #0f172a;
+          line-height: 1.2;
+        }
+        .hphoto-card-sub {
+          font-size: 0.72rem;
+          color: #64748b;
+          font-weight: 500;
+        }
+        .hphoto-stat-badge {
+          position: absolute;
+          bottom: -10px;
+          right: -2%;
+          z-index: 5;
+          background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+          color: #ffffff;
+          border-radius: 14px;
+          padding: 12px 20px;
+          text-align: center;
+          box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
+        }
+        .hphoto-stat-stars {
+          font-size: 0.9rem;
+          color: #fbbf24;
+          letter-spacing: 2px;
+          margin-bottom: 2px;
+        }
+        .hphoto-stat-val {
+          font-size: 0.95rem;
+          font-weight: 800;
+        }
 
         /* Hero Image Container & AP.LK Animated Elements */
         .hero-image-card {
