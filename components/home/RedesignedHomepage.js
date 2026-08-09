@@ -493,7 +493,7 @@ export default function RedesignedHomepage() {
         /* ── HERO LIGHT ── */
         .hero-light {
           background: linear-gradient(135deg, #f8fafc 0%, #ede9fe 60%, #e0e7ff 100%);
-          padding: 30px 0 0;
+          padding: 30px 0 52px;
           position: relative;
           overflow: hidden;
         }
