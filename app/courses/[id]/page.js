@@ -77,8 +77,38 @@ export default function CourseDetailPage({ params }) {
     window.open(url, '_blank');
   };
 
+  const courseSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    'name': course.title,
+    'description': course.description || `${course.title} by Ishan Maduranga on MathSpark platform.`,
+    'provider': {
+      '@type': 'EducationalOrganization',
+      'name': 'MathSpark',
+      'sameAs': 'https://math-spark-tau.vercel.app'
+    },
+    'offers': {
+      '@type': 'Offer',
+      'price': course.price,
+      'priceCurrency': 'LKR',
+      'availability': 'https://schema.org/InStock'
+    },
+    'hasCourseInstance': {
+      '@type': 'CourseInstance',
+      'courseMode': 'online',
+      'instructor': {
+        '@type': 'Person',
+        'name': 'Ishan Maduranga'
+      }
+    }
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
+      />
       <Header />
       <main>
         {/* Course Hero */}
