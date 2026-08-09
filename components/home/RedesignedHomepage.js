@@ -115,81 +115,45 @@ export default function RedesignedHomepage() {
 
             {/* ── RIGHT: Image with floating cards ── */}
             <div className="hero-image-side">
-              {/* Purple circle bg */}
-              <div className="hero-circle-bg" />
+              <div className="hero-image-card animated-hero-glow">
+                {/* Decorative floating math particle badges */}
+                <div className="hero-floating-particle particle-1 font-mono">∑x²</div>
+                <div className="hero-floating-particle particle-2 font-mono">πr²</div>
+                <div className="hero-floating-particle particle-3 font-mono">∫dx</div>
 
-              {/* Math decorations */}
-              <div className="math-deco math-deco-1">a²+b²=c²</div>
-              <div className="math-deco math-deco-2">
-                <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-                  <path d="M8 48 L48 8 M8 8 L48 48" stroke="#c4b5fd" strokeWidth="1" opacity="0.5"/>
-                  <rect x="18" y="18" width="20" height="20" stroke="#a78bfa" strokeWidth="1.5" fill="none" transform="perspective(60px) rotateY(30deg)"/>
-                  <rect x="24" y="12" width="20" height="20" stroke="#c4b5fd" strokeWidth="1" fill="none" transform="perspective(60px) rotateY(30deg)"/>
-                </svg>
-              </div>
-              <div className="math-deco math-deco-3">+</div>
+                <img
+                  src="/ishan_teaching.jpg"
+                  alt="Ishan Maduranga Mathematics"
+                  className="hero-main-img"
+                />
+                
+                {/* Floating Stat Card 1 with animated 3D Grad Cap Badge */}
+                <div className="floating-stat-card card-top float-card-1">
+                  <div className="stat-icon-bg bg-gradient-blue animated-badge">
+                    <svg className="badge-3d-svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="stat-number">5,200+</div>
+                    <div className="stat-desc">{t('hero.statStudents')}</div>
+                  </div>
+                </div>
 
-              {/* Floating card: 5,000+ Students — top right */}
-              <div className="hero-float-card fc-students">
-                <div className="fc-icon fc-icon-indigo">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-                  </svg>
+                {/* Floating Stat Card 2 with animated 3D Medal #1 Badge */}
+                <div className="floating-stat-card card-bottom float-card-2">
+                  <div className="stat-icon-bg bg-gradient-purple animated-badge">
+                    <div className="ap-medal-badge small-medal">
+                      <span className="medal-number small-num">1</span>
+                      <div className="medal-ribbon small-ribbon" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="stat-number">98%</div>
+                    <div className="stat-desc">{t('hero.statPass')}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="fc-value">5,200+</div>
-                  <div className="fc-label">{t('hero.statStudents')}</div>
-                </div>
-              </div>
-
-              {/* Floating card: Live Classes — left mid */}
-              <div className="hero-float-card fc-live">
-                <div className="fc-icon fc-icon-purple">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="fc-value">Live Classes</div>
-                  <div className="fc-label">Interactive &amp; Engaging</div>
-                </div>
-              </div>
-
-              {/* Floating card: Video Recordings — bottom left */}
-              <div className="hero-float-card fc-video">
-                <div className="fc-icon fc-icon-orange">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="fc-value">Video Recordings</div>
-                  <div className="fc-label">Learn at your pace</div>
-                </div>
-              </div>
-
-              {/* Floating card: 24/7 Support — right */}
-              <div className="hero-float-card fc-support">
-                <div className="fc-icon fc-icon-green">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a11.945 11.945 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.855L.057 23.633a.5.5 0 00.609.61l5.879-1.464A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.001-1.369l-.36-.214-3.713.924.951-3.62-.234-.372A9.818 9.818 0 1112 21.818z"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="fc-value">24/7 Support</div>
-                  <div className="fc-label">We&apos;re here for you!</div>
-                </div>
-              </div>
-
-              {/* Main photo */}
-              <img src="/ishan_teaching.jpg" alt="Ishan Maduranga Mathematics" className="hero-main-img" />
-
-              {/* Dark stat card — bottom right */}
-              <div className="hero-stat-dark">
-                <div className="stat-stars">★★★★★</div>
-                <div className="stat-pass-rate">98% A-Pass Rate</div>
-                <div className="stat-sub">({t('hero.statStudents')})</div>
               </div>
             </div>
           </div>
