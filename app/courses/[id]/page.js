@@ -85,7 +85,7 @@ export default function CourseDetailPage({ params }) {
     'provider': {
       '@type': 'EducationalOrganization',
       'name': 'MathSpark',
-      'sameAs': 'https://math-spark-tau.vercel.app'
+      'sameAs': SITE.url
     },
     'offers': {
       '@type': 'Offer',
