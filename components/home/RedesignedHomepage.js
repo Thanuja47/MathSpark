@@ -177,53 +177,58 @@ export default function RedesignedHomepage() {
             </div>
           </div>
 
-          {/* ── Bottom Trust Bar ── */}
-          <div className="hero-trust-bar">
-            <div className="trust-bar-item">
-              <div className="trust-bar-icon" style={{background:'#e0e7ff'}}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
-                </svg>
-              </div>
+          {/* ── Bottom Trust Bar Card ── */}
+          <div className="tbar-card-container">
+            {/* 1. Expert Teachers */}
+            <div className="tbar-item">
+              <svg className="tbar-icon text-indigo-600" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+              </svg>
               <div>
-                <div className="trust-bar-title">Expert Teachers</div>
-                <div className="trust-bar-sub">Experienced &amp; Qualified</div>
+                <div className="tbar-title">Expert Teachers</div>
+                <div className="tbar-sub">Experienced &amp; Qualified</div>
               </div>
             </div>
-            <div className="trust-bar-divider" />
-            <div className="trust-bar-item">
-              <div className="trust-bar-icon" style={{background:'#fce7f3'}}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#db2777" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
-                </svg>
-              </div>
+
+            <div className="tbar-divider" />
+
+            {/* 2. Result Focused */}
+            <div className="tbar-item">
+              <svg className="tbar-icon text-pink-500" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="6"/>
+                <circle cx="12" cy="12" r="2"/>
+              </svg>
               <div>
-                <div className="trust-bar-title">Result Focused</div>
-                <div className="trust-bar-sub">Proven Exam Success</div>
+                <div className="tbar-title">Result Focused</div>
+                <div className="tbar-sub">Proven Exam Success</div>
               </div>
             </div>
-            <div className="trust-bar-divider" />
-            <div className="trust-bar-item">
-              <div className="trust-bar-icon" style={{background:'#dcfce7'}}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-              </div>
+
+            <div className="tbar-divider" />
+
+            {/* 3. Trusted by Parents */}
+            <div className="tbar-item">
+              <svg className="tbar-icon text-blue-500" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <polyline points="9 12 11 14 15 10"/>
+              </svg>
               <div>
-                <div className="trust-bar-title">Trusted by Parents</div>
-                <div className="trust-bar-sub">Safe &amp; Reliable Platform</div>
+                <div className="tbar-title">Trusted by Parents</div>
+                <div className="tbar-sub">Safe &amp; Reliable Platform</div>
               </div>
             </div>
-            <div className="trust-bar-divider" />
-            <div className="trust-bar-item">
-              <div className="trust-bar-icon" style={{background:'#fef9c3'}}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ca8a04" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                </svg>
-              </div>
+
+            <div className="tbar-divider" />
+
+            {/* 4. 98% A-Pass Rate (No subtitle) */}
+            <div className="tbar-item">
+              <svg className="tbar-icon text-amber-500" width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
               <div>
-                <div className="trust-bar-title">98% A-Pass Rate</div>
-                <div className="trust-bar-sub">Active Students</div>
+                <div className="tbar-title">98% A-Pass Rate</div>
               </div>
             </div>
           </div>
@@ -703,6 +708,56 @@ export default function RedesignedHomepage() {
         .hphoto-stat-val {
           font-size: 0.95rem;
           font-weight: 800;
+        }
+
+        /* ── SINGLE WHITE TRUST BAR CARD (tbar-*) ── */
+        .tbar-card-container {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          background: #ffffff;
+          border-radius: 16px;
+          padding: 22px 32px;
+          margin-top: 48px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+          border: 1px solid #f1f5f9;
+        }
+        .tbar-item {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          flex: 1;
+        }
+        .tbar-icon {
+          flex-shrink: 0;
+        }
+        .tbar-title {
+          font-size: 0.925rem;
+          font-weight: 800;
+          color: #0f172a;
+          line-height: 1.25;
+        }
+        .tbar-sub {
+          font-size: 0.78rem;
+          color: #64748b;
+          font-weight: 500;
+          margin-top: 2px;
+        }
+        .tbar-divider {
+          width: 1px;
+          height: 36px;
+          background: #e2e8f0;
+          margin: 0 24px;
+          flex-shrink: 0;
+        }
+        @media (max-width: 900px) {
+          .tbar-card-container {
+            flex-direction: column;
+            gap: 20px;
+            align-items: flex-start;
+            padding: 20px;
+          }
+          .tbar-divider { display: none; }
         }
 
         /* Hero Image Container & AP.LK Animated Elements */
