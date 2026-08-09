@@ -122,10 +122,20 @@ export default function ForgotPasswordPage() {
             )}
 
             {!success && (
-              <p className="text-center text-sm text-muted" style={{ marginTop: 24 }}>
-                Remember your password?{' '}
-                <Link href="/" style={{ color: 'var(--primary-light)', fontWeight: 600 }}>Login here</Link>
-              </p>
+              <div className="text-center text-sm text-muted" style={{ marginTop: 24 }}>
+                <p style={{ margin: '0 0 8px' }}>
+                  Remember your password?{' '}
+                  <Link href="/" style={{ color: 'var(--primary-light)', fontWeight: 600 }}>Login here</Link>
+                </p>
+                <p style={{ margin: 0, fontSize: '0.8rem' }}>
+                  Need immediate help?{' '}
+                  <a href={`https://wa.me/${SITE.whatsapp}?text=Hi%20MathSpark,%20I%20need%20help%20resetting%20my%20password.`}
+                    target="_blank" rel="noreferrer"
+                    style={{ color: '#25D366', fontWeight: 600 }}>
+                    Contact WhatsApp Support 💬
+                  </a>
+                </p>
+              </div>
             )}
           </div>
         </div>

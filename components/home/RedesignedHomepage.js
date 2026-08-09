@@ -138,7 +138,7 @@ export default function RedesignedHomepage() {
                     </svg>
                   </div>
                   <div>
-                    <div className="stat-number">15,000+</div>
+                    <div className="stat-number">5,200+</div>
                     <div className="stat-desc">{t('hero.statStudents')}</div>
                   </div>
                 </div>

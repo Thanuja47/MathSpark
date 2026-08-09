@@ -22,17 +22,26 @@ export default function PolicyPage() {
             <div className="policy-box">
               <h3>1. Terms of Service</h3>
               <p>
-                By accessing MatSpark, you agree to abide by our platform guidelines. All course materials, video recordings, and study packs remain the intellectual property of MatSpark. Account sharing or unauthorized downloading of proprietary content is strictly prohibited.
+                By accessing MathSpark (&quot;the Platform&quot;), operated by Ishan Maduranga Mathematics, you agree to abide by these Terms of Service. All course materials, live stream accesses, video recordings, MCQ test banks, and physical or digital study packs remain the exclusive intellectual property of MathSpark.
+              </p>
+              <p>
+                Account credentials are strictly non-transferable. Any unauthorized account sharing, screen recording, commercial reproduction, or redistribution of proprietary learning materials will result in immediate termination of account access without entitlement to a refund, and may incur legal action.
               </p>
 
-              <h3 style={{ marginTop: 32 }}>2. Privacy Policy</h3>
+              <h3 style={{ marginTop: 32 }}>2. Privacy &amp; Data Protection</h3>
               <p>
-                We value your privacy. We collect minimal student information (name, WhatsApp number, grade) solely for class management, delivery tracking, and academic updates. We do not sell or share personal data with third parties.
+                MathSpark respects student privacy and is committed to protecting your personal information. We collect essential profile data—specifically your name, grade, mobile/WhatsApp contact number, and transaction records—solely to facilitate course access, process physical tute deliveries, and provide academic support.
+              </p>
+              <p>
+                Your data is stored securely and processed exclusively for MathSpark services. We do not sell, rent, or trade student personal information to third-party advertisers or external organizations under any circumstances.
               </p>
 
-              <h3 style={{ marginTop: 32 }}>3. Refund Policy</h3>
+              <h3 style={{ marginTop: 32 }}>3. Refund &amp; Cancellation Policy</h3>
               <p>
-                Monthly subscription fees are refundable within 7 days of payment if you have attended fewer than 2 live sessions and wish to cancel your enrollment. Physical tute packs can be returned if undamaged within 5 days of delivery.
+                Monthly subscription fees for live online classes and recording access packs are eligible for a refund within <strong>7 days</strong> of purchase, provided the student has attended fewer than two live sessions and accessed no more than two recording packs.
+              </p>
+              <p>
+                Physical study materials and printed tute packs may be returned or replaced within <strong>5 days</strong> of delivery if received damaged or incomplete. To request a refund or tute pack exchange, please contact our official support team at <strong>+94 72 929 8096</strong> via WhatsApp.
               </p>
             </div>
           </div>
