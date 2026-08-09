@@ -64,34 +64,32 @@ export default function RedesignedHomepage() {
 
   return (
     <div className="light-theme-wrapper">
-      {/* ── 1. VIBRANT HERO SECTION ── */}
+      {/* ── 1. HERO SECTION ── */}
       <section className="hero-light">
         <div className="container">
           <div className="hero-grid">
+            {/* ── LEFT: Text ── */}
             <div className="hero-text-side">
               <div className="trust-badge-pill">
-                <span className="badge-dot" />
+                <span className="badge-star">★</span>
                 {t('hero.tag')}
               </div>
 
               <h1 className="hero-headline">
                 <span className="accent-tag">A/L &amp; O/L MATHEMATICS</span>
-                <br />
-                {t('hero.title')} <span className="highlight-blue">{t('hero.titleGradient')}</span>
+                {t('hero.title')}{' '}
+                <span className="highlight-blue">{t('hero.titleGradient')}</span>
               </h1>
+              <div className="headline-underline" />
 
-              <p className="hero-subtitle">
-                {t('hero.description')}
-              </p>
+              <p className="hero-subtitle">{t('hero.description')}</p>
 
               {/* Grade Selector Pills */}
               <div className="hero-grades-wrapper">
                 <span className="grades-label">{t('sections.browseByGrade')}:</span>
                 <div className="grades-pills">
                   {GRADES.map(g => (
-                    <Link key={g.id} href={`/grades/${g.id}`} className="grade-pill-item">
-                      G{g.id}
-                    </Link>
+                    <Link key={g.id} href={`/grades/${g.id}`} className="grade-pill-item">G{g.id}</Link>
                   ))}
                 </div>
               </div>
@@ -104,58 +102,145 @@ export default function RedesignedHomepage() {
                     <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                   </svg>
                 </Link>
-                <Link href="/contact" className="btn-light-secondary">
+                <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer" className="btn-light-secondary">
+                  {/* WhatsApp Icon */}
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style={{flexShrink:0}}>
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.855L.057 23.633a.5.5 0 00.609.61l5.879-1.464A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.001-1.369l-.36-.214-3.713.924.951-3.62-.234-.372A9.818 9.818 0 1112 21.818z"/>
+                  </svg>
                   {t('common.contactUs')}
-                </Link>
-              </div>
-
-              {/* Trust indicator */}
-              <div className="hero-trust-row">
-                <span className="stars">⭐⭐⭐⭐⭐</span>
-                <span className="trust-text"><strong>98% {t('hero.statPass')}</strong> ({t('hero.statStudents')})</span>
+                </a>
               </div>
             </div>
 
+            {/* ── RIGHT: Image with floating cards ── */}
             <div className="hero-image-side">
-              <div className="hero-image-card animated-hero-glow">
-                {/* Decorative floating math particle badges */}
-                <div className="hero-floating-particle particle-1 font-mono">∑x²</div>
-                <div className="hero-floating-particle particle-2 font-mono">πr²</div>
-                <div className="hero-floating-particle particle-3 font-mono">∫dx</div>
+              {/* Purple circle bg */}
+              <div className="hero-circle-bg" />
 
-                <img
-                  src="/ishan_teaching.jpg"
-                  alt="Ishan Maduranga Mathematics"
-                  className="hero-main-img"
-                />
-                
-                {/* Floating Stat Card 1 with animated 3D Grad Cap Badge */}
-                <div className="floating-stat-card card-top float-card-1">
-                  <div className="stat-icon-bg bg-gradient-blue animated-badge">
-                    <svg className="badge-3d-svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                      <path d="M6 12v5c3 3 9 3 12 0v-5"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="stat-number">5,200+</div>
-                    <div className="stat-desc">{t('hero.statStudents')}</div>
-                  </div>
-                </div>
+              {/* Math decorations */}
+              <div className="math-deco math-deco-1">a²+b²=c²</div>
+              <div className="math-deco math-deco-2">
+                <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                  <path d="M8 48 L48 8 M8 8 L48 48" stroke="#c4b5fd" strokeWidth="1" opacity="0.5"/>
+                  <rect x="18" y="18" width="20" height="20" stroke="#a78bfa" strokeWidth="1.5" fill="none" transform="perspective(60px) rotateY(30deg)"/>
+                  <rect x="24" y="12" width="20" height="20" stroke="#c4b5fd" strokeWidth="1" fill="none" transform="perspective(60px) rotateY(30deg)"/>
+                </svg>
+              </div>
+              <div className="math-deco math-deco-3">+</div>
 
-                {/* Floating Stat Card 2 with animated 3D Medal #1 Badge */}
-                <div className="floating-stat-card card-bottom float-card-2">
-                  <div className="stat-icon-bg bg-gradient-purple animated-badge">
-                    <div className="ap-medal-badge small-medal">
-                      <span className="medal-number small-num">1</span>
-                      <div className="medal-ribbon small-ribbon" />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="stat-number">98%</div>
-                    <div className="stat-desc">{t('hero.statPass')}</div>
-                  </div>
+              {/* Floating card: 5,000+ Students — top right */}
+              <div className="hero-float-card fc-students">
+                <div className="fc-icon fc-icon-indigo">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
                 </div>
+                <div>
+                  <div className="fc-value">5,200+</div>
+                  <div className="fc-label">{t('hero.statStudents')}</div>
+                </div>
+              </div>
+
+              {/* Floating card: Live Classes — left mid */}
+              <div className="hero-float-card fc-live">
+                <div className="fc-icon fc-icon-purple">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                  </svg>
+                </div>
+                <div>
+                  <div className="fc-value">Live Classes</div>
+                  <div className="fc-label">Interactive &amp; Engaging</div>
+                </div>
+              </div>
+
+              {/* Floating card: Video Recordings — bottom left */}
+              <div className="hero-float-card fc-video">
+                <div className="fc-icon fc-icon-orange">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+                  </svg>
+                </div>
+                <div>
+                  <div className="fc-value">Video Recordings</div>
+                  <div className="fc-label">Learn at your pace</div>
+                </div>
+              </div>
+
+              {/* Floating card: 24/7 Support — right */}
+              <div className="hero-float-card fc-support">
+                <div className="fc-icon fc-icon-green">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#25D366">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a11.945 11.945 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zM12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.126 1.532 5.855L.057 23.633a.5.5 0 00.609.61l5.879-1.464A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.001-1.369l-.36-.214-3.713.924.951-3.62-.234-.372A9.818 9.818 0 1112 21.818z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div className="fc-value">24/7 Support</div>
+                  <div className="fc-label">We&apos;re here for you!</div>
+                </div>
+              </div>
+
+              {/* Main photo */}
+              <img src="/ishan_teaching.jpg" alt="Ishan Maduranga Mathematics" className="hero-main-img" />
+
+              {/* Dark stat card — bottom right */}
+              <div className="hero-stat-dark">
+                <div className="stat-stars">★★★★★</div>
+                <div className="stat-pass-rate">98% A-Pass Rate</div>
+                <div className="stat-sub">({t('hero.statStudents')})</div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Bottom Trust Bar ── */}
+          <div className="hero-trust-bar">
+            <div className="trust-bar-item">
+              <div className="trust-bar-icon" style={{background:'#e0e7ff'}}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                </svg>
+              </div>
+              <div>
+                <div className="trust-bar-title">Expert Teachers</div>
+                <div className="trust-bar-sub">Experienced &amp; Qualified</div>
+              </div>
+            </div>
+            <div className="trust-bar-divider" />
+            <div className="trust-bar-item">
+              <div className="trust-bar-icon" style={{background:'#fce7f3'}}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#db2777" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+                </svg>
+              </div>
+              <div>
+                <div className="trust-bar-title">Result Focused</div>
+                <div className="trust-bar-sub">Proven Exam Success</div>
+              </div>
+            </div>
+            <div className="trust-bar-divider" />
+            <div className="trust-bar-item">
+              <div className="trust-bar-icon" style={{background:'#dcfce7'}}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              </div>
+              <div>
+                <div className="trust-bar-title">Trusted by Parents</div>
+                <div className="trust-bar-sub">Safe &amp; Reliable Platform</div>
+              </div>
+            </div>
+            <div className="trust-bar-divider" />
+            <div className="trust-bar-item">
+              <div className="trust-bar-icon" style={{background:'#fef9c3'}}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ca8a04" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+              </div>
+              <div>
+                <div className="trust-bar-title">98% A-Pass Rate</div>
+                <div className="trust-bar-sub">Active Students</div>
               </div>
             </div>
           </div>
@@ -353,169 +438,147 @@ export default function RedesignedHomepage() {
 
         /* ── HERO LIGHT ── */
         .hero-light {
-          background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 50%, #e0e7ff 100%);
-          padding: 80px 0 60px;
+          background: linear-gradient(135deg, #f8fafc 0%, #ede9fe 60%, #e0e7ff 100%);
+          padding: 64px 0 0;
           position: relative;
           overflow: hidden;
         }
         .hero-grid {
           display: grid;
-          grid-template-columns: 1.15fr 0.85fr;
-          gap: 48px;
+          grid-template-columns: 1fr 1fr;
+          gap: 40px;
           align-items: center;
+        }
+        /* LEFT */
+        .hero-text-side {
+          padding-bottom: 40px;
         }
         .trust-badge-pill {
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          padding: 6px 16px;
-          background: rgba(255, 255, 255, 0.85);
-          border: 1px solid rgba(99, 102, 241, 0.2);
+          padding: 7px 16px;
+          background: #ffffff;
+          border: 1.5px solid #e0e7ff;
           border-radius: 999px;
-          font-size: 0.825rem;
+          font-size: 0.82rem;
           font-weight: 700;
           color: #4f46e5;
-          margin-bottom: 24px;
-          backdrop-filter: blur(12px);
-          box-shadow: 0 2px 10px rgba(99, 102, 241, 0.08);
-          letter-spacing: -0.01em;
+          margin-bottom: 20px;
+          box-shadow: 0 2px 8px rgba(79,70,229,0.08);
         }
-        .badge-dot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #4f46e5;
-          box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-        }
-        .hero-headline {
-          font-size: clamp(2.3rem, 4.8vw, 3.5rem);
-          font-weight: 850;
-          line-height: 1.12;
-          color: #0f172a;
-          letter-spacing: -0.035em;
-          margin-bottom: 22px;
-        }
+        .badge-star { color: #4f46e5; font-size: 0.9rem; }
+        .badge-dot { width:8px;height:8px;border-radius:50%;background:#4f46e5; }
         .accent-tag {
-          font-size: 0.85rem;
-          color: #6366f1;
-          background: rgba(99, 102, 241, 0.08);
-          padding: 4px 12px;
-          border-radius: 6px;
-          border: 1px solid rgba(99, 102, 241, 0.15);
+          display: block;
+          font-size: 0.82rem;
           font-weight: 800;
+          color: #4f46e5;
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          display: inline-block;
-          margin-bottom: 12px;
+          margin-bottom: 10px;
+        }
+        .hero-headline {
+          font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+          font-weight: 900;
+          line-height: 1.13;
+          color: #0f172a;
+          letter-spacing: -0.035em;
+          margin: 0 0 12px;
         }
         .highlight-blue {
-          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%);
+          background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #2563eb 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           font-weight: 900;
         }
+        .headline-underline {
+          width: 48px;
+          height: 4px;
+          border-radius: 2px;
+          background: linear-gradient(90deg, #4f46e5, #7c3aed);
+          margin-bottom: 20px;
+        }
         .hero-subtitle {
-          font-size: 1.075rem;
+          font-size: 1rem;
           color: #475569;
           line-height: 1.65;
-          margin-bottom: 28px;
-          max-width: 540px;
-          font-weight: 450;
+          margin-bottom: 24px;
+          max-width: 480px;
         }
+        /* Grade pills */
         .hero-grades-wrapper {
           display: flex;
           align-items: center;
           gap: 10px;
-          margin-bottom: 32px;
+          margin-bottom: 28px;
           flex-wrap: wrap;
-          background: rgba(255, 255, 255, 0.6);
-          padding: 8px 16px;
-          border-radius: 14px;
-          border: 1px solid rgba(226, 232, 240, 0.8);
-          max-width: fit-content;
         }
         .grades-label {
-          font-size: 0.825rem;
+          font-size: 0.82rem;
           font-weight: 700;
           color: #64748b;
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
         }
-        .grades-pills {
-          display: flex;
-          gap: 6px;
-          flex-wrap: wrap;
-        }
+        .grades-pills { display:flex;gap:6px;flex-wrap:wrap; }
         .grade-pill-item {
-          padding: 5px 13px;
+          padding: 5px 14px;
           background: #ffffff;
-          border: 1px solid #cbd5e1;
+          border: 1.5px solid #cbd5e1;
           border-radius: 8px;
-          font-size: 0.825rem;
+          font-size: 0.82rem;
           font-weight: 800;
           color: #1e293b;
           text-decoration: none;
-          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-          box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+          transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
+          box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         .grade-pill-item:hover {
           background: #4f46e5;
-          color: #ffffff;
+          color: #fff;
           border-color: #4f46e5;
           transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+          box-shadow: 0 4px 10px rgba(79,70,229,0.3);
         }
-        .hero-actions {
-          display: flex;
-          gap: 14px;
-          margin-bottom: 36px;
-          flex-wrap: wrap;
-        }
+        /* Buttons */
+        .hero-actions { display:flex;gap:14px;margin-bottom:0;flex-wrap:wrap; }
         .btn-light-primary {
           display: inline-flex;
           align-items: center;
           gap: 10px;
-          background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-          color: #ffffff;
-          padding: 14px 30px;
+          background: linear-gradient(135deg,#4f46e5,#3730a3);
+          color: #fff;
+          padding: 13px 28px;
           border-radius: 12px;
-          font-size: 0.975rem;
-          font-weight: 750;
+          font-size: 0.95rem;
+          font-weight: 700;
           text-decoration: none;
-          box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
-          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 6px 18px rgba(79,70,229,0.35);
+          transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
         }
         .btn-light-primary:hover {
-          background: linear-gradient(135deg, #4338ca 0%, #312e81 100%);
+          background: linear-gradient(135deg,#4338ca,#312e81);
           transform: translateY(-2px);
-          box-shadow: 0 8px 26px rgba(79, 70, 229, 0.45);
-          color: #ffffff;
+          box-shadow: 0 8px 24px rgba(79,70,229,0.45);
+          color: #fff;
         }
         .btn-light-secondary {
           display: inline-flex;
           align-items: center;
+          gap: 8px;
           background: #ffffff;
           color: #1e293b;
           border: 1.5px solid #cbd5e1;
-          padding: 14px 28px;
+          padding: 13px 24px;
           border-radius: 12px;
-          font-size: 0.975rem;
-          font-weight: 750;
+          font-size: 0.95rem;
+          font-weight: 700;
           text-decoration: none;
-          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-          box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+          box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+          transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
         }
         .btn-light-secondary:hover {
-          background: #f8fafc;
+          background: #f1f5f9;
           border-color: #94a3b8;
-        }
-        .hero-trust-row {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          font-size: 0.85rem;
-          color: #475569;
-        }
 
         /* Hero Image Container & AP.LK Animated Elements */
         .hero-image-card {
