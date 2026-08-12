@@ -10,9 +10,20 @@ export default function ContactPage() {
   const { t } = useLanguage();
   const [submitted, setSubmitted] = useState(false);
 
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [grade, setGrade] = useState('6');
+  const [message, setMessage] = useState('');
+  const [waLink, setWaLink] = useState('');
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    const text = `*New Contact Inquiry from MatSpark Website*%0A%0A*Name:* ${encodeURIComponent(name)}%0A*Phone:* ${encodeURIComponent(phone)}%0A*Grade:* Grade ${encodeURIComponent(grade)}%0A*Message:* ${encodeURIComponent(message)}`;
+    const url = `https://wa.me/${SITE.whatsapp}?text=${text}`;
+    setWaLink(url);
     setSubmitted(true);
+    // Automatically open WhatsApp in new tab for instant response
+    window.open(url, '_blank');
   };
 
   return (
@@ -84,28 +95,33 @@ export default function ContactPage() {
               <div className="contact-form-box">
                 {submitted ? (
                   <div className="text-center" style={{ padding: '40px 0' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: 16 }}>🎉</div>
-                    <h3>Message Sent Successfully!</h3>
+                    <div style={{ fontSize: '3rem', marginBottom: 16 }}>💬</div>
+                    <h3>Opening WhatsApp to Send Message...</h3>
                     <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>
-                      Thank you for contacting MatSpark. Our team will respond within 24 hours.
+                      If WhatsApp did not open automatically, click the button below to send your inquiry directly to Ishan Maduranga:
                     </p>
-                    <button className="btn btn-outline" style={{ marginTop: 24 }} onClick={() => setSubmitted(false)}>
-                      Send Another Message
-                    </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', marginTop: 24 }}>
+                      <a href={waLink} target="_blank" rel="noreferrer" className="btn btn-primary btn-lg" style={{ background: '#10B981', textDecoration: 'none' }}>
+                        Chat directly on WhatsApp 💬
+                      </a>
+                      <button className="btn btn-outline" onClick={() => setSubmitted(false)}>
+                        Send Another Message
+                      </button>
+                    </div>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit}>
                     <div className="form-group">
                       <label className="form-label">{t('auth.nameLabel')}</label>
-                      <input type="text" className="form-input" placeholder="Ex: Kavindi Perera" required />
+                      <input type="text" className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Kavindi Perera" required />
                     </div>
                     <div className="form-group">
                       <label className="form-label">{t('auth.phoneLabel')}</label>
-                      <input type="number" className="form-input" placeholder="Ex: 0712345678" required />
+                      <input type="tel" className="form-input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="Ex: 0712345678" required />
                     </div>
                     <div className="form-group">
                       <label className="form-label">{t('auth.gradeLabel')}</label>
-                      <select className="form-input">
+                      <select className="form-input" value={grade} onChange={e => setGrade(e.target.value)}>
                         <option value="6">Grade 06</option>
                         <option value="7">Grade 07</option>
                         <option value="8">Grade 08</option>
@@ -116,7 +132,7 @@ export default function ContactPage() {
                     </div>
                     <div className="form-group">
                       <label className="form-label">Message</label>
-                      <textarea className="form-input" rows="4" placeholder="How can we help you?" required />
+                      <textarea className="form-input" rows="4" value={message} onChange={e => setMessage(e.target.value)} placeholder="How can we help you?" required />
                     </div>
                     <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }}>
                       {t('common.contactUs')} 🚀
