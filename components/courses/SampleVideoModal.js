@@ -22,8 +22,23 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
 
   if (!isOpen || !course) return null;
 
-  const videoUrl = course.sampleVideoUrl || '';
-  const isPlaceholder = !videoUrl || videoUrl.includes('VIDEO_ID');
+  const rawVideoUrl = course.sampleVideoUrl || '';
+  const isPlaceholder = !rawVideoUrl || rawVideoUrl.includes('VIDEO_ID');
+
+  const getEmbedUrl = (url) => {
+    if (!url) return '';
+    if (url.includes('youtube.com/embed/')) return url;
+    let videoId = '';
+    if (url.includes('youtu.be/')) {
+      videoId = url.split('youtu.be/')[1]?.split('?')[0]?.split('&')[0];
+    } else if (url.includes('youtube.com/watch')) {
+      const urlParams = new URLSearchParams(url.split('?')[1] || '');
+      videoId = urlParams.get('v');
+    }
+    return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : url;
+  };
+
+  const videoUrl = getEmbedUrl(rawVideoUrl);
   const waText = encodeURIComponent(`Hi Ishan Sir, I want to watch a free sample lesson for ${course.title || 'Grade Maths'} on MathSpark. Can you share the preview link?`);
 
   return (

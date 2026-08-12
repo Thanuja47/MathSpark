@@ -24,6 +24,7 @@ export default function AdminPage() {
   const [courseMedium, setCourseMedium]     = useState('sinhala');
   const [coursePrice, setCoursePrice]       = useState('');
   const [courseBadge, setCourseBadge]       = useState('');
+  const [courseSampleVideo, setCourseSampleVideo] = useState('');
   const [courseDesc, setCourseDesc]         = useState('');
   const [courseImageFile, setCourseImageFile]   = useState(null);
   const [courseImagePreview, setCourseImagePreview] = useState('');
@@ -149,14 +150,14 @@ export default function AdminPage() {
   const resetCourseForm = () => {
     setEditingCourse(null); setCourseTitle(''); setCourseGrade('10');
     setCourseMedium('sinhala'); setCoursePrice(''); setCourseBadge('');
-    setCourseDesc(''); setCourseImageFile(null); setCourseImagePreview('');
+    setCourseSampleVideo(''); setCourseDesc(''); setCourseImageFile(null); setCourseImagePreview('');
     setShowCourseForm(false); setCourseMsg('');
   };
 
   const editCourse = (c) => {
     setEditingCourse(c.id); setCourseTitle(c.title); setCourseGrade(String(c.grade));
     setCourseMedium(c.medium); setCoursePrice(String(c.price)); setCourseBadge(c.badge || '');
-    setCourseDesc(c.description || ''); setCourseImagePreview(c.imageUrl || '');
+    setCourseSampleVideo(c.sampleVideoUrl || ''); setCourseDesc(c.description || ''); setCourseImagePreview(c.imageUrl || '');
     setCourseImageFile(null); setShowCourseForm(true); setCourseMsg('');
   };
 
@@ -165,7 +166,7 @@ export default function AdminPage() {
     try {
       let finalImageUrl = courseImagePreview;
       if (courseImageFile) finalImageUrl = await uploadImage(courseImageFile);
-      const payload = { title: courseTitle, grade: courseGrade, medium: courseMedium, price: coursePrice, badge: courseBadge, description: courseDesc, imageUrl: finalImageUrl || null };
+      const payload = { title: courseTitle, grade: courseGrade, medium: courseMedium, price: coursePrice, badge: courseBadge, sampleVideoUrl: courseSampleVideo, description: courseDesc, imageUrl: finalImageUrl || null };
       const res = editingCourse
         ? await apiFetch(`/api/admin/courses/${editingCourse}`, { method: 'PUT', body: JSON.stringify(payload) })
         : await apiFetch('/api/admin/courses', { method: 'POST', body: JSON.stringify(payload) });
@@ -698,6 +699,9 @@ export default function AdminPage() {
                         </div>
                         <div className="form-group"><label className="form-label">Badge (optional)</label>
                           <input className="form-input" value={courseBadge} onChange={e => setCourseBadge(e.target.value)} placeholder="e.g. NEW · POPULAR" />
+                        </div>
+                        <div className="form-group"><label className="form-label">Free Sample Video URL (YouTube link)</label>
+                          <input className="form-input" value={courseSampleVideo} onChange={e => setCourseSampleVideo(e.target.value)} placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..." />
                         </div>
                         <div className="form-group"><label className="form-label">Description</label>
                           <textarea className="form-input" rows={3} value={courseDesc} onChange={e => setCourseDesc(e.target.value)} />
