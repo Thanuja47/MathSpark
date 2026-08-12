@@ -22,8 +22,9 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
 
   if (!isOpen || !course) return null;
 
-  const videoUrl = course.sampleVideoUrl || 'https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1';
-  const waText = encodeURIComponent(`Hi Ishan Sir, I watched the free sample video for ${course.title || 'Grade Maths'} on MathSpark and I would like to enroll in the full class!`);
+  const videoUrl = course.sampleVideoUrl || '';
+  const isPlaceholder = !videoUrl || videoUrl.includes('VIDEO_ID');
+  const waText = encodeURIComponent(`Hi Ishan Sir, I want to watch a free sample lesson for ${course.title || 'Grade Maths'} on MathSpark. Can you share the preview link?`);
 
   return (
     <div className="sample-modal-overlay" onClick={onClose}>
@@ -47,15 +48,35 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
           Watch a free sample lesson to experience Ishan Sir&apos;s step-by-step teaching method before enrolling!
         </p>
 
-        {/* Video Player */}
-        <div className="video-responsive-wrapper">
-          <iframe
-            src={videoUrl}
-            title={`Free Sample Lesson - ${course.title}`}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-        </div>
+        {/* Video Player or Coming Soon */}
+        {isPlaceholder ? (
+          <div className="video-coming-soon">
+            <div className="coming-soon-icon">🎬</div>
+            <h4>Sample Video Coming Soon!</h4>
+            <p>
+              The free preview video for <strong>{course.title}</strong> will be uploaded shortly.
+              Contact Ishan Sir on WhatsApp to get early access!
+            </p>
+            <a
+              href={`https://wa.me/${SITE.whatsapp}?text=${waText}`}
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-whatsapp btn-md"
+              style={{ marginTop: 16, display: 'inline-flex' }}
+            >
+              💬 Ask for Sample Video on WhatsApp
+            </a>
+          </div>
+        ) : (
+          <div className="video-responsive-wrapper">
+            <iframe
+              src={videoUrl}
+              title={`Free Sample Lesson - ${course.title}`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          </div>
+        )}
 
         {/* CTA Box */}
         <div className="sample-cta-box">
@@ -171,6 +192,30 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
           line-height: 1.5;
         }
 
+        .video-coming-soon {
+          background: linear-gradient(135deg, rgba(37,99,235,0.1), rgba(124,58,237,0.1));
+          border: 1.5px dashed rgba(59,130,246,0.4);
+          border-radius: 14px;
+          padding: 40px 24px;
+          text-align: center;
+          margin-bottom: 24px;
+        }
+        .coming-soon-icon {
+          font-size: 3rem;
+          margin-bottom: 12px;
+        }
+        .video-coming-soon h4 {
+          font-size: 1.1rem;
+          font-weight: 800;
+          color: #eff2ff;
+          margin-bottom: 8px;
+        }
+        .video-coming-soon p {
+          font-size: 0.87rem;
+          color: #8d96a7;
+          line-height: 1.5;
+          margin: 0;
+        }
         .video-responsive-wrapper {
           position: relative;
           width: 100%;
