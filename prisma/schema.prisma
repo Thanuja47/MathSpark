@@ -16,6 +16,7 @@ model Student {
   grade           Int
   medium          String               @default("sinhala")
   role            String               @default("student")
+  phoneVerified   Boolean              @default(false)
   enrolledCourses String               @default("[]")
   createdAt       DateTime             @default(now())
   isActive        Boolean              @default(true)

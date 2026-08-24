@@ -4,6 +4,7 @@ import { hashPassword, signToken, setAuthCookie } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { normalisePhone } from '@/utils/formatPhone';
 import { ROLES } from '@/utils/constants';
+import { isOtpVerified, clearOtpState } from '@/lib/otpStore';
 
 export async function POST(request) {
   try {
@@ -18,6 +19,11 @@ export async function POST(request) {
     }
 
     const normalised = normalisePhone(phone);
+
+    // Enforce OTP Verification check
+    if (!isOtpVerified(normalised)) {
+      return NextResponse.json({ error: 'WhatsApp phone number has not been verified via SMS OTP. Please verify OTP first.' }, { status: 403 });
+    }
 
     // Check if already registered
     const exists = await db.students.exists(normalised);
@@ -34,8 +40,12 @@ export async function POST(request) {
       grade: parseInt(grade, 10),
       medium: medium || 'sinhala',
       role: ROLES.STUDENT,
+      phoneVerified: true,
       enrolledCourses: [],
     });
+
+    // Clear OTP state after successful registration
+    clearOtpState(normalised);
 
     // Sign token & set cookie
     const token = signToken({ id: student.id, name: student.name, phone: student.phone, grade: student.grade });

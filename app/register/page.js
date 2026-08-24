@@ -10,6 +10,8 @@ import { useLanguage } from '@/context/LanguageContext';
 export default function RegisterPage() {
   const { t } = useLanguage();
   const { register: performRegister, error, setError, loading } = useAuth();
+  
+  // Step 1: Info, Step 2: Password, Step 3: OTP Verification
   const [step, setStep] = useState(1);
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
@@ -17,6 +19,12 @@ export default function RegisterPage() {
   const [medium, setMedium] = useState('sinhala');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // OTP state
+  const [otpCode, setOtpCode] = useState('');
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+  const [otpMsg, setOtpMsg] = useState('');
   const [success, setSuccess] = useState(false);
 
   const handleStep1 = (e) => {
@@ -27,22 +35,88 @@ export default function RegisterPage() {
     setStep(2);
   };
 
-  const handleRegister = async (e) => {
+  const handleSendOtpAndProceed = async (e) => {
     e.preventDefault();
     if (password.length < 6) { setError('Password must be at least 6 characters.'); return; }
     if (password !== confirmPassword) { setError('Passwords do not match.'); return; }
     setError('');
     
-    const result = await performRegister({
-      name,
-      phone,
-      grade: parseInt(grade, 10),
-      medium,
-      password
-    });
-    
-    if (result.success) {
-      setSuccess(true);
+    setSendingOtp(true);
+    try {
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send OTP.');
+      
+      setOtpMsg('✅ Verification code sent to your WhatsApp / Phone via SMS.');
+      setStep(3);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setError('');
+    setOtpMsg('');
+    setSendingOtp(true);
+    try {
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to resend OTP.');
+      setOtpMsg('✅ A new 6-digit OTP code has been sent via SMS.');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSendingOtp(false);
+    }
+  };
+
+  const handleVerifyOtpAndRegister = async (e) => {
+    e.preventDefault();
+    if (!otpCode || otpCode.length !== 6) {
+      setError('Please enter the 6-digit verification code.');
+      return;
+    }
+    setError('');
+    setVerifyingOtp(true);
+
+    try {
+      // 1. Verify OTP
+      const verifyRes = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, code: otpCode }),
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok) throw new Error(verifyData.error || 'Invalid OTP code.');
+
+      // 2. Perform Account Registration
+      const result = await performRegister({
+        name,
+        phone,
+        grade: parseInt(grade, 10),
+        medium,
+        password
+      });
+
+      if (result.success) {
+        setSuccess(true);
+      } else {
+        throw new Error(result.error || 'Registration failed.');
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setVerifyingOtp(false);
     }
   };
 
@@ -58,162 +132,171 @@ export default function RegisterPage() {
               <p className="text-secondary text-sm" style={{ marginTop: 8 }}>Join 5,200+ students mastering Maths across Sri Lanka</p>
             </div>
 
-            {/* Step Indicator */}
+            {/* Step Indicators */}
             {!success && (
-              <div className="register-steps">
-                <div className={`reg-step ${step >= 1 ? 'active' : ''}`}>
-                  <div className="reg-step-dot">1</div>
-                  <span>Your Info</span>
-                </div>
-                <div className="reg-step-line" />
-                <div className={`reg-step ${step >= 2 ? 'active' : ''}`}>
-                  <div className="reg-step-dot">2</div>
-                  <span>Set Password</span>
-                </div>
+              <div style={{ display: 'flex', gap: 8, margin: '20px 0 24px' }}>
+                <div style={{ flex: 1, height: 4, borderRadius: 2, background: step >= 1 ? 'var(--primary)' : 'var(--border-dark)' }} />
+                <div style={{ flex: 1, height: 4, borderRadius: 2, background: step >= 2 ? 'var(--primary)' : 'var(--border-dark)' }} />
+                <div style={{ flex: 1, height: 4, borderRadius: 2, background: step >= 3 ? 'var(--primary)' : 'var(--border-dark)' }} />
               </div>
             )}
 
             {error && (
-              <div className="login-error">⚠️ {error}</div>
+              <div className="alert alert-error" style={{ marginBottom: 20 }}>
+                ⚠️ {error}
+              </div>
+            )}
+
+            {otpMsg && (
+              <div className="alert alert-success" style={{ marginBottom: 20, background: 'rgba(16,185,129,0.15)', color: '#34d399', border: '1px solid rgba(16,185,129,0.3)' }}>
+                {otpMsg}
+              </div>
             )}
 
             {success ? (
-              <div className="text-center" style={{ padding: '20px 0' }}>
-                <div style={{ fontSize: '3.5rem', marginBottom: 16 }}>🎉</div>
-                <h3 style={{ marginBottom: 8 }}>Welcome to MathSpark!</h3>
-                <p className="text-secondary text-sm">Your account has been created. You can now log in and start learning.</p>
-                <Link href="/" className="btn btn-primary" style={{ marginTop: 24 }}>
-                  Go to Homepage →
+              <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                <div style={{ fontSize: '3rem', marginBottom: 16 }}>🎉</div>
+                <h3 style={{ color: '#fff', fontSize: '1.4rem', fontWeight: '800', marginBottom: 8 }}>Registration Complete!</h3>
+                <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>Your account has been verified and activated. Welcome to MathSpark!</p>
+                <Link href="/my-account" className="btn btn-primary btn-full">
+                  Go to Student Dashboard →
                 </Link>
               </div>
             ) : step === 1 ? (
               <form onSubmit={handleStep1}>
                 <div className="form-group">
-                  <label className="form-label">{t('auth.nameLabel')}</label>
-                  <input type="text" className="form-input" placeholder="Ex: Kavindi Perera"
-                    value={name} onChange={e => { setName(e.target.value); setError(''); }} required />
+                  <label className="form-label">{t('auth.fullName')}</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. Kasun Perera"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
                 </div>
+
                 <div className="form-group">
-                  <label className="form-label">{t('auth.phoneLabel')}</label>
-                  <div style={{ position: 'relative' }}>
-                    <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 600 }}>+94</span>
-                    <input type="number" className="form-input" placeholder="712 345 678"
-                      style={{ paddingLeft: 52 }}
-                      value={phone}
-                      onChange={e => { if (e.target.value.length <= 10) setPhone(e.target.value); setError(''); }}
-                      required />
-                  </div>
+                  <label className="form-label">{t('auth.whatsappNumber')}</label>
+                  <input
+                    type="tel"
+                    className="form-input"
+                    placeholder="07X XXXXXXX"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                  />
+                  <p className="field-help">SMS OTP will be sent to verify this phone number.</p>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  <div className="form-group">
-                    <label className="form-label">{t('auth.gradeLabel')}</label>
-                    <select className="form-input" value={grade} onChange={e => setGrade(e.target.value)}>
-                      {[6, 7, 8, 9, 10, 11].map(g => <option key={g} value={g}>Grade {g}</option>)}
+
+                <div className="form-row">
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">{t('auth.grade')}</label>
+                    <select className="form-input" value={grade} onChange={(e) => setGrade(e.target.value)}>
+                      {[6,7,8,9,10,11].map(g => <option key={g} value={g}>Grade {g}</option>)}
                     </select>
                   </div>
-                  <div className="form-group">
-                    <label className="form-label">Medium</label>
-                    <select className="form-input" value={medium} onChange={e => setMedium(e.target.value)}>
+                  <div className="form-group" style={{ flex: 1 }}>
+                    <label className="form-label">{t('auth.medium')}</label>
+                    <select className="form-input" value={medium} onChange={(e) => setMedium(e.target.value)}>
                       <option value="sinhala">Sinhala Medium</option>
                       <option value="english">English Medium</option>
                     </select>
                   </div>
                 </div>
-                <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                  {t('auth.registerBtn').split(' ')[0]} →
+
+                <button type="submit" className="btn btn-primary btn-full">
+                  Next Step →
                 </button>
               </form>
+            ) : step === 2 ? (
+              <form onSubmit={handleSendOtpAndProceed}>
+                <div className="form-group">
+                  <label className="form-label">{t('auth.createPassword')}</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    placeholder="At least 6 characters"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">{t('auth.confirmPassword')}</label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    placeholder="Repeat password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={() => setStep(1)}>
+                    ← Back
+                  </button>
+                  <button type="submit" className="btn btn-primary" style={{ flex: 2 }} disabled={sendingOtp}>
+                    {sendingOtp ? 'Sending OTP SMS...' : 'Send SMS OTP Code →'}
+                  </button>
+                </div>
+              </form>
             ) : (
-              <form onSubmit={handleRegister}>
-                <div className="form-group">
-                  <label className="form-label">WhatsApp Number (confirmed)</label>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px', background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)' }}>
-                    <span>+94 {phone}</span>
-                    <button type="button" style={{ fontSize: '0.8rem', color: 'var(--primary-light)', background: 'none', border: 'none', cursor: 'pointer' }}
-                      onClick={() => { setStep(1); setError(''); }}>Change</button>
-                  </div>
+              /* Step 3: SMS OTP Verification Screen */
+              <form onSubmit={handleVerifyOtpAndRegister}>
+                <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                  <span style={{ fontSize: '2.5rem' }}>📱</span>
+                  <h3 style={{ color: '#fff', fontSize: '1.2rem', margin: '8px 0 4px' }}>SMS Verification Required</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+                    Enter the 6-digit OTP code sent to <strong>{phone}</strong>
+                  </p>
                 </div>
+
                 <div className="form-group">
-                  <label className="form-label">{t('auth.passwordLabel')}</label>
-                  <input type="password" className="form-input" placeholder="At least 6 characters"
-                    value={password} onChange={e => { setPassword(e.target.value); setError(''); }} required />
+                  <label className="form-label" style={{ textAlign: 'center', display: 'block' }}>6-Digit SMS Verification Code</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="123456"
+                    maxLength={6}
+                    style={{ textAlign: 'center', fontSize: '1.5rem', letterSpacing: '8px', fontWeight: '800' }}
+                    value={otpCode}
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                    required
+                  />
                 </div>
-                <div className="form-group">
-                  <label className="form-label">{t('auth.passwordLabel')} (Confirm)</label>
-                  <input type="password" className="form-input" placeholder="Re-enter your password"
-                    value={confirmPassword} onChange={e => { setConfirmPassword(e.target.value); setError(''); }} required />
+
+                <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+                  <button type="button" className="btn btn-outline btn-sm" style={{ flex: 1 }} onClick={handleResendOtp} disabled={sendingOtp}>
+                    {sendingOtp ? 'Resending...' : '🔄 Resend SMS OTP'}
+                  </button>
                 </div>
-                <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
-                  {loading ? t('common.loading') : t('auth.registerBtn')}
+
+                <button type="submit" className="btn btn-primary btn-full" disabled={verifyingOtp || loading}>
+                  {verifyingOtp || loading ? 'Verifying & Creating Account...' : 'Verify OTP & Complete Registration 🎉'}
                 </button>
+
+                <div style={{ textAlign: 'center', marginTop: 16 }}>
+                  <button type="button" style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }} onClick={() => setStep(2)}>
+                    ← Change Password / Details
+                  </button>
+                </div>
               </form>
             )}
 
-            {!success && (
-              <p className="text-center text-sm text-muted" style={{ marginTop: 24 }}>
-                {t('auth.alreadyHaveAccount').split('?')[0]}?{' '}
-                <span style={{ color: 'var(--primary-light)', fontWeight: 600, cursor: 'pointer' }}>{t('auth.signInBtn')}</span>
+            <div className="register-footer" style={{ marginTop: 24, textAlign: 'center' }}>
+              <p className="text-secondary text-sm">
+                Already have an account? <Link href="/login" style={{ color: 'var(--primary)', fontWeight: '700' }}>Log In</Link>
               </p>
-            )}
+            </div>
           </div>
         </div>
       </main>
       <Footer />
       <FloatingWidgets />
-
-      <style jsx>{`
-        .register-box {
-          max-width: 480px;
-          margin: 0 auto;
-          background: var(--dark-2);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-xl);
-          padding: 48px 40px;
-        }
-        .register-header { text-align: center; margin-bottom: 32px; }
-        .register-logo {
-          width: 52px; height: 52px;
-          background: var(--gradient-blue);
-          border-radius: 14px;
-          display: flex; align-items: center; justify-content: center;
-          font-size: 1.5rem;
-          margin: 0 auto 16px;
-          box-shadow: 0 4px 20px rgba(0,82,255,0.4);
-        }
-        .register-steps {
-          display: flex; align-items: center; justify-content: center;
-          gap: 0;
-          margin-bottom: 28px;
-        }
-        .reg-step { display: flex; align-items: center; flex-direction: column; gap: 4px; }
-        .reg-step-dot {
-          width: 32px; height: 32px;
-          border-radius: 50%;
-          background: var(--dark-3);
-          border: 2px solid var(--border);
-          display: flex; align-items: center; justify-content: center;
-          font-size: 0.8rem; font-weight: 700;
-          color: var(--text-muted);
-          transition: var(--transition);
-        }
-        .reg-step.active .reg-step-dot {
-          background: var(--gradient-blue);
-          border-color: var(--primary);
-          color: white;
-          box-shadow: 0 0 12px rgba(0,82,255,0.4);
-        }
-        .reg-step span { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
-        .reg-step.active span { color: var(--primary-light); }
-        .reg-step-line { width: 60px; height: 2px; background: var(--border); margin-bottom: 16px; }
-        .login-error {
-          background: rgba(255,60,60,0.1); border: 1px solid rgba(255,60,60,0.2);
-          border-radius: var(--radius-md); padding: 12px 16px;
-          font-size: 0.875rem; color: #FF6B6B; margin-bottom: 20px;
-        }
-        @media (max-width: 520px) {
-          .register-box { padding: 32px 24px; }
-        }
-      `}</style>
     </>
   );
 }
