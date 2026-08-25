@@ -615,51 +615,53 @@ export default function AdminPage() {
                     {filteredStudents.length === 0 ? (
                       <div className="admin-empty-box">No students found matching your query.</div>
                     ) : (
-                      <table className="admin-table">
-                        <thead>
-                          <tr>
-                            <th>Student Name</th>
-                            <th>Phone</th>
-                            <th>Reg. Date</th>
-                            <th>Approved Grade Access</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filteredStudents.map(student => (
-                            <tr key={student.id}>
-                              <td style={{ fontWeight: 600 }}>{student.name}</td>
-                              <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>{student.phone}</td>
-                              <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                {new Date(student.createdAt).toLocaleDateString()}
-                              </td>
-                              <td>
-                                {(!student.approvedGrades || student.approvedGrades.length === 0) ? (
-                                  <span className="badge badge-accent" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>
-                                    No Access Granted
-                                  </span>
-                                ) : (
-                                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                                    {student.approvedGrades.sort((a,b)=>a-b).map(g => (
-                                      <span key={g} className="badge badge-green" style={{ fontSize: '0.75rem' }}>
-                                        Grade {g}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-                              </td>
-                              <td>
-                                <button
-                                  className="btn btn-outline btn-sm"
-                                  onClick={() => openStudentModal(student)}
-                                >
-                                  ⚙️ Manage Access
-                                </button>
-                              </td>
+                      <div className="admin-table-scroll">
+                        <table className="admin-table">
+                          <thead>
+                            <tr>
+                              <th>Student Name</th>
+                              <th>Phone</th>
+                              <th>Reg. Date</th>
+                              <th>Approved Grade Access</th>
+                              <th>Action</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {filteredStudents.map(student => (
+                              <tr key={student.id}>
+                                <td style={{ fontWeight: 600 }}>{student.name}</td>
+                                <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>{student.phone}</td>
+                                <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                  {new Date(student.createdAt).toLocaleDateString()}
+                                </td>
+                                <td>
+                                  {(!student.approvedGrades || student.approvedGrades.length === 0) ? (
+                                    <span className="badge badge-accent" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>
+                                      No Access Granted
+                                    </span>
+                                  ) : (
+                                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                                      {student.approvedGrades.sort((a,b)=>a-b).map(g => (
+                                        <span key={g} className="badge badge-green" style={{ fontSize: '0.75rem' }}>
+                                          Grade {g}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </td>
+                                <td>
+                                  <button
+                                    className="btn btn-outline btn-sm"
+                                    onClick={() => openStudentModal(student)}
+                                  >
+                                    ⚙️ Manage Access
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     )}
                   </div>
                 )}
@@ -777,7 +779,7 @@ export default function AdminPage() {
                         <button className="btn btn-primary" type="submit">{editingTt ? 'Update Entry' : 'Add Entry'}</button>
                       </form>
                     )}
-                    <div className="admin-table-wrap">
+                    <div className="admin-table-scroll">
                       <table className="admin-table">
                         <thead><tr><th>Day</th><th>Time</th><th>Subject</th><th>Grade</th><th>Live Link</th><th>Actions</th></tr></thead>
                         <tbody>
@@ -833,7 +835,7 @@ export default function AdminPage() {
                         <button className="btn btn-primary" type="submit">{editingExam ? 'Update Test' : 'Create Test'}</button>
                       </form>
                     )}
-                    <div className="admin-table-wrap">
+                    <div className="admin-table-scroll">
                       <table className="admin-table">
                         <thead><tr><th>Title</th><th>Grade</th><th>Duration</th><th>Questions</th><th>Actions</th></tr></thead>
                         <tbody>
@@ -896,7 +898,7 @@ export default function AdminPage() {
                         </button>
                       </form>
                     )}
-                    <div className="admin-table-wrap">
+                    <div className="admin-table-scroll">
                       <table className="admin-table">
                         <thead><tr><th>Image</th><th>Name</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
                         <tbody>
@@ -926,7 +928,7 @@ export default function AdminPage() {
                       <h3>Store Orders Management</h3>
                     </div>
                     {orderMsg && <p className="form-msg" style={{ marginBottom: 16 }}>{orderMsg}</p>}
-                    <div className="admin-table-wrap">
+                    <div className="admin-table-scroll">
                       <table className="admin-table">
                         <thead>
                           <tr>
@@ -1042,7 +1044,7 @@ export default function AdminPage() {
                         </button>
                       </form>
                     )}
-                    <div className="admin-table-wrap">
+                    <div className="admin-table-scroll">
                       <table className="admin-table">
                         <thead><tr><th>Image</th><th>Student</th><th>Grade</th><th>Subject</th><th>Score</th><th>Year</th><th>Actions</th></tr></thead>
                         <tbody>
@@ -1089,7 +1091,7 @@ export default function AdminPage() {
                         <button className="btn btn-primary" type="submit">{editingGrade ? 'Update Grade' : 'Create Grade'}</button>
                       </form>
                     )}
-                    <div className="admin-table-wrap">
+                    <div className="admin-table-scroll">
                       <table className="admin-table">
                         <thead><tr><th>Grade Name</th><th>Description</th><th>Actions</th></tr></thead>
                         <tbody>
