@@ -69,7 +69,7 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
             <div className="coming-soon-icon">🎬</div>
             <h4>Sample Video Coming Soon!</h4>
             <p>
-              The free preview video for <strong>{course.title}</strong> will be uploaded shortly.
+              The free preview video for <strong>{course.title || 'this course'}</strong> will be uploaded shortly.
               Contact Ishan Sir on WhatsApp to get early access!
             </p>
             <a
@@ -77,7 +77,7 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
               target="_blank"
               rel="noreferrer"
               className="btn btn-whatsapp btn-md"
-              style={{ marginTop: 16, display: 'inline-flex' }}
+              style={{ marginTop: 16, display: 'inline-flex', maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}
             >
               💬 Ask for Sample Video on WhatsApp
             </a>
@@ -100,7 +100,7 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
             <p>Enroll now to unlock all {course.lessons || '300+'} video lessons, weekly live Zoom classes, printable tutes, and model paper discussions.</p>
           </div>
           <div className="sample-cta-buttons">
-            <Link href={`/courses/${course.id}`} className="btn btn-primary btn-md" onClick={onClose}>
+            <Link href={`/courses/${course.id}`} className="btn btn-primary btn-md" onClick={onClose} style={{ maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}>
               🚀 Enroll in Full Course ({course.currency || 'LKR'} {Number(course.price || 2000).toLocaleString()}/mo)
             </Link>
             <a
@@ -108,6 +108,7 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
               target="_blank"
               rel="noreferrer"
               className="btn btn-whatsapp btn-md"
+              style={{ maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}
             >
               💬 Contact on WhatsApp
             </a>

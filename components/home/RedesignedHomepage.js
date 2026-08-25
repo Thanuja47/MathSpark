@@ -83,22 +83,24 @@ export default function RedesignedHomepage() {
               {/* Grade Selector Pills */}
               <div className="hero-grades-wrapper">
                 <span className="grades-label">{t('sections.browseByGrade')}:</span>
-                <div className="grades-pills">
+                <div className="hero-grade-pills" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', justifyContent: 'center' }}>
                   {GRADES.map(g => (
                     <Link
                       key={g.id}
                       href={`/grades/${g.id}`}
                       className="grade-pill-item"
                       style={{
-                        padding: '6px 16px',
+                        padding: '5px 12px',
                         background: '#f3e8ff',
                         border: '1px solid #e9d5ff',
                         borderRadius: '9999px',
-                        fontSize: '0.82rem',
+                        fontSize: '0.8rem',
                         fontWeight: '800',
                         color: '#6b21a8',
                         textDecoration: 'none',
-                        display: 'inline-block'
+                        display: 'inline-block',
+                        minWidth: '38px',
+                        textAlign: 'center'
                       }}
                     >
                       G{g.id}
