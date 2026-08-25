@@ -8,8 +8,9 @@ function verifyAdmin(request) {
   if (!user) {
     return { authorized: false, error: 'Unauthorized: No token provided.', status: 401 };
   }
-  // Allow admin user role or admin phone number
-  if (user.role !== 'admin' && user.phone !== '0712345678') {
+  // Allow admin user role or designated admin phone numbers
+  const adminPhones = ['0713486268', '0729298096', '94729298096', '0712345678'];
+  if (user.role !== 'admin' && !adminPhones.includes(user.phone)) {
     return { authorized: false, error: 'Forbidden: Admin access required.', status: 403 };
   }
   return { authorized: true, user };
