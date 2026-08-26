@@ -52,7 +52,7 @@ export default function AboutPage() {
           </div>
 
           {/* Bio Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '40px', alignItems: 'start', marginBottom: '60px' }}>
+          <div className="about-bio-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '40px', alignItems: 'start', marginBottom: '60px' }}>
             <div style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '24px', textAlign: 'center' }}>
               <img
                 src="/ishan_portrait.webp"

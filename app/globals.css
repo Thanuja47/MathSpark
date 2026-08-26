@@ -1469,3 +1469,12 @@ p { color: var(--text); line-height: 1.75; }
     padding: 16px;
   }
 }
+
+/* ── About Page Responsive ── */
+@media (max-width: 768px) {
+  .about-bio-grid {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+}
+
