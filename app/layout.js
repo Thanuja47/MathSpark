@@ -1,5 +1,27 @@
 import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
+import { Inter, DM_Serif_Display, JetBrains_Mono } from 'next/font/google';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+  weight: ['400', '500', '600', '700', '800', '900'],
+});
+
+const dmSerif = DM_Serif_Display({
+  subsets: ['latin'],
+  weight: ['400'],
+  variable: '--font-dm-serif',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-jetbrains',
+  display: 'swap',
+});
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ishanmaduranga.lk';
 
@@ -77,19 +99,8 @@ export default function RootLayout({ children }) {
   };
 
   return (
-    <html lang="en-LK">
+    <html lang="en-LK" className={`${inter.variable} ${dmSerif.variable} ${jetbrainsMono.variable}`}>
       <head>
-        {/* Preconnect to Google Fonts servers */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Non-render-blocking font load — display=swap prevents FOIT/FOUT layout shift */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
-        />
-        {/* Preload above-fold hero images to reduce CLS */}
-        <link rel="preload" as="image" href="/ishan_teaching.jpg" />
-        <link rel="preload" as="image" href="/ishan_portrait.jpg" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }}

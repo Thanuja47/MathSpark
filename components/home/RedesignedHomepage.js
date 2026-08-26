@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { SITE, GRADES } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -222,15 +223,15 @@ export default function RedesignedHomepage() {
                 </div>
               </div>
 
-              {/* Main Photo */}
-              <img
-                src="/ishan_teaching.jpg"
+              {/* Main Photo — Next.js optimized WebP image */}
+              <Image
+                src="/ishan_teaching.webp"
                 alt="Ishan Maduranga Mathematics"
                 className="hphoto-main-img"
-                width="320"
-                height="340"
-                loading="eager"
-                decoding="async"
+                width={335}
+                height={340}
+                priority
+                quality={85}
               />
 
               {/* Stat card showing "98% A-Pass Rate" (no Active Students text) */}
@@ -413,14 +414,13 @@ export default function RedesignedHomepage() {
           <div className="instructor-bio-grid">
             <div className="instructor-photo-side">
               <div className="instructor-photo-wrapper">
-                <img
-                  src="/ishan_portrait.jpg"
+                <Image
+                  src="/ishan_portrait.webp"
                   alt="Ishan Maduranga"
                   className="instructor-img"
-                  width="480"
-                  height="480"
-                  loading="lazy"
-                  decoding="async"
+                  width={533}
+                  height={541}
+                  quality={85}
                 />
                 <div className="instructor-experience-badge">
                   <span className="exp-years">10+</span>
@@ -549,6 +549,8 @@ export default function RedesignedHomepage() {
           color: #0f172a;
           letter-spacing: -0.035em;
           margin: 0 0 12px;
+          min-height: 2.2em; /* Reserve bounding height for headline to prevent FOUT/reflow layout shifts */
+          contain: layout;
         }
         .highlight-blue {
           background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 60%, #2563eb 100%);
