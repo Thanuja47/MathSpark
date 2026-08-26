@@ -662,6 +662,8 @@ export default function RedesignedHomepage() {
           display: flex;
           align-items: flex-end;
           justify-content: center;
+          contain: layout paint;
+          transform: translate3d(0,0,0);
         }
         .hphoto-glow-bg {
           position: absolute;
@@ -733,6 +735,8 @@ export default function RedesignedHomepage() {
           border: 1px solid rgba(226, 232, 240, 0.8);
           white-space: nowrap;
           animation: floatCardHero 3.5s ease-in-out infinite alternate;
+          will-change: transform;
+          transform: translate3d(0,0,0);
         }
         @keyframes floatCardHero {
           0% { transform: translateY(0); }

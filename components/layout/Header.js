@@ -688,9 +688,8 @@ export default function Header() {
           box-shadow: 0 4px 12px rgba(255,255,255,0.3);
         }
         @keyframes pillIconFloat {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-1.5px); }
-          100% { transform: translateY(0px); }
+          0% { opacity: 0.95; }
+          100% { opacity: 1; }
         }
         /* Each icon gets its own color */
         .pill-icon-home     { background: linear-gradient(135deg, #06b6d4, #2563eb); box-shadow: 0 2px 6px rgba(6,182,212,0.3); }
