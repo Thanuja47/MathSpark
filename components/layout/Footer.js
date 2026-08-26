@@ -40,22 +40,13 @@ export default function Footer() {
             {/* Brand Column */}
             <div className="footer-brand">
               <Link href="/" className="footer-logo">
-                <svg className="footer-logo-svg" width="38" height="38" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="logo-grad-footer" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                      <stop offset="0%" stopColor="#6366f1"/>
-                      <stop offset="100%" stopColor="#8b5cf6"/>
-                    </linearGradient>
-                    <filter id="logo-glow-footer" x="-20%" y="-20%" width="140%" height="140%">
-                      <feGaussianBlur stdDeviation="1.5" result="blur"/>
-                      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                    </filter>
-                  </defs>
-                  <rect width="40" height="40" rx="10" fill="#13141a"/>
-                  <rect x="0.5" y="0.5" width="39" height="39" rx="9.5" stroke="url(#logo-grad-footer)" strokeOpacity="0.4"/>
-                  <path d="M10 28 L16 12 L20 22 L24 12 L30 28" stroke="url(#logo-grad-footer)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" filter="url(#logo-glow-footer)"/>
-                  <circle cx="20" cy="20" r="1.5" fill="#8b5cf6" opacity="0.7"/>
-                </svg>
+                <img
+                  src="/mathspark_icon_512.png"
+                  alt="MathSpark icon"
+                  width="38"
+                  height="38"
+                  className="footer-logo-svg"
+                />
                 <div>
                   <span className="footer-logo-name">MathSpark</span>
                   <span className="footer-logo-sub">Online Academy</span>
