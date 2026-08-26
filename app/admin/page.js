@@ -1469,8 +1469,8 @@ export default function AdminPage() {
         }
         @media (max-width: 900px) {
           .admin-grid { grid-template-columns: 1fr; }
-          .admin-sidebar { display: flex; flex-direction: row; overflow-x: auto; padding-bottom: 8px; white-space: nowrap; gap: 6px; }
-          .admin-nav-item { flex-shrink: 0; padding: 8px 14px; }
+          .admin-sidebar { display: flex; flex-direction: column; width: 100%; gap: 6px; position: static; }
+          .admin-nav-item { width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; }
         }
         .tab-header {
           display: flex;
