@@ -121,25 +121,13 @@ export default function Header() {
 
           {/* ── Unified Premium Logo ── */}
           <Link href="/" className="header-logo">
-            <svg className="logo-mark-svg" width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="logo-grad-hdr" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#6366f1"/>
-                  <stop offset="100%" stopColor="#8b5cf6"/>
-                </linearGradient>
-                <filter id="logo-glow-hdr" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="1.5" result="blur"/>
-                  <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-                </filter>
-              </defs>
-              {/* Rounded square base */}
-              <rect width="40" height="40" rx="10" fill="#13141a"/>
-              <rect x="0.5" y="0.5" width="39" height="39" rx="9.5" stroke="url(#logo-grad-hdr)" strokeOpacity="0.5"/>
-              {/* Lightning M mark */}
-              <path d="M10 28 L16 12 L20 22 L24 12 L30 28" stroke="url(#logo-grad-hdr)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" filter="url(#logo-glow-hdr)"/>
-              {/* Spark dot */}
-              <circle cx="20" cy="20" r="1.5" fill="#8b5cf6" opacity="0.7"/>
-            </svg>
+            <img
+              src="/mathspark_icon_512.png"
+              alt="MathSpark icon"
+              width="34"
+              height="34"
+              className="logo-mark-svg"
+            />
             <div className="logo-wordmark">
               <span className="logo-name">MathSpark</span>
               <span className="logo-tagline">Online Academy</span>

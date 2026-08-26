@@ -16,17 +16,16 @@ const MAX_PDF_BYTES   = 20 * 1024 * 1024; // 20 MB
 
 export async function POST(req) {
   // ── 1. Admin-only auth guard ─────────────────────────────────────────────
-  try {
-    const token = req.cookies.get?.('token')?.value
-      || req.headers.get('authorization')?.replace('Bearer ', '');
-    if (token) {
-      const user = verifyToken(token);
-      if (!user || user.role !== 'ADMIN') {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-      }
-    }
-  } catch {
-    // If verifyToken doesn't exist yet we allow through — the Supabase key is already protected
+  // Note: middleware.js already blocks non-admins before this runs.
+  // This is a belt-and-suspenders check using the correct cookie name.
+  const token = req.cookies.get?.('auth_token')?.value
+    || req.headers.get('authorization')?.replace('Bearer ', '');
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized: No token provided.' }, { status: 401 });
+  }
+  const user = verifyToken(token);
+  if (!user || (user.role !== 'admin' && user.role !== 'ADMIN')) {
+    return NextResponse.json({ error: 'Forbidden: Admin access required.' }, { status: 403 });
   }
 
   try {
