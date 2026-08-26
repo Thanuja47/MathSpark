@@ -33,7 +33,7 @@ export default function RedesignedHomepage() {
       step: '03',
       title: t('sections.step3Title'),
       desc: t('sections.step3Desc'),
-      icon: '🚀',
+      icon: '',
       color: '#fce7f3',
       textColor: '#9d174d',
     },

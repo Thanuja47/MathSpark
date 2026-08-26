@@ -50,7 +50,7 @@ export default function AccessLockedModal({ grade, onClose }) {
             className="btn btn-accent btn-lg"
             style={{ width: '100%', justifyContent: 'center', fontWeight: 600, textDecoration: 'none' }}
           >
-            💬 {t('common.contactViaWhatsApp')}
+            {t('common.contactViaWhatsApp')}
           </a>
 
           <button

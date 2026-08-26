@@ -156,7 +156,7 @@ export default function OLMathsPage() {
             <h2 style={{ fontSize: '1.8rem', fontWeight: '900', color: '#fff', marginBottom: '12px' }}>Ready to Boost Your O/L Maths Results?</h2>
             <p style={{ color: '#dbeafe', fontSize: '1.05rem', maxWidth: '600px', margin: '0 auto 24px' }}>Join online today and get instant access to live interactive classes, full recordings, and step-by-step model papers.</p>
             <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer" className="btn" style={{ background: '#25D366', color: '#fff', fontWeight: '800', padding: '14px 28px', borderRadius: '12px', textDecoration: 'none', display: 'inline-block' }}>
-              💬 Chat with Ishan Sir on WhatsApp
+              Chat with Ishan Sir on WhatsApp
             </a>
           </div>
 

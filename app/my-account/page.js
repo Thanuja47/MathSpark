@@ -139,7 +139,7 @@ export default function MyAccountPage() {
                           Your registered account has not been granted access to live classes yet. Please contact Ishan Sir on WhatsApp after completing your fee payment to get your grade unlocked.
                         </p>
                         <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm">
-                          💬 Request Grade Approval on WhatsApp
+                          Request Grade Approval on WhatsApp
                         </a>
                       </div>
                     ) : enrolledCourses.length === 0 ? (
@@ -185,7 +185,7 @@ export default function MyAccountPage() {
                           Lesson recordings are locked until your grade access is approved by Ishan Sir.
                         </p>
                         <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm">
-                          💬 Request Access on WhatsApp
+                          Request Access on WhatsApp
                         </a>
                       </div>
                     ) : (

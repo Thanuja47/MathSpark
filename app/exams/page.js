@@ -312,7 +312,7 @@ export default function ExamsPage() {
                 </div>
 
                 <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginTop: 32 }}>
-                  <button className="btn btn-primary btn-lg" onClick={() => startQuiz(selected)}>Retry Test 🔄</button>
+                  <button className="btn btn-primary btn-lg" onClick={() => startQuiz(selected)}>Retry Test</button>
                   <button className="btn btn-outline btn-lg" onClick={() => setView('list')}>← All Tests</button>
                   <Link href="/results" className="btn btn-accent btn-lg">View Hall of Fame →</Link>
                 </div>

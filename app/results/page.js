@@ -96,7 +96,7 @@ export default function ResultsPage() {
                           <span>{r.percentage}</span>
                         </div>
                       </td>
-                      <td style={{ fontSize: '0.85rem' }}>🏆 {r.topScorer}</td>
+                      <td style={{ fontSize: '0.85rem' }}>{r.topScorer}</td>
                       <td><span className="badge badge-primary">{r.medium}</span></td>
                     </tr>
                   ))}

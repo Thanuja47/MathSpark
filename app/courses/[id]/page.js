@@ -211,7 +211,7 @@ export default function CourseDetailPage({ params }) {
                     className="btn btn-accent btn-lg"
                     style={{ width: '100%', justifyContent: 'center', marginBottom: 12 }}
                   >
-                    💬 {t('common.whatsAppEnroll')}
+                    {t('common.whatsAppEnroll')}
                   </a>
                   <a href={`tel:${SITE.phone}`} className="btn btn-outline" style={{ width: '100%', justifyContent: 'center' }}>
                     📞 {t('common.callToEnroll')}
@@ -311,7 +311,7 @@ export default function CourseDetailPage({ params }) {
                   rel="noreferrer"
                   className="btn btn-accent btn-lg"
                 >
-                  💬 WhatsApp Enroll
+                  WhatsApp Enroll
                 </a>
                 <Link href="/courses" className="btn btn-outline btn-lg">
                   ← Back to Classes

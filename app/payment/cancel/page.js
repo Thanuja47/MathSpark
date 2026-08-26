@@ -44,7 +44,7 @@ export default function PaymentCancelPage() {
                 Try Again / Choose Class
               </Link>
               <a href="https://wa.me/94712345678" target="_blank" rel="noreferrer" className="btn btn-outline btn-lg">
-                💬 WhatsApp Support
+                WhatsApp Support
               </a>
             </div>
           </div>

@@ -75,7 +75,7 @@ export default function AboutPage() {
                 rel="noreferrer"
                 style={{ display: 'block', marginTop: '20px', background: '#25D366', color: '#fff', padding: '12px', borderRadius: '12px', fontWeight: '700', textDecoration: 'none', textAlign: 'center' }}
               >
-                💬 Contact on WhatsApp
+                Contact on WhatsApp
               </a>
             </div>
 

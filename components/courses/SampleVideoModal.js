@@ -79,7 +79,7 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
               className="btn btn-whatsapp btn-md"
               style={{ marginTop: 16, display: 'inline-flex', maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}
             >
-              💬 Ask for Sample Video on WhatsApp
+              Ask for Sample Video on WhatsApp
             </a>
           </div>
         ) : (
@@ -96,12 +96,12 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
         {/* CTA Box */}
         <div className="sample-cta-box">
           <div className="sample-cta-text">
-            <h4>Ready to get an A-Pass in Maths? 🏆</h4>
+            <h4>Ready to get an A-Pass in Maths?</h4>
             <p>Enroll now to unlock all {course.lessons || '300+'} video lessons, weekly live Zoom classes, printable tutes, and model paper discussions.</p>
           </div>
           <div className="sample-cta-buttons">
             <Link href={`/courses/${course.id}`} className="btn btn-primary btn-md" onClick={onClose} style={{ maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}>
-              🚀 Enroll in Full Course ({course.currency || 'LKR'} {Number(course.price || 2000).toLocaleString()}/mo)
+              Enroll in Full Course ({course.currency || 'LKR'} {Number(course.price || 2000).toLocaleString()}/mo)
             </Link>
             <a
               href={`https://wa.me/${SITE.whatsapp}?text=${waText}`}
@@ -110,7 +110,7 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
               className="btn btn-whatsapp btn-md"
               style={{ maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}
             >
-              💬 Contact on WhatsApp
+              Contact on WhatsApp
             </a>
           </div>
         </div>

@@ -548,7 +548,7 @@ export default function AdminPage() {
     { key: 'exams',     label: `📝 ${t('admin.tabExams')}`,      count: examList.length },
     { key: 'store',     label: `🛒 ${t('admin.tabStore')}`,      count: storeList.length },
     { key: 'orders',    label: `📦 ${t('admin.tabOrders')}`,     count: ordersList.length },
-    { key: 'results',   label: `🏆 ${t('admin.tabResults')}`,    count: resultsList.length },
+    { key: 'results',   label: `${t('admin.tabResults')}`,    count: resultsList.length },
     { key: 'grades',    label: `🎓 ${t('admin.tabGrades')}`,     count: gradesList.length },
   ];
 
@@ -654,7 +654,7 @@ export default function AdminPage() {
                                     className="btn btn-outline btn-sm"
                                     onClick={() => openStudentModal(student)}
                                   >
-                                    ⚙️ Manage Access
+                                    Manage Access
                                   </button>
                                 </td>
                               </tr>
@@ -730,7 +730,7 @@ export default function AdminPage() {
                               <td style={{ textTransform: 'capitalize' }}>{c.medium}</td>
                               <td>LKR {Number(c.price).toLocaleString()}</td>
                               <td>
-                                <button className="btn btn-sm btn-outline" style={{ marginRight: 6 }} onClick={() => openCourseLessonsModal(c)}>📖 Manage Lessons</button>
+                                <button className="btn btn-sm btn-outline" style={{ marginRight: 6 }} onClick={() => openCourseLessonsModal(c)}>Manage Lessons</button>
                                 <button className="btn btn-sm btn-outline" style={{ marginRight: 6 }} onClick={() => editCourse(c)}>Edit</button>
                                 <button className="btn btn-sm" style={{ background: '#ef4444', color: '#fff' }} onClick={() => deleteCourse(c.id)}>Delete</button>
                               </td>

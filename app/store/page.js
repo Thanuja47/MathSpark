@@ -120,7 +120,7 @@ export default function StorePage() {
               color: '#10B981',
               textAlign: 'center'
             }}>
-              <h3>🎉 {orderSuccess}</h3>
+              <h3>✅ {orderSuccess}</h3>
               <p style={{ fontSize: '0.9rem', color: 'var(--paper)', marginTop: 8 }}>
                 Bank Transfer &amp; WhatsApp payment details will be sent to your WhatsApp number.
               </p>
@@ -237,7 +237,7 @@ export default function StorePage() {
                     {t('common.cancel')}
                   </button>
                   <button type="submit" className="btn btn-primary" disabled={submitting}>
-                    {submitting ? t('common.loading') : 'Confirm Order 🚀'}
+                    {submitting ? t('common.loading') : 'Confirm Order'}
                   </button>
                 </div>
               </form>

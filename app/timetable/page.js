@@ -89,7 +89,7 @@ export default function TimetablePage() {
                             className="btn btn-ghost btn-sm"
                             style={{ marginTop: 10, width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
                           >
-                            📹 Join Zoom
+                            Join Zoom
                           </button>
                         </div>
                       ))

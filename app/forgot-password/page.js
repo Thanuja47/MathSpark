@@ -206,7 +206,7 @@ export default function ForgotPasswordPage() {
                   />
                 </div>
                 <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
-                  {loading ? 'Updating Password...' : 'Reset Password & Save 🎉'}
+                  {loading ? 'Updating Password...' : 'Reset Password & Save ✅'}
                 </button>
               </form>
             )}

@@ -155,7 +155,7 @@ export default function RegisterPage() {
 
             {success ? (
               <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                <div style={{ fontSize: '3rem', marginBottom: 16 }}>🎉</div>
+                <div style={{ fontSize: '3rem', marginBottom: 16 }}>✅</div>
                 <h3 style={{ color: '#fff', fontSize: '1.4rem', fontWeight: '800', marginBottom: 8 }}>Registration Complete!</h3>
                 <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>Your account has been verified and activated. Welcome to MathSpark!</p>
                 <Link href="/my-account" className="btn btn-primary btn-full">
@@ -271,12 +271,12 @@ export default function RegisterPage() {
 
                 <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
                   <button type="button" className="btn btn-outline btn-sm" style={{ flex: 1 }} onClick={handleResendOtp} disabled={sendingOtp}>
-                    {sendingOtp ? 'Resending...' : '🔄 Resend SMS OTP'}
+                    {sendingOtp ? 'Resending...' : 'Resend SMS OTP'}
                   </button>
                 </div>
 
                 <button type="submit" className="btn btn-primary btn-full" disabled={verifyingOtp || loading}>
-                  {verifyingOtp || loading ? 'Verifying & Creating Account...' : 'Verify OTP & Complete Registration 🎉'}
+                  {verifyingOtp || loading ? 'Verifying & Creating Account...' : 'Verify OTP & Complete Registration'}
                 </button>
 
                 <div style={{ textAlign: 'center', marginTop: 16 }}>

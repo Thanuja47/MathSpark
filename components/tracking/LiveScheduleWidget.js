@@ -79,7 +79,7 @@ export default function LiveScheduleWidget() {
               </div>
             </div>
             <a href={nextClass.zoom} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm" style={{ marginTop: 14 }}>
-              📹 Join Zoom Class
+              Join Zoom Class
             </a>
           </div>
         </div>

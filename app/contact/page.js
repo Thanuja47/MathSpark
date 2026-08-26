@@ -61,7 +61,7 @@ export default function ContactPage() {
                 </div>
 
                 <div className="contact-info-item">
-                  <div className="contact-icon">💬</div>
+                  <div className="contact-icon"></div>
                   <div>
                     <div className="contact-info-label">WhatsApp Support</div>
                     <div className="contact-info-value">
@@ -95,14 +95,14 @@ export default function ContactPage() {
               <div className="contact-form-box">
                 {submitted ? (
                   <div className="text-center" style={{ padding: '40px 0' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: 16 }}>💬</div>
+                    <div style={{ fontSize: '3rem', marginBottom: 16 }}></div>
                     <h3>Opening WhatsApp to Send Message...</h3>
                     <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>
                       If WhatsApp did not open automatically, click the button below to send your inquiry directly to Ishan Maduranga:
                     </p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', marginTop: 24 }}>
                       <a href={waLink} target="_blank" rel="noreferrer" className="btn btn-primary btn-lg" style={{ background: '#10B981', textDecoration: 'none' }}>
-                        Chat directly on WhatsApp 💬
+                        Chat directly on WhatsApp 
                       </a>
                       <button className="btn btn-outline" onClick={() => setSubmitted(false)}>
                         Send Another Message
@@ -135,7 +135,7 @@ export default function ContactPage() {
                       <textarea className="form-input" rows="4" value={message} onChange={e => setMessage(e.target.value)} placeholder="How can we help you?" required />
                     </div>
                     <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }}>
-                      {t('common.contactUs')} 🚀
+                      {t('common.contactUs')}
                     </button>
                   </form>
                 )}

@@ -110,7 +110,7 @@ export default function TrackingPage() {
                     className="btn btn-accent btn-sm"
                     style={{ width: '100%', marginTop: 16, justifyContent: 'center' }}
                   >
-                    💬 Ask Delivery Support on WhatsApp
+                    Ask Delivery Support on WhatsApp
                   </a>
                 </div>
               )}
