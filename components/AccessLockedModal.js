@@ -1,4 +1,4 @@
-'use client';
+import { Lock, MessageCircle } from 'lucide-react';
 import { SITE } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -34,7 +34,9 @@ export default function AccessLockedModal({ grade, onClose }) {
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🔒</div>
+        <div style={{ display: 'inline-flex', padding: 16, background: 'rgba(239, 68, 68, 0.12)', borderRadius: '50%', color: '#ef4444', marginBottom: 16 }}>
+          <Lock size={36} />
+        </div>
         <h3 style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 700, marginBottom: '12px' }}>
           {t('common.accessRequired')} (Grade {grade})
         </h3>
@@ -48,9 +50,10 @@ export default function AccessLockedModal({ grade, onClose }) {
             target="_blank"
             rel="noreferrer"
             className="btn btn-accent btn-lg"
-            style={{ width: '100%', justifyContent: 'center', fontWeight: 600, textDecoration: 'none' }}
+            style={{ width: '100%', justifyContent: 'center', fontWeight: 600, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8 }}
           >
-            {t('common.contactViaWhatsApp')}
+            <MessageCircle size={18} />
+            <span>{t('common.contactViaWhatsApp')}</span>
           </a>
 
           <button

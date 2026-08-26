@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Clock, Video, Globe, FileCheck, ArrowRight } from 'lucide-react';
 
 const SCHEDULE = [
   { day: 0, grade: 10, title: 'Grade 10 – Algebra & Equations', time: '18:00', duration: 90, medium: 'Sinhala', zoom: 'https://zoom.us/j/123456789', color: '#0052FF' },
@@ -57,8 +58,15 @@ export default function LiveScheduleWidget() {
               {nextClass.isToday ? 'TODAY' : DAYS[nextClass.day]}
             </div>
             <div className="next-class-title">{nextClass.title}</div>
-            <div className="next-class-meta">
-              🕐 {nextClass.time} &nbsp;|&nbsp; ⏱️ {nextClass.duration} min &nbsp;|&nbsp; 🌐 {nextClass.medium} Medium
+            <div className="next-class-meta" style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <Clock size={14} />
+                <span>{nextClass.time} ({nextClass.duration} min)</span>
+              </span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                <Globe size={14} />
+                <span>{nextClass.medium} Medium</span>
+              </span>
             </div>
           </div>
           <div className="next-class-right">
@@ -78,8 +86,9 @@ export default function LiveScheduleWidget() {
                 <div className="countdown-lbl">SEC</div>
               </div>
             </div>
-            <a href={nextClass.zoom} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm" style={{ marginTop: 14 }}>
-              Join Zoom Class
+            <a href={nextClass.zoom} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm" style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <Video size={16} />
+              <span>Join Zoom Class</span>
             </a>
           </div>
         </div>
@@ -96,17 +105,25 @@ export default function LiveScheduleWidget() {
               <div key={i} className="today-class-row" style={{ borderLeftColor: c.color }}>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{c.title}</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>🕐 {c.time} &nbsp;•&nbsp; Grade {c.grade}</div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                    <Clock size={12} />
+                    <span>{c.time} &nbsp;•&nbsp; Grade {c.grade}</span>
+                  </div>
                 </div>
-                <a href={c.zoom} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm">Join →</a>
+                <a href={c.zoom} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                  <span>Join</span>
+                  <ArrowRight size={14} />
+                </a>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      <Link href="/exams" style={{ display: 'block', marginTop: 20, fontSize: '0.85rem', color: 'var(--primary-light)', textAlign: 'center', fontWeight: 500 }}>
-        📝 Practice MCQ Tests →
+      <Link href="/exams" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 20, fontSize: '0.85rem', color: 'var(--primary-light)', fontWeight: 500 }}>
+        <FileCheck size={16} />
+        <span>Practice MCQ Tests</span>
+        <ArrowRight size={14} />
       </Link>
 
       <style jsx>{`

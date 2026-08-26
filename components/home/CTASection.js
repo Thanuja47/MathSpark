@@ -1,4 +1,4 @@
-'use client';
+import { MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { SITE } from '@/lib/data';
 
@@ -23,8 +23,9 @@ export default function CTASection() {
                   <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
                 </svg>
               </Link>
-              <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer" className="btn btn-accent btn-xl">
-                <span>💬</span> WhatsApp Inquiry
+              <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer" className="btn btn-accent btn-xl" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                <MessageCircle size={20} />
+                <span>WhatsApp Inquiry</span>
               </a>
             </div>
           </div>

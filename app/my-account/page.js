@@ -6,6 +6,8 @@ import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import { COURSES, SITE } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 
+import { BookOpen, Video, Package, Settings, LogOut, MessageCircle, Lock, Play, ExternalLink } from 'lucide-react';
+
 export default function MyAccountPage() {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('courses');
@@ -23,7 +25,7 @@ export default function MyAccountPage() {
           setUser(data.user);
         }
       })
-      .catch(err => console.error('Auth error', err))
+      .catch(() => {})
       .finally(() => setLoading(false));
 
     fetch('/api/orders/my-orders')
@@ -38,44 +40,47 @@ export default function MyAccountPage() {
   }, []);
 
   const handleLogout = async () => {
-    await fetch('/api/auth/me', { method: 'POST' });
-    window.location.href = '/';
+    await fetch('/api/auth/login', { method: 'DELETE' });
+    window.location.href = '/login';
   };
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <main className="container" style={{ padding: '80px 0', textAlign: 'center' }}>
+          <p>Loading account details...</p>
+        </main>
+        <Footer />
+      </>
+    );
+  }
 
   const approvedGrades = user?.approvedGrades || [];
   const hasAccess = approvedGrades.length > 0;
-
-  // Filter courses strictly by approved grade access
   const enrolledCourses = COURSES.filter(c => approvedGrades.includes(c.grade));
 
   return (
     <>
       <Header />
-      <main style={{ background: 'var(--dark)', minHeight: '85vh' }}>
-        <section className="page-hero" style={{ padding: '60px 0 40px' }}>
+      <main>
+        <section className="page-hero" style={{ padding: '40px 0 30px', borderBottom: '1px solid var(--border)' }}>
           <div className="container">
             <div className="dashboard-user-header">
-              <div className="dashboard-avatar">👨‍🎓</div>
+              <div className="dashboard-avatar">👤</div>
               <div>
-                <h2 style={{ fontSize: '1.8rem' }}>
-                  Welcome back, <span className="theme-gradient">{user ? user.name : 'Student'}!</span>
-                </h2>
-                <p className="text-secondary text-sm">
-                  {user ? `Registered Grade: Grade ${user.grade} · ${user.medium ? user.medium.toUpperCase() : 'SINHALA'} Medium · WhatsApp: ${user.phone}` : 'Grade 10 · Sinhala Medium'}
+                <h1 style={{ fontSize: '1.8rem', margin: '0 0 4px' }}>{user?.name || 'Student Account'}</h1>
+                <p style={{ color: 'var(--text-muted)', margin: 0 }}>
+                  Phone: <strong>{user?.phone}</strong> &nbsp;|&nbsp; Registered Grade: <strong>Grade {user?.grade}</strong>
                 </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10, flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>
-                    {t('common.approvedAccess')}:
-                  </span>
+                <div style={{ marginTop: 8 }}>
                   {hasAccess ? (
-                    approvedGrades.sort((a,b)=>a-b).map(g => (
-                      <span key={g} className="badge badge-green" style={{ fontSize: '0.75rem' }}>
-                        Grade {g}
-                      </span>
-                    ))
+                    <span className="badge badge-green" style={{ fontSize: '0.8rem', padding: '4px 12px' }}>
+                      Approved Access: {approvedGrades.sort((a,b)=>a-b).map(g => `Grade ${g}`).join(', ')}
+                    </span>
                   ) : (
-                    <span className="badge badge-accent" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', fontSize: '0.75rem' }}>
-                      {t('common.noAccessGranted')}
+                    <span className="badge badge-accent" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', fontSize: '0.8rem', padding: '4px 12px' }}>
+                      NO ACCESS GRANTED — FEE PAYMENT PENDING
                     </span>
                   )}
                 </div>
@@ -87,59 +92,67 @@ export default function MyAccountPage() {
         <section className="section-sm">
           <div className="container">
             <div className="dashboard-grid">
-              {/* Sidebar navigation */}
               <div className="dashboard-sidebar">
                 <button
                   className={`dashboard-nav-item ${activeTab === 'courses' ? 'active' : ''}`}
                   onClick={() => setActiveTab('courses')}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                 >
-                  📚 My Enrolled Classes ({enrolledCourses.length})
+                  <BookOpen size={18} />
+                  <span>My Enrolled Classes ({enrolledCourses.length})</span>
                 </button>
                 <button
                   className={`dashboard-nav-item ${activeTab === 'recordings' ? 'active' : ''}`}
                   onClick={() => setActiveTab('recordings')}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                 >
-                  📹 Lesson Recordings ({hasAccess ? enrolledCourses.length * 3 : 0})
+                  <Video size={18} />
+                  <span>Lesson Recordings ({hasAccess ? enrolledCourses.length * 3 : 0})</span>
                 </button>
                 <button
                   className={`dashboard-nav-item ${activeTab === 'tutes' ? 'active' : ''}`}
                   onClick={() => setActiveTab('tutes')}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                 >
-                  📦 My Tute Orders ({myTracking.length + myOrders.length})
+                  <Package size={18} />
+                  <span>My Tute Orders ({myTracking.length + myOrders.length})</span>
                 </button>
                 <button
                   className={`dashboard-nav-item ${activeTab === 'profile' ? 'active' : ''}`}
                   onClick={() => setActiveTab('profile')}
+                  style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                 >
-                  ⚙️ Profile Settings
+                  <Settings size={18} />
+                  <span>Profile Settings</span>
                 </button>
                 {user && (
                   <button
                     className="dashboard-nav-item"
                     onClick={handleLogout}
-                    style={{ color: '#ff4d4f', marginTop: 12 }}
+                    style={{ color: '#ff4d4f', marginTop: 12, display: 'flex', alignItems: 'center', gap: 10 }}
                   >
-                    🚪 Logout
+                    <LogOut size={18} />
+                    <span>Logout</span>
                   </button>
                 )}
               </div>
 
-              {/* Main content */}
               <div className="dashboard-content">
-                
-                {/* 1. ENROLLED CLASSES TAB */}
                 {activeTab === 'courses' && (
                   <div>
                     <h3 style={{ marginBottom: 20 }}>Enrolled Classes</h3>
                     {!hasAccess ? (
                       <div className="admin-empty-box" style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(239,68,68,0.2)', padding: '36px', borderRadius: '16px', textAlign: 'center' }}>
-                        <div style={{ fontSize: '2.5rem', marginBottom: 12 }}>🔒</div>
+                        <div style={{ display: 'inline-flex', padding: 14, background: 'rgba(239,68,68,0.1)', borderRadius: '50%', color: '#ef4444', marginBottom: 12 }}>
+                          <Lock size={32} />
+                        </div>
                         <h4 style={{ color: '#ef4444', fontSize: '1.2rem', marginBottom: 8 }}>No Grade Access Approved Yet</h4>
                         <p style={{ color: '#94a3b8', fontSize: '0.95rem', maxWidth: '500px', margin: '0 auto 20px' }}>
                           Your registered account has not been granted access to live classes yet. Please contact Ishan Sir on WhatsApp after completing your fee payment to get your grade unlocked.
                         </p>
-                        <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm">
-                          Request Grade Approval on WhatsApp
+                        <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                          <MessageCircle size={16} />
+                          <span>Request Grade Approval on WhatsApp</span>
                         </a>
                       </div>
                     ) : enrolledCourses.length === 0 ? (

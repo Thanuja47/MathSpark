@@ -6,6 +6,9 @@ import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import AccessLockedModal from '@/components/AccessLockedModal';
 import { useLanguage } from '@/context/LanguageContext';
+import { RefreshCw, Trophy, FileText, Clock, Globe } from 'lucide-react';
+
+/* static quizzes fallback */
 
 const STATIC_QUIZZES = [
   {
@@ -312,9 +315,15 @@ export default function ExamsPage() {
                 </div>
 
                 <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginTop: 32 }}>
-                  <button className="btn btn-primary btn-lg" onClick={() => startQuiz(selected)}>Retry Test</button>
+                  <button className="btn btn-primary btn-lg" onClick={() => startQuiz(selected)} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                    <RefreshCw size={18} />
+                    <span>Retry Test</span>
+                  </button>
                   <button className="btn btn-outline btn-lg" onClick={() => setView('list')}>← All Tests</button>
-                  <Link href="/results" className="btn btn-accent btn-lg">View Hall of Fame →</Link>
+                  <Link href="/results" className="btn btn-accent btn-lg" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                    <Trophy size={18} />
+                    <span>View Hall of Fame →</span>
+                  </Link>
                 </div>
               </div>
             </div>

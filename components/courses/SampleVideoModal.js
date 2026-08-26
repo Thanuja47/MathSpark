@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import { SITE } from '@/lib/data';
 
+import { MessageCircle, Trophy, Video, PlayCircle } from 'lucide-react';
+
 export default function SampleVideoModal({ isOpen, onClose, course }) {
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -66,8 +68,10 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
         {/* Video Player or Coming Soon */}
         {isPlaceholder ? (
           <div className="video-coming-soon">
-            <div className="coming-soon-icon">🎬</div>
-            <h4>Sample Video Coming Soon!</h4>
+            <div className="coming-soon-icon" style={{ display: 'inline-flex', padding: '16px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '50%', color: '#3b82f6' }}>
+              <Video size={36} />
+            </div>
+            <h4 style={{ marginTop: 12 }}>Sample Video Coming Soon!</h4>
             <p>
               The free preview video for <strong>{course.title || 'this course'}</strong> will be uploaded shortly.
               Contact Ishan Sir on WhatsApp to get early access!
@@ -77,9 +81,10 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
               target="_blank"
               rel="noreferrer"
               className="btn btn-whatsapp btn-md"
-              style={{ marginTop: 16, display: 'inline-flex', maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}
+              style={{ marginTop: 16, display: 'inline-flex', alignItems: 'center', gap: 8, maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}
             >
-              Ask for Sample Video on WhatsApp
+              <MessageCircle size={18} />
+              <span>Ask for Sample Video on WhatsApp</span>
             </a>
           </div>
         ) : (
@@ -96,21 +101,26 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
         {/* CTA Box */}
         <div className="sample-cta-box">
           <div className="sample-cta-text">
-            <h4>Ready to get an A-Pass in Maths?</h4>
+            <h4 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Trophy size={20} color="#f59e0b" />
+              <span>Ready to get an A-Pass in Maths?</span>
+            </h4>
             <p>Enroll now to unlock all {course.lessons || '300+'} video lessons, weekly live Zoom classes, printable tutes, and model paper discussions.</p>
           </div>
           <div className="sample-cta-buttons">
-            <Link href={`/courses/${course.id}`} className="btn btn-primary btn-md" onClick={onClose} style={{ maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}>
-              Enroll in Full Course ({course.currency || 'LKR'} {Number(course.price || 2000).toLocaleString()}/mo)
+            <Link href={`/courses/${course.id}`} className="btn btn-primary btn-md" onClick={onClose} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}>
+              <PlayCircle size={18} />
+              <span>Enroll in Full Course ({course.currency || 'LKR'} {Number(course.price || 2000).toLocaleString()}/mo)</span>
             </Link>
             <a
               href={`https://wa.me/${SITE.whatsapp}?text=${waText}`}
               target="_blank"
               rel="noreferrer"
               className="btn btn-whatsapp btn-md"
-              style={{ maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, maxWidth: '100%', wordBreak: 'break-word', whiteSpace: 'normal', textAlign: 'center' }}
             >
-              Contact on WhatsApp
+              <MessageCircle size={18} />
+              <span>Contact on WhatsApp</span>
             </a>
           </div>
         </div>

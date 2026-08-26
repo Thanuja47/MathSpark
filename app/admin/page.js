@@ -5,6 +5,7 @@ import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import { uploadImage } from '@/utils/uploadImage';
 import { useLanguage } from '@/context/LanguageContext';
+import { Users, BookOpen, Calendar, FileCheck, ShoppingBag, Package, Trophy, GraduationCap, Settings, Trash2, Edit } from 'lucide-react';
 
 /* ─── tiny helpers ─────────────────────────────────── */
 const apiFetch = (url, opts) => fetch(url, { ...opts, headers: { 'Content-Type': 'application/json', ...(opts?.headers || {}) } });
@@ -12,6 +13,10 @@ const apiFetch = (url, opts) => fetch(url, { ...opts, headers: { 'Content-Type':
 export default function AdminPage() {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('courses');
+
+  /* ════════════════════════════════════════════════════
+     COURSES STATE
+  ════════════════════════════════════════════════════ */
 
   /* ════════════════════════════════════════════════════
      COURSES STATE
@@ -542,16 +547,15 @@ export default function AdminPage() {
      NAV TABS CONFIG
   ════════════════════════════════════════════════════ */
   const tabs = [
-    { key: 'students',  label: `👥 ${t('admin.tabStudents')}`,   count: studentsList.length },
-    { key: 'courses',   label: `📚 ${t('admin.tabCourses')}`,    count: coursesList.length },
-    { key: 'timetable', label: `📅 ${t('admin.tabTimetable')}`,  count: ttList.length },
-    { key: 'exams',     label: `📝 ${t('admin.tabExams')}`,      count: examList.length },
-    { key: 'store',     label: `🛒 ${t('admin.tabStore')}`,      count: storeList.length },
-    { key: 'orders',    label: `📦 ${t('admin.tabOrders')}`,     count: ordersList.length },
-    { key: 'results',   label: `${t('admin.tabResults')}`,    count: resultsList.length },
-    { key: 'grades',    label: `🎓 ${t('admin.tabGrades')}`,     count: gradesList.length },
+    { key: 'students',  label: t('admin.tabStudents'), count: studentsList.length, icon: Users },
+    { key: 'courses',   label: t('admin.tabCourses'),  count: coursesList.length, icon: BookOpen },
+    { key: 'timetable', label: t('admin.tabTimetable'),count: ttList.length, icon: Calendar },
+    { key: 'exams',     label: t('admin.tabExams'),    count: examList.length, icon: FileCheck },
+    { key: 'store',     label: t('admin.tabStore'),    count: storeList.length, icon: ShoppingBag },
+    { key: 'orders',    label: t('admin.tabOrders'),   count: ordersList.length, icon: Package },
+    { key: 'results',   label: t('admin.tabResults'),  count: resultsList.length, icon: Trophy },
+    { key: 'grades',    label: t('admin.tabGrades'),   count: gradesList.length, icon: GraduationCap },
   ];
-
 
   /* ════════════════════════════════════════════════════
      RENDER
@@ -576,14 +580,22 @@ export default function AdminPage() {
 
               {/* Sidebar Nav */}
               <div className="admin-sidebar">
-                {tabs.map(t => (
-                  <button key={t.key}
-                    className={`admin-nav-item ${activeTab === t.key ? 'active' : ''}`}
-                    onClick={() => setActiveTab(t.key)}
-                  >
-                    {t.label} <span className="admin-nav-count">{t.count}</span>
-                  </button>
-                ))}
+                {tabs.map(tab => {
+                  const IconComp = tab.icon;
+                  return (
+                    <button key={tab.key}
+                      className={`admin-nav-item ${activeTab === tab.key ? 'active' : ''}`}
+                      onClick={() => setActiveTab(tab.key)}
+                      style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}
+                    >
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+                        {IconComp && <IconComp size={18} />}
+                        <span>{tab.label}</span>
+                      </span>
+                      <span className="admin-nav-count">{tab.count}</span>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Content Area */}
@@ -1112,8 +1124,8 @@ export default function AdminPage() {
                   </div>
                 )}
 
-              </div>{/* /admin-content */}
-            </div>{/* /admin-grid */}
+              </div>
+            </div>
           </div>
         </section>
       </main>
