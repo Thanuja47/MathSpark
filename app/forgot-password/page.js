@@ -113,9 +113,9 @@ export default function ForgotPasswordPage() {
           <div className="register-box" style={{ maxWidth: 460, margin: '0 auto' }}>
             <div className="register-header">
               <div className="register-logo">🔒</div>
-              <h2>Reset Password</h2>
+              <h2>{t('auth.forgotTitle')}</h2>
               <p className="text-secondary text-sm" style={{ marginTop: 8 }}>
-                Verify your WhatsApp number via SMS OTP to set a new password
+                {t('auth.forgotSubtitle')}
               </p>
             </div>
 
@@ -134,10 +134,10 @@ export default function ForgotPasswordPage() {
             {resetComplete ? (
               <div style={{ textAlign: 'center', padding: '20px 0' }}>
                 <div style={{ fontSize: '3rem', marginBottom: 16 }}>✅</div>
-                <h3 style={{ color: '#fff', fontSize: '1.3rem', fontWeight: '800', marginBottom: 8 }}>Password Reset Successful!</h3>
-                <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>Your password has been updated. You can now log into your account.</p>
+                <h3 style={{ color: '#fff', fontSize: '1.3rem', fontWeight: '800', marginBottom: 8 }}>{t('auth.resetSuccessTitle')}</h3>
+                <p style={{ color: 'var(--text-muted)', marginBottom: 24 }}>{t('auth.resetSuccessDesc')}</p>
                 <Link href="/login" className="btn btn-primary btn-full">
-                  Go to Login →
+                  {t('auth.goToLogin')} →
                 </Link>
               </div>
             ) : step === 1 ? (
@@ -154,13 +154,13 @@ export default function ForgotPasswordPage() {
                   />
                 </div>
                 <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
-                  {loading ? 'Sending SMS OTP...' : 'Send SMS OTP Code →'}
+                  {loading ? t('auth.sendingOtp') : `${t('auth.sendOtpBtn')} →`}
                 </button>
               </form>
             ) : step === 2 ? (
               <form onSubmit={handleVerifyOtp}>
                 <div className="form-group">
-                  <label className="form-label" style={{ textAlign: 'center', display: 'block' }}>Enter 6-Digit SMS Verification Code</label>
+                  <label className="form-label" style={{ textAlign: 'center', display: 'block' }}>{t('auth.enterOtpLabel')}</label>
                   <input
                     type="text"
                     className="form-input"
@@ -173,47 +173,47 @@ export default function ForgotPasswordPage() {
                   />
                 </div>
                 <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
-                  {loading ? 'Verifying OTP...' : 'Verify OTP Code →'}
+                  {loading ? t('auth.verifyingOtp') : `${t('auth.verifyOtpBtn')} →`}
                 </button>
                 <div style={{ textAlign: 'center', marginTop: 16 }}>
                   <button type="button" style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.85rem' }} onClick={() => setStep(1)}>
-                    ← Change Phone Number
+                    ← {t('auth.changePhone')}
                   </button>
                 </div>
               </form>
             ) : (
               <form onSubmit={handleResetPassword}>
                 <div className="form-group">
-                  <label className="form-label">New Password</label>
+                  <label className="form-label">{t('auth.newPasswordLabel')}</label>
                   <input
                     type="password"
                     className="form-input"
-                    placeholder="At least 6 characters"
+                    placeholder={t('auth.newPasswordPlaceholder')}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Confirm New Password</label>
+                  <label className="form-label">{t('auth.confirmPasswordLabel')}</label>
                   <input
                     type="password"
                     className="form-input"
-                    placeholder="Repeat new password"
+                    placeholder={t('auth.confirmPasswordPlaceholder')}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                   />
                 </div>
                 <button type="submit" className="btn btn-primary btn-full" disabled={loading}>
-                  {loading ? 'Updating Password...' : 'Reset Password & Save ✅'}
+                  {loading ? t('auth.updatingPassword') : `${t('auth.resetPasswordBtn')} ✅`}
                 </button>
               </form>
             )}
 
             <div className="register-footer" style={{ marginTop: 24, textAlign: 'center' }}>
               <p className="text-secondary text-sm">
-                Remember your password? <Link href="/login" style={{ color: 'var(--primary)', fontWeight: '700' }}>Log In</Link>
+                {t('auth.rememberPassword')} <Link href="/login" style={{ color: 'var(--primary)', fontWeight: '700' }}>{t('nav.login')}</Link>
               </p>
             </div>
           </div>

@@ -299,7 +299,16 @@ export default function Header() {
       />
 
       {/* ── Mobile Menu ── */}
-      <div className={`mobile-menu${mobileOpen ? ' open' : ''}`} aria-hidden={!mobileOpen} role="dialog" aria-label="Navigation menu">
+      {/* aria-hidden is tied to !mobileOpen: when CLOSED → hidden from AT; when OPEN → visible */}
+      {/* inert makes all children non-focusable when menu is closed (fixes PageSpeed a11y audit) */}
+      <div
+        className={`mobile-menu${mobileOpen ? ' open' : ''}`}
+        aria-hidden={!mobileOpen}
+        aria-modal={mobileOpen ? 'true' : undefined}
+        role="dialog"
+        aria-label="Navigation menu"
+        {...(!mobileOpen ? { inert: '' } : {})}
+      >
         <div className="mobile-menu-header">
           <Link href="/" className="header-logo" onClick={closeMobile}>
             <svg className="logo-mark-svg" width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">

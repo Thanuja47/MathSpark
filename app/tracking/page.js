@@ -48,7 +48,7 @@ export default function TrackingPage() {
               {t('nav.tracking')}
             </h1>
             <p className="page-hero-desc">
-              Enter your mobile number or tracking code to check the real-time delivery status of your study pack.
+              {t('tracking.pageDesc')}
             </p>
           </div>
         </section>
@@ -58,10 +58,10 @@ export default function TrackingPage() {
             <div className="tracking-box">
               <form onSubmit={handleTrack}>
                 <div className="form-group" style={{ textAlign: 'left' }}>
-                  <label className="form-label">{t('common.search')}</label>
+                  <label className="form-label">{t('tracking.searchLabel')}</label>
                   <input
                     type="text"
-                    placeholder="Ex: MSP-9842 or 0712345678"
+                    placeholder={t('tracking.placeholder')}
                     value={trackingNo}
                     onChange={(e) => setTrackingNo(e.target.value)}
                     className="form-input"
@@ -71,7 +71,7 @@ export default function TrackingPage() {
                 </div>
 
                 <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%', marginTop: '16px' }} disabled={loading}>
-                  {loading ? t('common.loading') : 'Track Package 🚚'}
+                  {loading ? t('tracking.tracking') : `${t('tracking.trackBtn')} 🚚`}
                 </button>
               </form>
 
@@ -84,21 +84,21 @@ export default function TrackingPage() {
               {result && (
                 <div className="tracking-result" style={{ marginTop: 32 }}>
                   <div className="tracking-badge">
-                    <span>Status: <strong>{result.status}</strong></span>
+                    <span>{t('tracking.statusLabel')}: <strong>{result.status}</strong></span>
                     <span>ID: <code>{result.trackingNo}</code></span>
                   </div>
 
                   <div className="tracking-details">
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <span className="text-muted">Student:</span>
+                      <span className="text-muted">{t('tracking.studentLabel')}:</span>
                       <strong>{result.studentName}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                      <span className="text-muted">Item:</span>
+                      <span className="text-muted">{t('tracking.itemLabel')}:</span>
                       <span>{result.item}</span>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span className="text-muted">Courier:</span>
+                      <span className="text-muted">{t('tracking.courierLabel')}:</span>
                       <span>{result.courier}</span>
                     </div>
                   </div>
@@ -110,7 +110,7 @@ export default function TrackingPage() {
                     className="btn btn-accent btn-sm"
                     style={{ width: '100%', marginTop: 16, justifyContent: 'center' }}
                   >
-                    Ask Delivery Support on WhatsApp
+                    {t('tracking.whatsappSupport')}
                   </a>
                 </div>
               )}

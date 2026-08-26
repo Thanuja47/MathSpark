@@ -2,20 +2,23 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function RefundPolicyPage() {
+  const { t } = useLanguage();
+
   return (
     <>
       <Header />
       <main>
         <section className="page-hero">
           <div className="container">
-            <div className="section-tag page-hero-tag">Guarantee &amp; Support</div>
+            <div className="section-tag page-hero-tag">{t('legal.refundTag')}</div>
             <h1 className="page-hero-title">
-              Refund &amp; <span className="theme-gradient">Cancellation Policy</span>
+              {t('legal.refundTitle')} <span className="theme-gradient">{t('legal.refundTitleHighlight')}</span>
             </h1>
             <p className="page-hero-desc">
-              Clear and transparent terms for online class subscriptions and physical study materials.
+              {t('legal.refundDesc')}
             </p>
           </div>
         </section>
@@ -23,19 +26,19 @@ export default function RefundPolicyPage() {
         <section className="section" style={{ background: 'var(--dark)' }}>
           <div className="container" style={{ maxWidth: '800px' }}>
             <div className="policy-box">
-              <h3>1. Online Class Subscription Refunds</h3>
+              <h3>{t('legal.refund1Heading')}</h3>
               <p>
-                Monthly subscription fees for live online classes and recording access packs are eligible for a 100% refund within <strong>7 days</strong> of purchase, provided the student has attended fewer than two live sessions and accessed no more than two recording packs.
+                {t('legal.refund1Body')}
               </p>
 
-              <h3 style={{ marginTop: 32 }}>2. Physical Tute Pack Returns &amp; Exchanges</h3>
+              <h3 style={{ marginTop: 32 }}>{t('legal.refund2Heading')}</h3>
               <p>
-                Printed study materials and physical tute packs can be returned or exchanged within <strong>5 days</strong> of delivery if received in damaged condition, or if incorrect materials were shipped.
+                {t('legal.refund2Body')}
               </p>
 
-              <h3 style={{ marginTop: 32 }}>3. How to Request a Refund</h3>
+              <h3 style={{ marginTop: 32 }}>{t('legal.refund3Heading')}</h3>
               <p>
-                To request a refund or tute exchange, please contact our support team at <strong>+94 72 929 8096</strong> via WhatsApp with your student registration name, phone number, and payment receipt reference. Approved refunds are processed within 2–3 business days.
+                {t('legal.refund3Body')}
               </p>
             </div>
           </div>

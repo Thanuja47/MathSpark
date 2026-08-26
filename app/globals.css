@@ -408,9 +408,12 @@ p { color: var(--text); line-height: 1.75; }
 .glow-purple { background: rgba(124,58,237,0.10); }
 
 /* ── Animations ── */
+/* IMPORTANT: fadeInUp uses opacity-only (NO translateY) to prevent CLS.
+   translateY on hero elements was causing desktop CLS=1.034 because visible
+   elements were rendering 16px below final position and shifting up during load. */
 @keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 @keyframes fadeIn {
   from { opacity: 0; }

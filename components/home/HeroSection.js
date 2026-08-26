@@ -173,6 +173,7 @@ export default function HeroSection() {
           overflow: hidden;
           background: var(--gradient-hero);
           padding: 100px 0 80px;
+          contain: layout;
         }
         .hero-glow {
           position: absolute;
