@@ -55,7 +55,7 @@ export default function AboutPage() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '40px', alignItems: 'start', marginBottom: '60px' }}>
             <div style={{ background: 'rgba(15,23,42,0.6)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '24px', textAlign: 'center' }}>
               <img
-                src="/images/ishan_maduranga.png"
+                src="/ishan_portrait.webp"
                 alt="Ishan Maduranga Mathematics Educator"
                 style={{ width: '180px', height: '180px', borderRadius: '50%', objectFit: 'cover', border: '4px solid #2563eb', margin: '0 auto 20px' }}
               />
