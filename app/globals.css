@@ -8,9 +8,6 @@
    --muted (#8D96A7) on --surface (#141720)→  5.8:1 ✅
    ======================================================== */
 
-/* ── Google Fonts ── */
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 /* ── Design Tokens ── */
 :root {
   /* ── Core Palette ── */
@@ -446,15 +443,16 @@ p { color: var(--text); line-height: 1.75; }
 /* One deliberate load-in for hero */
 .hero-load-in {
   animation: fadeInUp 0.55s var(--ease-out) both;
+  will-change: transform, opacity;
 }
 .hero-load-in:nth-child(2) { animation-delay: 0.1s; }
 .hero-load-in:nth-child(3) { animation-delay: 0.2s; }
 .hero-load-in:nth-child(4) { animation-delay: 0.3s; }
 
-.float      { animation: float 5s ease-in-out infinite; }
+.float      { animation: float 5s ease-in-out infinite; will-change: transform; }
 .pulse-glow { animation: pulse-glow 2.5s ease-in-out infinite; }
-.fade-in-up { animation: fadeInUp 0.55s var(--ease-out) forwards; }
-.fade-in    { animation: fadeIn 0.4s var(--ease-out) forwards; }
+.fade-in-up { animation: fadeInUp 0.55s var(--ease-out) forwards; will-change: transform, opacity; }
+.fade-in    { animation: fadeIn 0.4s var(--ease-out) forwards; will-change: opacity; }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar       { width: 6px; }

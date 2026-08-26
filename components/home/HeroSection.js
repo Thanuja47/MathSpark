@@ -281,6 +281,7 @@ export default function HeroSection() {
           position: relative;
           width: 100%;
           max-width: 400px;
+          will-change: transform;
         }
 
         .live-panel-card {
@@ -430,6 +431,8 @@ export default function HeroSection() {
           letter-spacing: 0.01em;
           animation: badgeFloat 4s ease-in-out infinite;
           z-index: 2;
+          will-change: transform;
+          transform: translateZ(0);
         }
         .badge-icon { font-size: 0.95rem; line-height: 1; }
         .badge-text { font-size: 0.77rem; font-weight: 600; opacity: 0.92; }

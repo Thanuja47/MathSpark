@@ -227,6 +227,10 @@ export default function RedesignedHomepage() {
                 src="/ishan_teaching.jpg"
                 alt="Ishan Maduranga Mathematics"
                 className="hphoto-main-img"
+                width="320"
+                height="340"
+                loading="eager"
+                decoding="async"
               />
 
               {/* Stat card showing "98% A-Pass Rate" (no Active Students text) */}
@@ -413,6 +417,10 @@ export default function RedesignedHomepage() {
                   src="/ishan_portrait.jpg"
                   alt="Ishan Maduranga"
                   className="instructor-img"
+                  width="480"
+                  height="480"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="instructor-experience-badge">
                   <span className="exp-years">10+</span>
