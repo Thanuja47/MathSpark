@@ -236,8 +236,8 @@ export default function Header() {
 
             <span className="actions-separator" aria-hidden="true" />
 
-            {authChecked && (
-              user ? (
+            <div className="auth-action-slot">
+              {user ? (
                 <div className="user-menu-wrap" ref={userMenuRef}>
                   <button
                     id="user-menu-btn"
@@ -275,8 +275,8 @@ export default function Header() {
                   {t('nav.login')}
                   <svg className="arrow" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </button>
-              )
-            )}
+              )}
+            </div>
 
             {/* Mobile hamburger */}
             <button id="mobile-menu-btn" className="mobile-menu-btn" onClick={() => setMobileOpen(true)} aria-label="Open menu" aria-expanded={mobileOpen}>

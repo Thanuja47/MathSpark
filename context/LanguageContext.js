@@ -7,20 +7,28 @@ const translations = { en, si };
 
 const LanguageContext = createContext();
 
-export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState('en');
+function getInitialLanguage() {
+  if (typeof window !== 'undefined') {
+    try {
+      const match = document.cookie.match(/(?:^|;\s*)mathspark_lang=(en|si)/);
+      if (match) return match[1];
+      const saved = localStorage.getItem('mathspark_lang');
+      if (saved === 'en' || saved === 'si') return saved;
+    } catch (e) {}
+  }
+  return 'en';
+}
 
-  useEffect(() => {
-    const saved = localStorage.getItem('mathspark_lang');
-    if (saved && (saved === 'en' || saved === 'si')) {
-      setLang(saved);
-    }
-  }, []);
+export function LanguageProvider({ children }) {
+  const [lang, setLang] = useState(getInitialLanguage);
 
   const toggleLanguage = () => {
     const nextLang = lang === 'en' ? 'si' : 'en';
     setLang(nextLang);
-    localStorage.setItem('mathspark_lang', nextLang);
+    try {
+      document.cookie = `mathspark_lang=${nextLang}; path=/; max-age=31536000; SameSite=Lax`;
+      localStorage.setItem('mathspark_lang', nextLang);
+    } catch (e) {}
   };
 
   const t = (key) => {
