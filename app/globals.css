@@ -1446,17 +1446,22 @@ p { color: var(--text); line-height: 1.75; }
   }
 
   .admin-sidebar {
-    flex-direction: row;
-    overflow-x: auto;
-    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
     padding: 12px;
-    -webkit-overflow-scrolling: touch;
+    overflow-x: visible;
   }
 
   .admin-nav-item {
-    flex-shrink: 0;
-    width: auto;
-    gap: 8px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    box-sizing: border-box;
   }
 
   .admin-content {
