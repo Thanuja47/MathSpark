@@ -51,6 +51,14 @@ export const metadata = {
   alternates: {
     canonical: baseUrl,
   },
+  icons: {
+    icon: [
+      { url: '/mathspark_icon_32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/mathspark_icon_512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    shortcut: '/mathspark_icon_32.png',
+    apple: '/mathspark_icon_180.png',
+  },
   openGraph: {
     title: 'Ishan Maduranga Mathematics | Online Maths Class Sri Lanka',
     description: "Online Mathematics learning platform for Grades 6 to 11 & O/L by Ishan Maduranga.",
