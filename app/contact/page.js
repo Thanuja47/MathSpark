@@ -1,9 +1,10 @@
 'use client';
 import { useState } from 'react';
+import { Phone, MessageCircle, Mail, MapPin } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
-import { SITE } from '@/lib/data';
+import { SITE, GRADES } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function ContactPage() {
@@ -18,7 +19,7 @@ export default function ContactPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const text = `*New Contact Inquiry from MatSpark Website*%0A%0A*Name:* ${encodeURIComponent(name)}%0A*Phone:* ${encodeURIComponent(phone)}%0A*Grade:* Grade ${encodeURIComponent(grade)}%0A*Message:* ${encodeURIComponent(message)}`;
+    const text = encodeURIComponent(`Hi Ishan Sir, My name is ${name} (Grade ${grade}, Phone: ${phone}). Message: ${message}`);
     const url = `https://wa.me/${SITE.whatsapp}?text=${text}`;
     setWaLink(url);
     setSubmitted(true);
@@ -51,7 +52,9 @@ export default function ContactPage() {
               {/* Left Details */}
               <div className="contact-details">
                 <div className="contact-info-item">
-                  <div className="contact-icon">📞</div>
+                  <div className="contact-icon" style={{ color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Phone size={22} />
+                  </div>
                   <div>
                     <div className="contact-info-label">{t('common.contactUs')}</div>
                     <div className="contact-info-value">
@@ -61,19 +64,23 @@ export default function ContactPage() {
                 </div>
 
                 <div className="contact-info-item">
-                  <div className="contact-icon"></div>
+                  <div className="contact-icon" style={{ color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <MessageCircle size={22} />
+                  </div>
                   <div>
                     <div className="contact-info-label">WhatsApp Support</div>
                     <div className="contact-info-value">
                       <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer">
-                        +94 112 902 405
+                        {SITE.whatsappDisplay || '+94 70 241 6592'}
                       </a>
                     </div>
                   </div>
                 </div>
 
                 <div className="contact-info-item">
-                  <div className="contact-icon">✉️</div>
+                  <div className="contact-icon" style={{ color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Mail size={22} />
+                  </div>
                   <div>
                     <div className="contact-info-label">Email Us</div>
                     <div className="contact-info-value">
@@ -83,7 +90,9 @@ export default function ContactPage() {
                 </div>
 
                 <div className="contact-info-item">
-                  <div className="contact-icon">📍</div>
+                  <div className="contact-icon" style={{ color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <MapPin size={22} />
+                  </div>
                   <div>
                     <div className="contact-info-label">Location</div>
                     <div className="contact-info-value">Colombo, Sri Lanka</div>
