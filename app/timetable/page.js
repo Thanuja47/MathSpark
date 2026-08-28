@@ -113,47 +113,63 @@ export default function TimetablePage() {
               {reorderedDayIndices.map((dayIdx, colIdx) => {
                 const dayName = DAYS[dayIdx];
                 const dayClasses = activeSchedule.filter(c => c.day === dayIdx);
-                const isToday = colIdx === 0; // First column is always Today
+                const isToday = colIdx === 0;
 
                 return (
                   <div key={dayIdx} className={`timetable-day ${isToday ? 'today' : ''}`}>
+                    {/* Day column header */}
                     <div className="timetable-day-header">
                       <span className="timetable-day-name">{dayName}</span>
                       {isToday && <span className="badge badge-green">Today</span>}
                     </div>
+
                     {dayClasses.length === 0 ? (
                       <div className="timetable-empty">No classes</div>
                     ) : (
                       dayClasses.map((cls, i) => {
-                        // ── 3. Live Countdown per Class ─────────────────
                         const countdown = getCountdown(cls.day, cls.time, cls.duration || 90);
                         const isLive = countdown.isLive;
 
                         return (
-                          <div key={cls.id || i} className="timetable-class" style={{ borderLeftColor: cls.color }}>
-                            <div className="timetable-time">{cls.time}</div>
-                            <div className="timetable-title">{cls.title}</div>
-                            <div className="timetable-meta">
-                              <span>⏱ {cls.duration || 90}m</span>
-                              <span>Grade {cls.grade}</span>
+                          /* ── Each class card matches top hero card layout exactly ── */
+                          <div
+                            key={cls.id || i}
+                            className={`grid-class-card ${isLive ? 'grid-class-card--live' : ''}`}
+                            style={{ borderColor: cls.color }}
+                          >
+                            {/* Badge row — same as top card's live-badge */}
+                            <div className="grid-card-badge">
+                              <span className="grid-live-dot" style={{ background: isLive ? '#00C896' : cls.color }} />
+                              <span className="grid-card-badge-label" style={{ color: isLive ? '#00C896' : cls.color }}>
+                                {isLive ? 'LIVE NOW' : isToday ? 'TODAY' : dayName}
+                              </span>
                             </div>
 
-                            {/* Live per-class countdown using the exact shared CountdownDisplay component */}
-                            <div className="card-countdown-wrapper">
+                            {/* Title */}
+                            <div className="grid-card-title">{cls.title}</div>
+
+                            {/* Meta — time · grade · medium */}
+                            <div className="grid-card-meta">
+                              <span>🕐 {cls.time}</span>
+                              <span>{cls.duration || 90} min</span>
+                              <span>Gr {cls.grade}</span>
+                            </div>
+
+                            {/* Countdown — identical component, centered */}
+                            <div className="grid-card-countdown">
                               {isLive ? (
-                                <div className="card-live-now">🔴 LIVE NOW</div>
+                                <div className="grid-live-text">🔴 CLASS IS LIVE!</div>
                               ) : (
-                                <CountdownDisplay countdown={countdown} scale={0.72} />
+                                <CountdownDisplay countdown={countdown} scale={0.7} />
                               )}
                             </div>
 
-                            {/* ── 2. Admin-Updatable Zoom Button ───────── */}
+                            {/* Join button — same blue btn-primary style as top card */}
                             <button
                               onClick={(e) => handleJoinZoom(e, cls.grade, cls.zoom)}
-                              className={`btn ${isLive ? 'btn-primary' : 'btn-ghost'} btn-sm`}
-                              style={{ width: '100%', justifyContent: 'center', fontSize: '0.78rem' }}
+                              className={`btn ${isLive ? 'btn-primary' : 'btn-primary'} btn-sm grid-join-btn`}
                             >
-                              {isLive ? '🔴 Join Live Class' : 'Join Zoom'}
+                              {isLive ? '🔴 Join Live Class' : '📹 Join Zoom Class'}
                             </button>
                           </div>
                         );
@@ -179,61 +195,123 @@ export default function TimetablePage() {
           grid-template-columns: repeat(7, 1fr);
           gap: 12px;
         }
+
+        /* ── Day column wrapper ── */
         .timetable-day {
-          background: var(--dark-card);
-          border: 1px solid var(--border);
-          border-radius: var(--radius-md);
-          overflow: hidden;
           display: flex;
           flex-direction: column;
+          gap: 10px;
         }
-        .timetable-day.today {
-          border-color: rgba(0,82,255,0.4);
-          box-shadow: 0 0 0 1px rgba(0,82,255,0.2), 0 0 30px rgba(0,82,255,0.1);
+        .timetable-day.today .timetable-day-header {
+          border-color: rgba(0,82,255,0.5);
         }
         .timetable-day-header {
-          padding: 12px 14px;
+          padding: 10px 12px;
           background: rgba(255,255,255,0.03);
-          border-bottom: 1px solid var(--border);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
           display: flex; align-items: center; justify-content: space-between; gap: 6px;
           flex-wrap: wrap;
         }
-        .timetable-day-name { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
-        .timetable-class {
-          padding: 12px 14px;
-          border-left: 3px solid;
-          margin: 10px 10px 10px;
-          border-radius: var(--radius-sm);
-          background: rgba(255,255,255,0.02);
+        .timetable-day-name {
+          font-size: 0.72rem; font-weight: 700;
+          text-transform: uppercase; letter-spacing: 0.08em;
+          color: var(--text-muted);
+        }
+        .timetable-empty {
+          padding: 20px 12px; font-size: 0.75rem;
+          color: var(--text-muted); text-align: center;
+          background: var(--dark-card);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-md);
+        }
+
+        /* ── Each class card: same as top hero card ── */
+        .grid-class-card {
+          background: var(--dark-card);
+          border: 1.5px solid;
+          border-radius: var(--radius-lg);
+          padding: 14px 14px 12px;
           display: flex;
           flex-direction: column;
+          gap: 0;
         }
-        .timetable-time { font-size: 0.78rem; font-weight: 700; color: var(--primary-light); margin-bottom: 4px; }
-        .timetable-title { font-size: 0.8rem; font-weight: 600; line-height: 1.3; margin-bottom: 6px; }
-        .timetable-meta { display: flex; gap: 6px; font-size: 0.7rem; color: var(--text-muted); flex-wrap: wrap; margin-bottom: 10px; }
-        .timetable-meta span::after { content: '•'; margin-left: 6px; }
-        .timetable-meta span:last-child::after { content: ''; margin: 0; }
-        
-        .card-countdown-wrapper {
-          padding: 6px 0;
+        .grid-class-card--live {
+          box-shadow: 0 0 0 1px rgba(0,200,150,0.3), 0 0 20px rgba(0,200,150,0.1);
+        }
+
+        /* Badge row */
+        .grid-card-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 0.68rem;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          margin-bottom: 8px;
+        }
+        .grid-live-dot {
+          width: 7px; height: 7px;
+          border-radius: 50%;
+          animation: pulse-glow 1.2s infinite;
+          flex-shrink: 0;
+        }
+        .grid-card-badge-label { line-height: 1; }
+
+        /* Title */
+        .grid-card-title {
+          font-weight: 700;
+          font-size: 0.82rem;
+          line-height: 1.35;
+          color: var(--paper);
           margin-bottom: 6px;
+        }
+
+        /* Meta */
+        .grid-card-meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 4px 8px;
+          font-size: 0.68rem;
+          color: var(--text-muted);
+          margin-bottom: 10px;
+        }
+        .grid-card-meta span {
+          display: inline-flex;
+          align-items: center;
+          gap: 3px;
+        }
+
+        /* Countdown area */
+        .grid-card-countdown {
           display: flex;
           align-items: center;
           justify-content: center;
-          min-height: 48px;
+          margin-bottom: 10px;
+          min-height: 44px;
         }
-        .card-live-now {
-          font-size: 0.8rem;
+        .grid-live-text {
+          font-size: 0.75rem;
           font-weight: 800;
           color: #00C896;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.04em;
           animation: pulse-glow 1.2s infinite;
+          text-align: center;
         }
-        .timetable-empty { padding: 20px 14px; font-size: 0.78rem; color: var(--text-muted); text-align: center; }
+
+        /* Join button — same primary blue as top card button */
+        .grid-join-btn {
+          width: 100%;
+          justify-content: center;
+          font-size: 0.75rem;
+          font-weight: 700;
+          padding: 8px 10px;
+        }
 
         @media (max-width: 1100px) { .timetable-grid { grid-template-columns: repeat(4, 1fr); } }
-        @media (max-width: 700px) { .timetable-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 420px) { .timetable-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 700px)  { .timetable-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 420px)  { .timetable-grid { grid-template-columns: 1fr; } }
       `}</style>
     </>
   );
