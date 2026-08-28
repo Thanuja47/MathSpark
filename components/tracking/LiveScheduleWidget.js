@@ -48,12 +48,12 @@ export function getCountdown(dayIndex, timeStr, durationMinutes = 90) {
 
   target.setDate(target.getDate() + daysUntil);
 
-  const diff = target - now;
+  const diff = target.getTime() - now.getTime();
   const endTarget = new Date(target.getTime() + durationMinutes * 60000);
   const isLive = now >= target && now <= endTarget;
 
   if (isLive) {
-    return { diff: 0, dh: 0, dm: 0, ds: 0, isToday: true, isLive: true, isPast: false };
+    return { targetTime: target.getTime(), diff: 0, dh: 0, dm: 0, ds: 0, isToday: true, isLive: true, isPast: false };
   }
 
   const isPast = diff < 0;
@@ -61,7 +61,7 @@ export function getCountdown(dayIndex, timeStr, durationMinutes = 90) {
   const dm = Math.max(0, Math.floor((diff % 3600000) / 60000));
   const ds = Math.max(0, Math.floor((diff % 60000) / 1000));
 
-  return { diff, dh, dm, ds, isToday: daysUntil === 0, isLive: false, isPast };
+  return { targetTime: target.getTime(), diff, dh, dm, ds, isToday: daysUntil === 0, isLive: false, isPast };
 }
 
 export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom = null }) {
@@ -106,7 +106,7 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
   
   const nextClass = activeSchedule
     .map(c => ({ ...c, ...getCountdown(c.day, c.time, c.duration || 90) }))
-    .sort((a, b) => (a.isLive ? -1 : b.isLive ? 1 : a.diff - b.diff))[0];
+    .sort((a, b) => (a.isLive ? -1 : b.isLive ? 1 : a.targetTime - b.targetTime))[0];
 
   const handleJoin = (e, cls) => {
     if (onJoinZoom) {
