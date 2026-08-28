@@ -15,37 +15,110 @@ const SCHEDULE = [
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-function getCountdown(dayIndex, timeStr) {
+export function parseTime(timeStr) {
+  if (!timeStr) return { h: 18, m: 0 };
+  const str = timeStr.trim();
+  const isPM = /pm/i.test(str);
+  const isAM = /am/i.test(str);
+  const clean = str.replace(/(am|pm)/i, '').trim();
+  const parts = clean.split(':').map(Number);
+  let h = parts[0] || 0;
+  const m = parts[1] || 0;
+  if (isPM && h < 12) h += 12;
+  if (isAM && h === 12) h = 0;
+  return { h, m };
+}
+
+export function getCountdown(dayIndex, timeStr, durationMinutes = 90) {
   const now = new Date();
-  const [h, m] = timeStr.split(':').map(Number);
+  const { h, m } = parseTime(timeStr);
+
   const target = new Date();
   target.setHours(h, m, 0, 0);
 
   let daysUntil = ((dayIndex - now.getDay()) + 7) % 7;
-  if (daysUntil === 0 && now >= target) daysUntil = 7;
+  
+  // If it's today, check if class is live or finished
+  if (daysUntil === 0) {
+    const endTarget = new Date(target.getTime() + durationMinutes * 60000);
+    if (now > endTarget) {
+      daysUntil = 7; // Completed today, next occurrence is next week
+    }
+  }
+
   target.setDate(target.getDate() + daysUntil);
 
   const diff = target - now;
-  const dh = Math.floor(diff / 3600000);
-  const dm = Math.floor((diff % 3600000) / 60000);
-  const ds = Math.floor((diff % 60000) / 1000);
+  const endTarget = new Date(target.getTime() + durationMinutes * 60000);
+  const isLive = now >= target && now <= endTarget;
 
-  return { diff, dh, dm, ds, isToday: daysUntil === 0 };
+  if (isLive) {
+    return { diff: 0, dh: 0, dm: 0, ds: 0, isToday: true, isLive: true, isPast: false };
+  }
+
+  const isPast = diff < 0;
+  const dh = Math.max(0, Math.floor(diff / 3600000));
+  const dm = Math.max(0, Math.floor((diff % 3600000) / 60000));
+  const ds = Math.max(0, Math.floor((diff % 60000) / 1000));
+
+  return { diff, dh, dm, ds, isToday: daysUntil === 0, isLive: false, isPast };
 }
 
-export default function LiveScheduleWidget() {
+export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom = null }) {
   const [now, setNow] = useState(new Date());
+  const [dbSchedule, setDbSchedule] = useState([]);
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
+  useEffect(() => {
+    if (!customSchedule) {
+      fetch('/api/timetable')
+        .then(r => r.json())
+        .then(data => {
+          if (Array.isArray(data) && data.length > 0) {
+            const mapped = data.map((item, idx) => {
+              const dayIdx = DAYS.findIndex(d => d.toLowerCase() === (item.day || '').toLowerCase());
+              return {
+                id: item.id,
+                day: dayIdx !== -1 ? dayIdx : 0,
+                grade: item.grade,
+                title: `${item.subject} (Grade ${item.grade})`,
+                time: item.time,
+                duration: 90,
+                medium: 'Sinhala & English',
+                zoom: item.liveLink || '#',
+                color: ['#0052FF', '#7B2FFF', '#FF6B00', '#00C896', '#FF3D9A'][idx % 5]
+              };
+            });
+            setDbSchedule(mapped);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [customSchedule]);
+
+  const activeSchedule = customSchedule || (dbSchedule.length > 0 ? dbSchedule : SCHEDULE);
   const todayDay = now.getDay();
-  const todayClasses = SCHEDULE.filter(c => c.day === todayDay);
-  const nextClass = SCHEDULE
-    .map(c => ({ ...c, ...getCountdown(c.day, c.time) }))
-    .sort((a, b) => a.diff - b.diff)[0];
+  const todayClasses = activeSchedule.filter(c => c.day === todayDay);
+  
+  const nextClass = activeSchedule
+    .map(c => ({ ...c, ...getCountdown(c.day, c.time, c.duration || 90) }))
+    .sort((a, b) => (a.isLive ? -1 : b.isLive ? 1 : a.diff - b.diff))[0];
+
+  const handleJoin = (e, cls) => {
+    if (onJoinZoom) {
+      onJoinZoom(e, cls.grade, cls.zoom);
+    } else {
+      if (cls.zoom && cls.zoom !== '#') {
+        window.open(cls.zoom, '_blank');
+      } else {
+        alert('Zoom link not set for this class.');
+      }
+    }
+  };
 
   return (
     <div className="live-schedule-widget">
@@ -55,41 +128,51 @@ export default function LiveScheduleWidget() {
           <div className="next-class-left">
             <div className="live-badge">
               <span className="live-dot" />
-              {nextClass.isToday ? 'TODAY' : DAYS[nextClass.day]}
+              {nextClass.isLive ? 'LIVE NOW' : nextClass.isToday ? 'TODAY' : DAYS[nextClass.day]}
             </div>
             <div className="next-class-title">{nextClass.title}</div>
             <div className="next-class-meta" style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                 <Clock size={14} />
-                <span>{nextClass.time} ({nextClass.duration} min)</span>
+                <span>{nextClass.time} ({nextClass.duration || 90} min)</span>
               </span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                 <Globe size={14} />
-                <span>{nextClass.medium} Medium</span>
+                <span>{nextClass.medium}</span>
               </span>
             </div>
           </div>
           <div className="next-class-right">
-            <div className="countdown-display">
-              <div className="countdown-unit">
-                <div className="countdown-num">{String(nextClass.dh).padStart(2, '0')}</div>
-                <div className="countdown-lbl">HRS</div>
+            {nextClass.isLive ? (
+              <div className="live-now-text" style={{ fontSize: '1.4rem', fontWeight: 900, color: '#00C896', marginBottom: 6 }}>
+                🔴 CLASS IS LIVE!
               </div>
-              <div className="countdown-sep">:</div>
-              <div className="countdown-unit">
-                <div className="countdown-num">{String(nextClass.dm).padStart(2, '0')}</div>
-                <div className="countdown-lbl">MIN</div>
+            ) : (
+              <div className="countdown-display">
+                <div className="countdown-unit">
+                  <div className="countdown-num">{String(nextClass.dh).padStart(2, '0')}</div>
+                  <div className="countdown-lbl">HRS</div>
+                </div>
+                <div className="countdown-sep">:</div>
+                <div className="countdown-unit">
+                  <div className="countdown-num">{String(nextClass.dm).padStart(2, '0')}</div>
+                  <div className="countdown-lbl">MIN</div>
+                </div>
+                <div className="countdown-sep">:</div>
+                <div className="countdown-unit">
+                  <div className="countdown-num">{String(nextClass.ds).padStart(2, '0')}</div>
+                  <div className="countdown-lbl">SEC</div>
+                </div>
               </div>
-              <div className="countdown-sep">:</div>
-              <div className="countdown-unit">
-                <div className="countdown-num">{String(nextClass.ds).padStart(2, '0')}</div>
-                <div className="countdown-lbl">SEC</div>
-              </div>
-            </div>
-            <a href={nextClass.zoom} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm" style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            )}
+            <button
+              onClick={(e) => handleJoin(e, nextClass)}
+              className="btn btn-primary btn-sm"
+              style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+            >
               <Video size={16} />
               <span>Join Zoom Class</span>
-            </a>
+            </button>
           </div>
         </div>
       )}
@@ -110,10 +193,14 @@ export default function LiveScheduleWidget() {
                     <span>{c.time} &nbsp;•&nbsp; Grade {c.grade}</span>
                   </div>
                 </div>
-                <a href={c.zoom} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <button
+                  onClick={(e) => handleJoin(e, c)}
+                  className="btn btn-ghost btn-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+                >
                   <span>Join</span>
                   <ArrowRight size={14} />
-                </a>
+                </button>
               </div>
             ))}
           </div>
