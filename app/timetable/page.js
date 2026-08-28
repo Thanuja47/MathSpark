@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
-import LiveScheduleWidget, { SCHEDULE, DAYS, getCountdown } from '@/components/tracking/LiveScheduleWidget';
+import LiveScheduleWidget, { SCHEDULE, DAYS, getCountdown, CountdownDisplay } from '@/components/tracking/LiveScheduleWidget';
 import AccessLockedModal from '@/components/AccessLockedModal';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -138,27 +138,12 @@ export default function TimetablePage() {
                               <span>Grade {cls.grade}</span>
                             </div>
 
-                            {/* Live per-class countdown block matching top card's stacked digit & label layout */}
-                            <div className="card-countdown-box">
+                            {/* Live per-class countdown using the exact shared CountdownDisplay component */}
+                            <div className="card-countdown-wrapper">
                               {isLive ? (
                                 <div className="card-live-now">🔴 LIVE NOW</div>
                               ) : (
-                                <div className="card-countdown-display">
-                                  <div className="card-countdown-unit">
-                                    <div className="card-countdown-num">{String(countdown.dh).padStart(2, '0')}</div>
-                                    <div className="card-countdown-lbl">HRS</div>
-                                  </div>
-                                  <div className="card-countdown-sep">:</div>
-                                  <div className="card-countdown-unit">
-                                    <div className="card-countdown-num">{String(countdown.dm).padStart(2, '0')}</div>
-                                    <div className="card-countdown-lbl">MIN</div>
-                                  </div>
-                                  <div className="card-countdown-sep">:</div>
-                                  <div className="card-countdown-unit">
-                                    <div className="card-countdown-num">{String(countdown.ds).padStart(2, '0')}</div>
-                                    <div className="card-countdown-lbl">SEC</div>
-                                  </div>
-                                </div>
+                                <CountdownDisplay countdown={countdown} scale={0.72} />
                               )}
                             </div>
 
@@ -229,50 +214,16 @@ export default function TimetablePage() {
         .timetable-meta span::after { content: '•'; margin-left: 6px; }
         .timetable-meta span:last-child::after { content: ''; margin: 0; }
         
-        .card-countdown-box {
-          background: rgba(0, 0, 0, 0.35);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: var(--radius-sm);
-          padding: 8px 6px;
-          margin-bottom: 10px;
-          text-align: center;
-        }
-        .card-countdown-display {
+        .card-countdown-wrapper {
+          padding: 6px 0;
+          margin-bottom: 6px;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 4px;
-        }
-        .card-countdown-unit {
-          text-align: center;
-          min-width: 26px;
-        }
-        .card-countdown-num {
-          font-family: var(--font-heading);
-          font-size: 1.15rem;
-          font-weight: 900;
-          background: var(--gradient-blue);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          line-height: 1;
-        }
-        .card-countdown-lbl {
-          font-size: 0.52rem;
-          font-weight: 700;
-          letter-spacing: 0.08em;
-          color: var(--text-muted);
-          text-transform: uppercase;
-          margin-top: 2px;
-        }
-        .card-countdown-sep {
-          font-size: 1rem;
-          font-weight: 900;
-          color: var(--text-muted);
-          margin-bottom: 8px;
+          min-height: 48px;
         }
         .card-live-now {
-          font-size: 0.78rem;
+          font-size: 0.8rem;
           font-weight: 800;
           color: #00C896;
           letter-spacing: 0.05em;

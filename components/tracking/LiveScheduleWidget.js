@@ -148,22 +148,7 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
                 🔴 CLASS IS LIVE!
               </div>
             ) : (
-              <div className="countdown-display">
-                <div className="countdown-unit">
-                  <div className="countdown-num">{String(nextClass.dh).padStart(2, '0')}</div>
-                  <div className="countdown-lbl">HRS</div>
-                </div>
-                <div className="countdown-sep">:</div>
-                <div className="countdown-unit">
-                  <div className="countdown-num">{String(nextClass.dm).padStart(2, '0')}</div>
-                  <div className="countdown-lbl">MIN</div>
-                </div>
-                <div className="countdown-sep">:</div>
-                <div className="countdown-unit">
-                  <div className="countdown-num">{String(nextClass.ds).padStart(2, '0')}</div>
-                  <div className="countdown-lbl">SEC</div>
-                </div>
-              </div>
+              <CountdownDisplay countdown={nextClass} />
             )}
             <button
               onClick={(e) => handleJoin(e, nextClass)}
@@ -238,7 +223,36 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
         .next-class-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
         .next-class-meta { font-size: 0.8rem; color: var(--text-muted); }
         .next-class-right { text-align: center; }
-        .countdown-display { display: flex; align-items: center; gap: 6px; }
+        .today-class-row {
+          display: flex; align-items: center; justify-content: space-between; gap: 12px;
+          background: var(--dark-card); border: 1px solid var(--border); border-left: 3px solid;
+          border-radius: var(--radius-md); padding: 12px 16px;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export function CountdownDisplay({ countdown, scale = 1 }) {
+  if (!countdown) return null;
+  return (
+    <div className="countdown-display" style={{ transform: scale !== 1 ? `scale(${scale})` : 'none', transformOrigin: 'center center' }}>
+      <div className="countdown-unit">
+        <div className="countdown-num">{String(countdown.dh).padStart(2, '0')}</div>
+        <div className="countdown-lbl">HRS</div>
+      </div>
+      <div className="countdown-sep">:</div>
+      <div className="countdown-unit">
+        <div className="countdown-num">{String(countdown.dm).padStart(2, '0')}</div>
+        <div className="countdown-lbl">MIN</div>
+      </div>
+      <div className="countdown-sep">:</div>
+      <div className="countdown-unit">
+        <div className="countdown-num">{String(countdown.ds).padStart(2, '0')}</div>
+        <div className="countdown-lbl">SEC</div>
+      </div>
+      <style jsx>{`
+        .countdown-display { display: flex; align-items: center; justify-content: center; gap: 6px; }
         .countdown-unit { text-align: center; }
         .countdown-num {
           font-family: var(--font-heading); font-size: 1.8rem; font-weight: 900;
@@ -248,11 +262,6 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
         }
         .countdown-lbl { font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; color: var(--text-muted); text-transform: uppercase; }
         .countdown-sep { font-size: 1.5rem; font-weight: 900; color: var(--text-muted); margin-bottom: 10px; }
-        .today-class-row {
-          display: flex; align-items: center; justify-content: space-between; gap: 12px;
-          background: var(--dark-card); border: 1px solid var(--border); border-left: 3px solid;
-          border-radius: var(--radius-md); padding: 12px 16px;
-        }
       `}</style>
     </div>
   );
