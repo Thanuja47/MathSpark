@@ -25,37 +25,65 @@ export default function CourseCard({ course }) {
   return (
     <>
       <div className="course-card">
-        {/* Image / Placeholder */}
+        {/* Image / Cover Photo */}
         <div className="course-card-image">
-          <div
-            className="course-img-placeholder"
-            style={{ background: gradientMap[grade] || gradientMap[10] }}
-          >
-            {/* Subtle math graph overlay */}
-            <div className="math-graph-overlay" />
-
-            <div className="course-placeholder-content">
-              <span className="course-grade-big font-mono">G{grade}</span>
-              <span className="course-medium-tag">{medium === 'english' ? 'English' : 'Sinhala'} Medium</span>
+          {course.imageUrl ? (
+            <div className="course-img-wrapper" style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
+              <img
+                src={course.imageUrl}
+                alt={title}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+              <div className="math-graph-overlay" style={{ background: 'linear-gradient(to top, rgba(13,15,20,0.85) 0%, rgba(13,15,20,0.2) 60%, transparent 100%)' }} />
+              
+              {/* Free Sample Play Overlay Button */}
+              <button
+                className="free-sample-play-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (course.sampleVideoUrl) {
+                    window.open(course.sampleVideoUrl, '_blank', 'noopener,noreferrer');
+                  } else {
+                    setIsModalOpen(true);
+                  }
+                }}
+                title="Watch Free Sample Lesson"
+              >
+                <span className="play-icon">▶</span>
+                <span>Watch Free Sample</span>
+              </button>
             </div>
-
-            {/* Free Sample Play Overlay Button */}
-            <button
-              className="free-sample-play-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (course.sampleVideoUrl) {
-                  window.open(course.sampleVideoUrl, '_blank', 'noopener,noreferrer');
-                } else {
-                  setIsModalOpen(true);
-                }
-              }}
-              title="Watch Free Sample Lesson"
+          ) : (
+            <div
+              className="course-img-placeholder"
+              style={{ background: gradientMap[grade] || gradientMap[10] }}
             >
-              <span className="play-icon">▶</span>
-              <span>Watch Free Sample</span>
-            </button>
-          </div>
+              {/* Subtle math graph overlay */}
+              <div className="math-graph-overlay" />
+
+              <div className="course-placeholder-content">
+                <span className="course-grade-big font-mono">G{grade}</span>
+                <span className="course-medium-tag">{medium === 'english' ? 'English' : 'Sinhala'} Medium</span>
+              </div>
+
+              {/* Free Sample Play Overlay Button */}
+              <button
+                className="free-sample-play-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (course.sampleVideoUrl) {
+                    window.open(course.sampleVideoUrl, '_blank', 'noopener,noreferrer');
+                  } else {
+                    setIsModalOpen(true);
+                  }
+                }}
+                title="Watch Free Sample Lesson"
+              >
+                <span className="play-icon">▶</span>
+                <span>Watch Free Sample</span>
+              </button>
+            </div>
+          )}
           {badge && (
             <div className="course-card-badge">
               {badge}
