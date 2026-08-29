@@ -24,11 +24,12 @@ model Student {
 }
 
 model StudentGradeAccess {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   studentId String
-  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
   gradeId   Int
-  grantedAt DateTime @default(now())
+  grantedAt DateTime  @default(now())
+  expiresAt DateTime?
 
   @@unique([studentId, gradeId])
 }

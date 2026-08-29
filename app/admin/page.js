@@ -115,8 +115,10 @@ export default function AdminPage() {
   const [studentSearch, setStudentSearch]   = useState('');
   const [managingStudent, setManagingStudent] = useState(null);
   const [selectedGrades, setSelectedGrades] = useState([]);
+  const [gradeExpiries, setGradeExpiries]   = useState({}); // { gradeNum: 'YYYY-MM-DD' }
   const [studentMsg, setStudentMsg]         = useState('');
   const [savingGrades, setSavingGrades]     = useState(false);
+  const [studentStats, setStudentStats]     = useState(null);
 
   /* ════════════════════════════════════════════════════
      COURSE LESSONS STATE
@@ -146,6 +148,7 @@ export default function AdminPage() {
     fetch('/api/admin/grades').then(r => r.json()).then(d => Array.isArray(d) && setGradesList(d)).catch(() => {});
     fetch('/api/admin/orders').then(r => r.json()).then(d => d?.orders && Array.isArray(d.orders) && setOrdersList(d.orders)).catch(() => {});
     fetch('/api/admin/students').then(r => r.json()).then(d => d?.students && Array.isArray(d.students) && setStudentsList(d.students)).catch(() => {});
+    fetch('/api/admin/students/stats').then(r => r.json()).then(d => d?.totalStudents !== undefined && setStudentStats(d)).catch(() => {});
   }, []);
 
 
@@ -413,6 +416,16 @@ export default function AdminPage() {
   const openStudentModal = (student) => {
     setManagingStudent(student);
     setSelectedGrades(student.approvedGrades || []);
+    // Populate existing expiry dates from gradeAccess if present
+    const expiries = {};
+    if (student.gradeAccess) {
+      student.gradeAccess.forEach(ga => {
+        if (ga.expiresAt) {
+          expiries[ga.gradeId] = new Date(ga.expiresAt).toISOString().split('T')[0];
+        }
+      });
+    }
+    setGradeExpiries(expiries);
     setStudentMsg('');
   };
 
@@ -423,19 +436,33 @@ export default function AdminPage() {
     );
   };
 
+  const setGradeExpiry = (gradeNum, dateStr) => {
+    setGradeExpiries(prev => ({ ...prev, [gradeNum]: dateStr }));
+  };
+
   const saveStudentGrades = async () => {
     if (!managingStudent) return;
     setSavingGrades(true);
     setStudentMsg('');
     try {
+      const gradeItems = selectedGrades.map(g => ({
+        gradeId: Number(g),
+        expiresAt: gradeExpiries[g] ? new Date(gradeExpiries[g] + 'T23:59:59').toISOString() : null
+      }));
       const res = await apiFetch(`/api/admin/students/${managingStudent.id}/grades`, {
         method: 'PUT',
-        body: JSON.stringify({ gradeIds: selectedGrades }),
+        body: JSON.stringify({ gradeItems }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to update access');
-      
-      setStudentsList(prev => prev.map(s => s.id === managingStudent.id ? { ...s, approvedGrades: data.approvedGrades } : s));
+
+      setStudentsList(prev => prev.map(s =>
+        s.id === managingStudent.id
+          ? { ...s, approvedGrades: data.approvedGrades, gradeAccess: data.gradeAccess }
+          : s
+      ));
+      // Refresh stats
+      fetch('/api/admin/students/stats').then(r => r.json()).then(d => d?.totalStudents !== undefined && setStudentStats(d)).catch(() => {});
       setStudentMsg('✅ Grade access updated successfully!');
       setTimeout(() => {
         setManagingStudent(null);
@@ -606,12 +633,51 @@ export default function AdminPage() {
                   <div>
                     <div className="tab-header" style={{ marginBottom: 20 }}>
                       <div>
-                        <h3 style={{ margin: 0 }}>Student Grade Access</h3>
+                        <h3 style={{ margin: 0 }}>Student Overview</h3>
                         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0 }}>
-                          Search students and manage which Grade contents (G6–G11) they are authorized to access.
+                          Manage grade access and view enrollment statistics across all grades.
                         </p>
                       </div>
                     </div>
+
+                    {/* ── Stats Cards ── */}
+                    {studentStats && (
+                      <div style={{ marginBottom: 28 }}>
+                        {/* Total Students card */}
+                        <div style={{ marginBottom: 16 }}>
+                          <div style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 16,
+                            background: 'linear-gradient(135deg, rgba(37,99,235,0.18), rgba(124,58,237,0.12))',
+                            border: '1px solid rgba(37,99,235,0.3)', borderRadius: 14,
+                            padding: '14px 24px',
+                          }}>
+                            <div style={{ fontSize: 32, lineHeight: 1 }}>👥</div>
+                            <div>
+                              <div style={{ fontSize: '2rem', fontWeight: 800, color: '#fff', lineHeight: 1 }}>{studentStats.totalStudents}</div>
+                              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 2 }}>Total Registered Students</div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Per-grade breakdown */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 12 }}>
+                          {[6,7,8,9,10,11].map(g => (
+                            <div key={g} style={{
+                              background: 'rgba(255,255,255,0.04)',
+                              border: '1px solid rgba(255,255,255,0.08)',
+                              borderRadius: 12, padding: '14px 16px', textAlign: 'center',
+                              transition: 'border-color 0.2s',
+                            }}>
+                              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: ['#3b82f6','#8b5cf6','#f59e0b','#10b981','#ef4444','#ec4899'][g-6] }}>
+                                {studentStats.gradeBreakdown[g] ?? 0}
+                              </div>
+                              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 4, fontWeight: 600 }}>Grade {g}</div>
+                              <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', marginTop: 2 }}>students</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     <div style={{ marginBottom: 20 }}>
                       <input
@@ -639,38 +705,58 @@ export default function AdminPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {filteredStudents.map(student => (
-                              <tr key={student.id}>
-                                <td style={{ fontWeight: 600 }}>{student.name}</td>
-                                <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>{student.phone}</td>
-                                <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                  {new Date(student.createdAt).toLocaleDateString()}
-                                </td>
-                                <td>
-                                  {(!student.approvedGrades || student.approvedGrades.length === 0) ? (
-                                    <span className="badge badge-accent" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>
-                                      No Access Granted
-                                    </span>
-                                  ) : (
-                                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                                      {student.approvedGrades.sort((a,b)=>a-b).map(g => (
-                                        <span key={g} className="badge badge-green" style={{ fontSize: '0.75rem' }}>
-                                          Grade {g}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  )}
-                                </td>
-                                <td>
-                                  <button
-                                    className="btn btn-outline btn-sm"
-                                    onClick={() => openStudentModal(student)}
-                                  >
-                                    Manage Access
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
+                            {filteredStudents.map(student => {
+                              const now = new Date();
+                              return (
+                                <tr key={student.id}>
+                                  <td style={{ fontWeight: 600 }}>{student.name}</td>
+                                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem' }}>{student.phone}</td>
+                                  <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                    {new Date(student.createdAt).toLocaleDateString()}
+                                  </td>
+                                  <td>
+                                    {(!student.gradeAccess || student.gradeAccess.length === 0) && (!student.approvedGrades || student.approvedGrades.length === 0) ? (
+                                      <span className="badge badge-accent" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>
+                                        No Access Granted
+                                      </span>
+                                    ) : (
+                                      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                                        {(student.gradeAccess || []).filter(ga => !ga.expiresAt || new Date(ga.expiresAt) > now).sort((a,b)=>a.gradeId-b.gradeId).map(ga => {
+                                          const expiring = ga.expiresAt && (new Date(ga.expiresAt) - now) < 7 * 24 * 60 * 60 * 1000;
+                                          return (
+                                            <span key={ga.gradeId} title={ga.expiresAt ? `Expires: ${new Date(ga.expiresAt).toLocaleDateString()}` : 'Permanent'}
+                                              style={{
+                                                display: 'inline-flex', alignItems: 'center', gap: 4,
+                                                fontSize: '0.72rem', fontWeight: 600, padding: '2px 8px', borderRadius: 20,
+                                                background: expiring ? 'rgba(245,158,11,0.18)' : 'rgba(34,197,94,0.15)',
+                                                color: expiring ? '#fbbf24' : '#4ade80',
+                                                border: `1px solid ${expiring ? 'rgba(245,158,11,0.3)' : 'rgba(34,197,94,0.25)'}`,
+                                              }}>
+                                              Gr {ga.gradeId}
+                                              {ga.expiresAt && (
+                                                <span style={{ opacity: 0.75 }}>· {new Date(ga.expiresAt).toLocaleDateString('en-GB', { day:'2-digit', month:'short' })}</span>
+                                              )}
+                                            </span>
+                                          );
+                                        })}
+                                        {/* Fallback for old records without gradeAccess array */}
+                                        {!student.gradeAccess && (student.approvedGrades || []).sort((a,b)=>a-b).map(g => (
+                                          <span key={g} className="badge badge-green" style={{ fontSize: '0.75rem' }}>Grade {g}</span>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </td>
+                                  <td>
+                                    <button
+                                      className="btn btn-outline btn-sm"
+                                      onClick={() => openStudentModal(student)}
+                                    >
+                                      Manage Access
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
                           </tbody>
                         </table>
                       </div>
@@ -1186,34 +1272,61 @@ export default function AdminPage() {
               </div>
             )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12, marginBottom: 24 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
               {[6, 7, 8, 9, 10, 11].map(gradeNum => {
                 const checked = selectedGrades.includes(gradeNum);
+                const expiryVal = gradeExpiries[gradeNum] || '';
                 return (
-                  <label
+                  <div
                     key={gradeNum}
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 10,
-                      padding: '10px 14px',
-                      borderRadius: 8,
+                      borderRadius: 10,
                       border: checked ? '1px solid var(--cobalt)' : '1px solid rgba(255,255,255,0.08)',
-                      background: checked ? 'rgba(37, 99, 235, 0.15)' : 'rgba(255,255,255,0.02)',
-                      cursor: 'pointer',
+                      background: checked ? 'rgba(37, 99, 235, 0.12)' : 'rgba(255,255,255,0.02)',
                       transition: 'all 0.15s',
+                      overflow: 'hidden',
                     }}
                   >
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={() => toggleGradeSelection(gradeNum)}
-                      style={{ width: 16, height: 16, accentColor: 'var(--cobalt)', cursor: 'pointer' }}
-                    />
-                    <span style={{ fontWeight: 600, color: '#fff', fontSize: '0.9rem' }}>
-                      Grade {gradeNum}
-                    </span>
-                  </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleGradeSelection(gradeNum)}
+                        style={{ width: 16, height: 16, accentColor: 'var(--cobalt)', cursor: 'pointer', flexShrink: 0 }}
+                      />
+                      <span style={{ fontWeight: 600, color: '#fff', fontSize: '0.9rem', flex: 1 }}>Grade {gradeNum}</span>
+                      {checked && expiryVal && (
+                        <span style={{ fontSize: '0.72rem', color: '#fbbf24', background: 'rgba(245,158,11,0.15)', padding: '2px 8px', borderRadius: 20, border: '1px solid rgba(245,158,11,0.25)' }}>
+                          Expires {new Date(expiryVal).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })}
+                        </span>
+                      )}
+                      {checked && !expiryVal && (
+                        <span style={{ fontSize: '0.72rem', color: '#4ade80', opacity: 0.7 }}>Permanent</span>
+                      )}
+                    </label>
+                    {checked && (
+                      <div style={{ padding: '0 14px 12px 40px', display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Expiry date (optional):</label>
+                        <input
+                          type="date"
+                          value={expiryVal}
+                          onChange={e => setGradeExpiry(gradeNum, e.target.value)}
+                          min={new Date().toISOString().split('T')[0]}
+                          style={{
+                            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)',
+                            borderRadius: 6, color: '#fff', padding: '4px 10px', fontSize: '0.82rem', cursor: 'pointer',
+                          }}
+                        />
+                        {expiryVal && (
+                          <button
+                            type="button"
+                            onClick={() => setGradeExpiry(gradeNum, '')}
+                            style={{ background: 'none', border: 'none', color: '#f87171', fontSize: '0.8rem', cursor: 'pointer', padding: 0 }}
+                          >✕ Clear</button>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>

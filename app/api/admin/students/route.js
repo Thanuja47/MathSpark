@@ -21,6 +21,11 @@ export async function GET(request) {
       role: s.role,
       createdAt: s.createdAt,
       approvedGrades: (s.gradeAccess || []).map(g => g.gradeId),
+      gradeAccess: (s.gradeAccess || []).map(g => ({
+        gradeId: g.gradeId,
+        grantedAt: g.grantedAt,
+        expiresAt: g.expiresAt || null,
+      })),
     }));
 
     return NextResponse.json({ success: true, students: formatted });

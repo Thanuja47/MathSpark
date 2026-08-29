@@ -12,10 +12,11 @@ export async function PUT(request, { params }) {
     }
 
     const { id } = params;
-    const { gradeIds } = await request.json();
+    const body = await request.json();
+    const gradeItems = body.gradeItems || body.gradeIds;
 
-    if (!Array.isArray(gradeIds)) {
-      return NextResponse.json({ error: 'gradeIds must be an array.' }, { status: 400 });
+    if (!Array.isArray(gradeItems)) {
+      return NextResponse.json({ error: 'gradeItems must be an array.' }, { status: 400 });
     }
 
     const student = await db.students.findById(id);
@@ -23,13 +24,14 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'Student not found.' }, { status: 404 });
     }
 
-    await db.students.setApprovedGrades(id, gradeIds);
-    const updatedApproved = await db.students.getApprovedGrades(id);
+    await db.students.setApprovedGrades(id, gradeItems);
+    const updatedStudent = await db.students.findByIdWithGrades(id);
 
     return NextResponse.json({
       success: true,
       message: 'Student grade access updated successfully.',
-      approvedGrades: updatedApproved
+      approvedGrades: (updatedStudent.gradeAccess || []).map(g => g.gradeId),
+      gradeAccess: updatedStudent.gradeAccess || []
     });
   } catch (err) {
     console.error('[PUT /api/admin/students/[id]/grades]', err);
