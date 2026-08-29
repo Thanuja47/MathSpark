@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { Video } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
@@ -43,11 +44,14 @@ export default function TimetablePage() {
   const handleJoinZoom = (e, grade, zoomUrl) => {
     e.preventDefault();
     if (!user) {
-      alert('Please log in to join live sessions.');
+      window.location.href = '/login?returnUrl=' + encodeURIComponent('/timetable');
       return;
     }
-    const approved = user.approvedGrades || [];
-    if (!approved.includes(Number(grade))) {
+    const approved = (user.approvedGrades || []).map(Number);
+    const userRole = user.role;
+    const isUserApproved = userRole === 'admin' || approved.includes(Number(grade));
+
+    if (!isUserApproved) {
       setLockedGrade(grade);
       return;
     }
@@ -160,10 +164,9 @@ export default function TimetablePage() {
                             {/* Title */}
                             <div className="grid-card-title">{cls.title}</div>
 
-                            {/* Meta — time · grade · medium */}
+                            {/* Meta — time · grade */}
                             <div className="grid-card-meta">
                               <span>🕐 {cls.time}</span>
-                              <span>{cls.duration || 90} min</span>
                               <span>Gr {cls.grade}</span>
                             </div>
 
@@ -185,8 +188,10 @@ export default function TimetablePage() {
                               <button
                                 onClick={(e) => handleJoinZoom(e, cls.grade, cls.zoom)}
                                 className={`btn ${isLive ? 'btn-primary' : 'btn-primary'} btn-sm grid-join-btn`}
+                                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                               >
-                                {isLive ? '🔴 Join Live Class' : '📹 Join Zoom Class'}
+                                <Video size={14} />
+                                <span>{isLive ? 'Join Live Class' : 'Join Zoom Class'}</span>
                               </button>
                             ) : (
                               <button

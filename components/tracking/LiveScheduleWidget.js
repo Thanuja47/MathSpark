@@ -229,7 +229,7 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
               <div className="next-class-meta" style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                   <Clock size={14} />
-                  <span>{item.time} ({item.duration} min)</span>
+                  <span>{item.time}</span>
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                   <Globe size={14} />
@@ -258,7 +258,7 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
                   style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}
                 >
                   <Video size={16} />
-                  <span>{item.isLive ? '🔴 Join Live Class' : '📹 Join Zoom Class'}</span>
+                  <span>{item.isLive ? 'Join Live Class' : 'Join Zoom Class'}</span>
                 </button>
               ) : (
                 <button
