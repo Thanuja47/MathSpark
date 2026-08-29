@@ -582,7 +582,6 @@ export default function AdminPage() {
     { key: 'store',     label: t('admin.tabStore'),    count: storeList.length, icon: ShoppingBag },
     { key: 'orders',    label: t('admin.tabOrders'),   count: ordersList.length, icon: Package },
     { key: 'results',   label: t('admin.tabResults'),  count: resultsList.length, icon: Trophy },
-    { key: 'grades',    label: t('admin.tabGrades'),   count: gradesList.length, icon: GraduationCap },
   ];
 
   /* ════════════════════════════════════════════════════
@@ -1177,45 +1176,6 @@ export default function AdminPage() {
                   </div>
                 )}
 
-                {/* ── GRADES TAB ── */}
-                {activeTab === 'grades' && (
-                  <div>
-                    <div className="tab-header">
-                      <h3>Grade Management</h3>
-                      <button className="btn btn-primary btn-sm" onClick={() => showGradeForm ? resetGradeForm() : setShowGradeForm(true)}>
-                        {showGradeForm ? 'Cancel' : '+ Add Grade'}
-                      </button>
-                    </div>
-                    {showGradeForm && (
-                      <form onSubmit={submitGrade} className="admin-form-box">
-                        <h4>{editingGrade ? 'Edit Grade' : 'New Grade'}</h4>
-                        {gradeMsg && <p className="form-msg">{gradeMsg}</p>}
-                        <div className="form-group"><label className="form-label">Grade Name</label>
-                          <input className="form-input" value={gradeName} onChange={e => setGradeName(e.target.value)} placeholder="e.g. Grade 10" required />
-                        </div>
-                        <div className="form-group"><label className="form-label">Description (optional)</label>
-                          <textarea className="form-input" rows={2} value={gradeDescription} onChange={e => setGradeDescription(e.target.value)} placeholder="e.g. O/L level students" />
-                        </div>
-                        <button className="btn btn-primary" type="submit">{editingGrade ? 'Update Grade' : 'Create Grade'}</button>
-                      </form>
-                    )}
-                    <div className="admin-table-scroll">
-                      <table className="admin-table">
-                        <thead><tr><th>Grade Name</th><th>Description</th><th>Actions</th></tr></thead>
-                        <tbody>
-                          {gradesList.length === 0 && <tr><td colSpan={3} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No grades yet. Add one above.</td></tr>}
-                          {gradesList.map(g => (
-                            <tr key={g.id}>
-                              <td><strong>{g.name}</strong></td>
-                              <td style={{ color: 'var(--text-muted)' }}>{g.description || '—'}</td>
-                              <td>
-                                <button className="btn btn-sm btn-outline" style={{ marginRight: 6 }} onClick={() => editGrade(g)}>Edit</button>
-                                <button className="btn btn-sm" style={{ background: '#ef4444', color: '#fff' }} onClick={() => deleteGrade(g.id)}>Delete</button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
                     </div>
                   </div>
                 )}

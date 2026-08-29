@@ -208,21 +208,7 @@ export default function Header() {
 
             <span className="actions-separator" aria-hidden="true" />
 
-            {/* Grades sidebar trigger */}
-            <button
-              id="grades-sidebar-btn"
-              className="grades-icon-btn"
-              onClick={() => setSidebarOpen(true)}
-              aria-label="Browse by Grade"
-            >
-              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-              </svg>
-              <span className="grades-icon-label">{t('nav.grades')}</span>
-            </button>
 
-            <span className="actions-separator" aria-hidden="true" />
 
             <div className="auth-action-slot">
               {user ? (
