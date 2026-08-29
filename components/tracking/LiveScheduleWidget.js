@@ -104,9 +104,16 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
   const todayDay = now.getDay();
   const todayClasses = activeSchedule.filter(c => c.day === todayDay);
   
-  const nextClass = activeSchedule
-    .map(c => ({ ...c, ...getCountdown(c.day, c.time, c.duration || 90) }))
-    .sort((a, b) => (a.isLive ? -1 : b.isLive ? 1 : a.targetTime - b.targetTime))[0];
+  // ── Hero card: always prefer today's classes first (even if already past),
+  // only fall back to the next upcoming class when today has zero classes at all.
+  const allWithCountdown = activeSchedule.map(c => ({ ...c, ...getCountdown(c.day, c.time, c.duration || 90) }));
+  const todayClassesForHero = allWithCountdown.filter(c => c.day === todayDay);
+  const futureClasses = allWithCountdown
+    .filter(c => !c.isPast || c.isLive)
+    .sort((a, b) => (a.isLive ? -1 : b.isLive ? 1 : a.targetTime - b.targetTime));
+  const nextClass = todayClassesForHero.length > 0
+    ? todayClassesForHero.sort((a, b) => (a.isLive ? -1 : b.isLive ? 1 : a.targetTime - b.targetTime))[0]
+    : futureClasses[0];
 
   const handleJoin = (e, cls) => {
     if (onJoinZoom) {
@@ -126,9 +133,9 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
       {nextClass && (
         <div className="next-class-banner" style={{ borderColor: nextClass.color }}>
           <div className="next-class-left">
-            <div className="live-badge">
-              <span className="live-dot" />
-              {nextClass.isLive ? 'LIVE NOW' : nextClass.isToday ? 'TODAY' : DAYS[nextClass.day]}
+            <div className="live-badge" style={{ color: nextClass.isLive ? '#00C896' : nextClass.day === todayDay ? '#00C896' : nextClass.color }}>
+              <span className="live-dot" style={{ background: nextClass.isLive ? '#00C896' : nextClass.day === todayDay ? '#00C896' : nextClass.color }} />
+              {nextClass.isLive ? 'LIVE NOW' : nextClass.day === todayDay ? 'TODAY' : DAYS[nextClass.day]}
             </div>
             <div className="next-class-title">{nextClass.title}</div>
             <div className="next-class-meta" style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
@@ -180,10 +187,10 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
                 </div>
                 <button
                   onClick={(e) => handleJoin(e, c)}
-                  className="btn btn-ghost btn-sm"
+                  className="btn btn-primary btn-sm"
                   style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
                 >
-                  <span>Join</span>
+                  <span>📹 Join Zoom Class</span>
                   <ArrowRight size={14} />
                 </button>
               </div>
@@ -214,11 +221,13 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
         .live-badge {
           display: inline-flex; align-items: center; gap: 6px;
           font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
-          color: #00C896; text-transform: uppercase; margin-bottom: 10px;
+          text-transform: uppercase; margin-bottom: 10px;
+          /* color set inline per class */
         }
         .live-dot {
-          width: 8px; height: 8px; border-radius: 50%; background: #00C896;
+          width: 8px; height: 8px; border-radius: 50%;
           animation: pulse-glow 1.2s infinite;
+          /* background set inline per class */
         }
         .next-class-title { font-weight: 700; font-size: 1rem; margin-bottom: 6px; }
         .next-class-meta { font-size: 0.8rem; color: var(--text-muted); }
