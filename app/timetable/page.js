@@ -48,6 +48,8 @@ export default function TimetablePage() {
       return;
     }
     const approved = (user.approvedGrades || []).map(Number);
+    if (user.grade) approved.push(Number(user.grade));
+    
     const userRole = user.role;
     const isUserApproved = userRole === 'admin' || approved.includes(Number(grade));
 

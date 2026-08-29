@@ -18,6 +18,7 @@ export async function GET(request) {
         const student = await db.students.findByIdWithGrades(tokenUser.id);
         if (student) {
           approvedGrades = (student.gradeAccess || []).map(g => Number(g.gradeId));
+          if (student.grade) approvedGrades.push(Number(student.grade));
         }
       }
     }
