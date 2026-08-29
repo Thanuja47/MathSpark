@@ -24,7 +24,7 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
 
   if (!isOpen || !course) return null;
 
-  const rawVideoUrl = course.sampleVideoUrl || '';
+  const rawVideoUrl = course.sampleVideoUrl || course.previewVideoUrl || (course.lessonsList && course.lessonsList.find(l => l.videoUrl)?.videoUrl) || '';
   const isPlaceholder = !rawVideoUrl || rawVideoUrl.includes('VIDEO_ID');
 
   const getEmbedUrl = (url) => {

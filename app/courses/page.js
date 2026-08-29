@@ -33,6 +33,7 @@ export default function CoursesPage() {
             description: c.description || '',
             instructor: 'Ishan Maduranga',
             imageUrl: c.imageUrl,
+            sampleVideoUrl: c.sampleVideoUrl,
           }));
           setCoursesList(formatted);
         }
