@@ -90,12 +90,14 @@ export function getCountdown(dayIndex, timeStr, customDuration = null) {
   const target = new Date(slNow.getTime());
   target.setHours(h, m, 0, 0);
 
-  let daysUntil = ((dayIndex - slNow.getDay()) + 7) % 7;
+  const daysUntilRaw = ((dayIndex - slNow.getDay()) + 7) % 7;
+  let daysUntil = daysUntilRaw;
+
+  const endTarget = new Date(target.getTime() + durationMinutes * 60000);
+  const isEndedToday = daysUntilRaw === 0 && slNow > endTarget;
 
   // If the class day matches Sri Lanka's today
   if (daysUntil === 0) {
-    const endTarget = new Date(target.getTime() + durationMinutes * 60000);
-    // If class ended earlier today, next occurrence is 7 days away
     if (slNow > endTarget) {
       daysUntil = 7;
     }
@@ -110,7 +112,11 @@ export function getCountdown(dayIndex, timeStr, customDuration = null) {
   const isLive = nowMs >= targetMs && nowMs <= endTargetMs;
 
   if (isLive) {
-    return { targetTime: targetMs, diff: 0, dh: 0, dm: 0, ds: 0, isToday: daysUntil === 0 || daysUntil === 7, isLive: true, isPast: false };
+    return { targetTime: targetMs, diff: 0, dh: 0, dm: 0, ds: 0, isToday: true, isLive: true, isEnded: false, isPast: false };
+  }
+
+  if (isEndedToday) {
+    return { targetTime: targetMs, diff: 0, dh: 0, dm: 0, ds: 0, isToday: true, isLive: false, isEnded: true, isPast: true };
   }
 
   const isPast = diff < 0;
@@ -118,7 +124,7 @@ export function getCountdown(dayIndex, timeStr, customDuration = null) {
   const dm = Math.max(0, Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)));
   const ds = Math.max(0, Math.floor((diff % (1000 * 60)) / 1000));
 
-  return { targetTime: targetMs, diff, dh, dm, ds, isToday: daysUntil === 0, isLive: false, isPast };
+  return { targetTime: targetMs, diff, dh, dm, ds, isToday: daysUntil === 0, isLive: false, isEnded: false, isPast };
 }
 
 export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom = null }) {
@@ -203,18 +209,21 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
           <div
             key={item.id || idx}
             className={`next-class-banner ${item.isLive ? 'next-class-banner--live' : ''}`}
-            style={{ borderColor: item.isLive ? '#00C896' : item.color }}
+            style={{
+              borderColor: item.isLive ? '#00C896' : item.isEnded ? 'rgba(255,255,255,0.1)' : item.color,
+              opacity: item.isEnded ? 0.75 : 1
+            }}
           >
             <div className="next-class-left">
               <div
                 className="live-badge"
-                style={{ color: item.isLive ? '#00C896' : item.day === todayDay ? '#00C896' : item.color }}
+                style={{ color: item.isLive ? '#00C896' : item.isEnded ? '#FF4D4D' : item.day === todayDay ? '#00C896' : item.color }}
               >
                 <span
                   className="live-dot"
-                  style={{ background: item.isLive ? '#00C896' : item.day === todayDay ? '#00C896' : item.color }}
+                  style={{ background: item.isLive ? '#00C896' : item.isEnded ? '#FF4D4D' : item.day === todayDay ? '#00C896' : item.color }}
                 />
-                {item.isLive ? 'LIVE NOW' : item.day === todayDay ? 'TODAY' : DAYS[item.day]}
+                {item.isLive ? 'LIVE NOW' : item.isEnded ? 'ENDED TODAY' : item.day === todayDay ? 'TODAY' : DAYS[item.day]}
               </div>
               <div className="next-class-title">{item.title}</div>
               <div className="next-class-meta" style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
@@ -234,17 +243,32 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
                 <div className="live-now-text" style={{ fontSize: '1.4rem', fontWeight: 900, color: '#00C896', marginBottom: 6 }}>
                   🔴 CLASS IS LIVE!
                 </div>
+              ) : item.isEnded ? (
+                <div className="class-ended-text" style={{ fontSize: '1.2rem', fontWeight: 800, color: '#8E8E93', marginBottom: 6, letterSpacing: '0.05em' }}>
+                  ⏹️ Class Ended
+                </div>
               ) : (
                 <CountdownDisplay countdown={item} />
               )}
-              <button
-                onClick={(e) => handleJoin(e, item)}
-                className={`btn ${item.isLive ? 'btn-primary' : 'btn-primary'} btn-sm`}
-                style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}
-              >
-                <Video size={16} />
-                <span>{item.isLive ? '🔴 Join Live Class' : '📹 Join Zoom Class'}</span>
-              </button>
+              
+              {!item.isEnded ? (
+                <button
+                  onClick={(e) => handleJoin(e, item)}
+                  className={`btn ${item.isLive ? 'btn-primary' : 'btn-primary'} btn-sm`}
+                  style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                >
+                  <Video size={16} />
+                  <span>{item.isLive ? '🔴 Join Live Class' : '📹 Join Zoom Class'}</span>
+                </button>
+              ) : (
+                <button
+                  disabled
+                  className="btn btn-ghost btn-sm"
+                  style={{ marginTop: 14, opacity: 0.5, cursor: 'not-allowed', fontSize: '0.8rem' }}
+                >
+                  Session Completed
+                </button>
+              )}
             </div>
           </div>
         ))}

@@ -145,9 +145,15 @@ export default function TimetablePage() {
                           >
                             {/* Badge row — same as top card's live-badge */}
                             <div className="grid-card-badge">
-                              <span className="grid-live-dot" style={{ background: isLive ? '#00C896' : cls.color }} />
-                              <span className="grid-card-badge-label" style={{ color: isLive ? '#00C896' : cls.color }}>
-                                {isLive ? 'LIVE NOW' : isToday ? 'TODAY' : dayName}
+                              <span
+                                className="grid-live-dot"
+                                style={{ background: isLive ? '#00C896' : countdown.isEnded ? '#FF4D4D' : cls.color }}
+                              />
+                              <span
+                                className="grid-card-badge-label"
+                                style={{ color: isLive ? '#00C896' : countdown.isEnded ? '#FF4D4D' : cls.color }}
+                              >
+                                {isLive ? 'LIVE NOW' : countdown.isEnded ? 'ENDED' : isToday ? 'TODAY' : dayName}
                               </span>
                             </div>
 
@@ -165,18 +171,32 @@ export default function TimetablePage() {
                             <div className="grid-card-countdown">
                               {isLive ? (
                                 <div className="grid-live-text">🔴 CLASS IS LIVE!</div>
+                              ) : countdown.isEnded ? (
+                                <div className="grid-ended-text" style={{ fontSize: '0.85rem', fontWeight: 700, color: '#8E8E93' }}>
+                                  ⏹️ Class Ended
+                                </div>
                               ) : (
                                 <CountdownDisplay countdown={countdown} scale={0.7} />
                               )}
                             </div>
 
-                            {/* Join button — passes cls.zoom explicitly so unique Zoom link is opened */}
-                            <button
-                              onClick={(e) => handleJoinZoom(e, cls.grade, cls.zoom)}
-                              className={`btn ${isLive ? 'btn-primary' : 'btn-primary'} btn-sm grid-join-btn`}
-                            >
-                              {isLive ? '🔴 Join Live Class' : '📹 Join Zoom Class'}
-                            </button>
+                            {/* Join button */}
+                            {!countdown.isEnded ? (
+                              <button
+                                onClick={(e) => handleJoinZoom(e, cls.grade, cls.zoom)}
+                                className={`btn ${isLive ? 'btn-primary' : 'btn-primary'} btn-sm grid-join-btn`}
+                              >
+                                {isLive ? '🔴 Join Live Class' : '📹 Join Zoom Class'}
+                              </button>
+                            ) : (
+                              <button
+                                disabled
+                                className="btn btn-ghost btn-sm grid-join-btn"
+                                style={{ opacity: 0.5, cursor: 'not-allowed', fontSize: '0.75rem' }}
+                              >
+                                Session Completed
+                              </button>
+                            )}
                           </div>
                         );
                       })
