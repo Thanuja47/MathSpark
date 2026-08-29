@@ -42,21 +42,34 @@ export default function TimetablePage() {
   }, []);
 
   const handleJoinZoom = (e, grade, zoomUrl) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
+    const targetGrade = Number(grade);
+
     if (!user) {
       window.location.href = '/login?returnUrl=' + encodeURIComponent('/timetable');
       return;
     }
-    const approved = (user.approvedGrades || []).map(Number);
-    if (user.grade) approved.push(Number(user.grade));
-    
-    const userRole = user.role;
-    const isUserApproved = userRole === 'admin' || approved.includes(Number(grade));
 
-    if (!isUserApproved) {
-      setLockedGrade(grade);
+    const userRole = user.role;
+    if (userRole === 'admin') {
+      if (!zoomUrl || zoomUrl === '#') {
+        alert('Zoom link not configured for this class yet.');
+        return;
+      }
+      window.open(zoomUrl, '_blank');
       return;
     }
+
+    const approved = (user.approvedGrades || []).map(Number);
+    if (user.grade) approved.push(Number(user.grade));
+
+    const isUserApproved = approved.includes(targetGrade);
+
+    if (!isUserApproved) {
+      setLockedGrade(targetGrade);
+      return;
+    }
+
     if (!zoomUrl || zoomUrl === '#') {
       alert('Zoom link not configured for this class yet.');
       return;
