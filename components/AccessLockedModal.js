@@ -46,7 +46,7 @@ export default function AccessLockedModal({ grade, onClose }) {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <a
-            href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(`Hi, I am requesting access to Grade ${grade} content on MathSpark.`)}`}
+            href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(`Hi Ishan Sir, I am requesting access to Grade ${grade} content on MathSpark.`)}`}
             target="_blank"
             rel="noreferrer"
             className="btn btn-accent btn-lg"
