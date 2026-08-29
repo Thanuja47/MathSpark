@@ -50,20 +50,11 @@ export default function TimetablePage() {
       return;
     }
 
-    const userRole = user.role;
-    if (userRole === 'admin') {
-      if (!zoomUrl || zoomUrl === '#') {
-        alert('Zoom link not configured for this class yet.');
-        return;
-      }
-      window.open(zoomUrl, '_blank');
-      return;
-    }
-
     const approved = (user.approvedGrades || []).map(Number);
     if (user.grade) approved.push(Number(user.grade));
 
-    const isUserApproved = approved.includes(targetGrade);
+    const userRole = user.role;
+    const isUserApproved = userRole === 'admin' || approved.includes(targetGrade);
 
     if (!isUserApproved) {
       setLockedGrade(targetGrade);
@@ -74,7 +65,14 @@ export default function TimetablePage() {
       alert('Zoom link not configured for this class yet.');
       return;
     }
-    window.open(zoomUrl, '_blank');
+
+    // Fix relative URL / missing protocol 404 issue:
+    let finalUrl = zoomUrl.trim();
+    if (!/^https?:\/\//i.test(finalUrl)) {
+      finalUrl = 'https://' + finalUrl;
+    }
+
+    window.open(finalUrl, '_blank');
   };
 
   // Build combined schedule from DB or fallback SCHEDULE
