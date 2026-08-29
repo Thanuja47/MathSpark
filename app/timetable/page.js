@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
-import LiveScheduleWidget, { SCHEDULE, DAYS, getCountdown, CountdownDisplay } from '@/components/tracking/LiveScheduleWidget';
+import LiveScheduleWidget, { SCHEDULE, DAYS, parseTime, getCountdown, CountdownDisplay } from '@/components/tracking/LiveScheduleWidget';
 import AccessLockedModal from '@/components/AccessLockedModal';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -112,7 +112,13 @@ export default function TimetablePage() {
             <div className="timetable-grid">
               {reorderedDayIndices.map((dayIdx, colIdx) => {
                 const dayName = DAYS[dayIdx];
-                const dayClasses = activeSchedule.filter(c => c.day === dayIdx);
+                const dayClasses = activeSchedule
+                  .filter(c => c.day === dayIdx)
+                  .sort((a, b) => {
+                    const { h: ha, m: ma } = parseTime(a.time);
+                    const { h: hb, m: mb } = parseTime(b.time);
+                    return (ha * 60 + ma) - (hb * 60 + mb);
+                  });
                 const isToday = colIdx === 0;
 
                 return (
@@ -164,7 +170,7 @@ export default function TimetablePage() {
                               )}
                             </div>
 
-                            {/* Join button — same blue btn-primary style as top card */}
+                            {/* Join button — passes cls.zoom explicitly so unique Zoom link is opened */}
                             <button
                               onClick={(e) => handleJoinZoom(e, cls.grade, cls.zoom)}
                               className={`btn ${isLive ? 'btn-primary' : 'btn-primary'} btn-sm grid-join-btn`}

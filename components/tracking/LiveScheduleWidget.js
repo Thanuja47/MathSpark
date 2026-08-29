@@ -17,10 +17,10 @@ const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
 
 export function parseTime(timeStr) {
   if (!timeStr) return { h: 18, m: 0 };
-  const str = timeStr.trim();
-  const isPM = /pm/i.test(str);
-  const isAM = /am/i.test(str);
-  const clean = str.replace(/(am|pm)/i, '').trim();
+  const str = timeStr.trim().toLowerCase();
+  const isPM = str.includes('pm');
+  const isAM = str.includes('am');
+  const clean = str.replace(/(am|pm)/g, '').trim();
   const parts = clean.split(':').map(Number);
   let h = parts[0] || 0;
   const m = parts[1] || 0;
@@ -37,31 +37,34 @@ export function getCountdown(dayIndex, timeStr, durationMinutes = 90) {
   target.setHours(h, m, 0, 0);
 
   let daysUntil = ((dayIndex - now.getDay()) + 7) % 7;
-  
-  // If it's today, check if class is live or finished
+
+  // If the target day is today
   if (daysUntil === 0) {
     const endTarget = new Date(target.getTime() + durationMinutes * 60000);
+    // If the class has already completed today, the next occurrence is 7 days away
     if (now > endTarget) {
-      daysUntil = 7; // Completed today, next occurrence is next week
+      daysUntil = 7;
     }
   }
 
   target.setDate(target.getDate() + daysUntil);
 
-  const diff = target.getTime() - now.getTime();
-  const endTarget = new Date(target.getTime() + durationMinutes * 60000);
-  const isLive = now >= target && now <= endTarget;
+  const targetMs = target.getTime();
+  const nowMs = now.getTime();
+  const diff = targetMs - nowMs;
+  const endTargetMs = targetMs + durationMinutes * 60000;
+  const isLive = nowMs >= targetMs && nowMs <= endTargetMs;
 
   if (isLive) {
-    return { targetTime: target.getTime(), diff: 0, dh: 0, dm: 0, ds: 0, isToday: true, isLive: true, isPast: false };
+    return { targetTime: targetMs, diff: 0, dh: 0, dm: 0, ds: 0, isToday: true, isLive: true, isPast: false };
   }
 
   const isPast = diff < 0;
-  const dh = Math.max(0, Math.floor(diff / 3600000));
-  const dm = Math.max(0, Math.floor((diff % 3600000) / 60000));
-  const ds = Math.max(0, Math.floor((diff % 60000) / 1000));
+  const dh = Math.max(0, Math.floor(diff / (1000 * 60 * 60)));
+  const dm = Math.max(0, Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)));
+  const ds = Math.max(0, Math.floor((diff % (1000 * 60)) / 1000));
 
-  return { targetTime: target.getTime(), diff, dh, dm, ds, isToday: daysUntil === 0, isLive: false, isPast };
+  return { targetTime: targetMs, diff, dh, dm, ds, isToday: daysUntil === 0, isLive: false, isPast };
 }
 
 export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom = null }) {
@@ -101,19 +104,14 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
   }, [customSchedule]);
 
   const activeSchedule = customSchedule || (dbSchedule.length > 0 ? dbSchedule : SCHEDULE);
-  const todayDay = now.getDay();
-  const todayClasses = activeSchedule.filter(c => c.day === todayDay);
-  
-  // ── Hero card: always prefer today's classes first (even if already past),
-  // only fall back to the next upcoming class when today has zero classes at all.
-  const allWithCountdown = activeSchedule.map(c => ({ ...c, ...getCountdown(c.day, c.time, c.duration || 90) }));
-  const todayClassesForHero = allWithCountdown.filter(c => c.day === todayDay);
-  const futureClasses = allWithCountdown
-    .filter(c => !c.isPast || c.isLive)
-    .sort((a, b) => (a.isLive ? -1 : b.isLive ? 1 : a.targetTime - b.targetTime));
-  const nextClass = todayClassesForHero.length > 0
-    ? todayClassesForHero.sort((a, b) => (a.isLive ? -1 : b.isLive ? 1 : a.targetTime - b.targetTime))[0]
-    : futureClasses[0];
+  // ── Hero card: select the absolute nearest upcoming class (chronological order) ──
+  const nextClass = activeSchedule
+    .map(c => ({ ...c, ...getCountdown(c.day, c.time, c.duration || 90) }))
+    .sort((a, b) => {
+      if (a.isLive) return -1;
+      if (b.isLive) return 1;
+      return a.targetTime - b.targetTime;
+    })[0];
 
   const handleJoin = (e, cls) => {
     if (onJoinZoom) {
@@ -133,9 +131,9 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
       {nextClass && (
         <div className="next-class-banner" style={{ borderColor: nextClass.color }}>
           <div className="next-class-left">
-            <div className="live-badge" style={{ color: nextClass.isLive ? '#00C896' : nextClass.day === todayDay ? '#00C896' : nextClass.color }}>
-              <span className="live-dot" style={{ background: nextClass.isLive ? '#00C896' : nextClass.day === todayDay ? '#00C896' : nextClass.color }} />
-              {nextClass.isLive ? 'LIVE NOW' : nextClass.day === todayDay ? 'TODAY' : DAYS[nextClass.day]}
+            <div className="live-badge" style={{ color: nextClass.isLive ? '#00C896' : nextClass.isToday ? '#00C896' : nextClass.color }}>
+              <span className="live-dot" style={{ background: nextClass.isLive ? '#00C896' : nextClass.isToday ? '#00C896' : nextClass.color }} />
+              {nextClass.isLive ? 'LIVE NOW' : nextClass.isToday ? 'TODAY' : DAYS[nextClass.day]}
             </div>
             <div className="next-class-title">{nextClass.title}</div>
             <div className="next-class-meta" style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
@@ -169,36 +167,7 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
         </div>
       )}
 
-      {/* Today's Classes */}
-      {todayClasses.length > 0 && (
-        <div style={{ marginTop: 24 }}>
-          <div style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-muted)', marginBottom: 12 }}>
-            Today's Classes
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {todayClasses.map((c, i) => (
-              <div key={i} className="today-class-row" style={{ borderLeftColor: c.color }}>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>{c.title}</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                    <Clock size={12} />
-                    <span>{c.time} &nbsp;•&nbsp; Grade {c.grade}</span>
-                  </div>
-                </div>
-                <button
-                  onClick={(e) => handleJoin(e, c)}
-                  className="btn btn-primary btn-sm"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                >
-                  <span>📹 Join Zoom Class</span>
-                  <ArrowRight size={14} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
+      {/* Practice MCQ Tests Link */}
       <Link href="/exams" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 20, fontSize: '0.85rem', color: 'var(--primary-light)', fontWeight: 500 }}>
         <FileCheck size={16} />
         <span>Practice MCQ Tests</span>
