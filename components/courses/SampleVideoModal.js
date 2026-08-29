@@ -65,7 +65,7 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
           Watch a free sample lesson to experience Ishan Sir&apos;s step-by-step teaching method before enrolling!
         </p>
 
-        {/* Video Player or Coming Soon */}
+        {/* Video Player or Direct Redirect / Coming Soon */}
         {isPlaceholder ? (
           <div className="video-coming-soon">
             <div className="coming-soon-icon" style={{ display: 'inline-flex', padding: '16px', background: 'rgba(59, 130, 246, 0.1)', borderRadius: '50%', color: '#3b82f6' }}>
@@ -88,13 +88,24 @@ export default function SampleVideoModal({ isOpen, onClose, course }) {
             </a>
           </div>
         ) : (
-          <div className="video-responsive-wrapper">
-            <iframe
-              src={videoUrl}
-              title={`Free Sample Lesson - ${course.title}`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
+          <div style={{ textCenter: 'center', marginBottom: 24 }}>
+            <div className="video-responsive-wrapper" style={{ cursor: 'pointer' }} onClick={() => window.open(rawVideoUrl, '_blank', 'noopener,noreferrer')}>
+              <iframe
+                src={videoUrl}
+                title={`Free Sample Lesson - ${course.title}`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+            <a
+              href={rawVideoUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary btn-md"
+              style={{ width: '100%', justifyContent: 'center', marginTop: 12, display: 'inline-flex', alignItems: 'center', gap: 8, background: '#FF0000', borderColor: '#FF0000', fontWeight: 700 }}
+            >
+              ▶ Watch Video Directly on YouTube
+            </a>
           </div>
         )}
 

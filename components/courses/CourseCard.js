@@ -42,7 +42,14 @@ export default function CourseCard({ course }) {
             {/* Free Sample Play Overlay Button */}
             <button
               className="free-sample-play-btn"
-              onClick={() => setIsModalOpen(true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (course.sampleVideoUrl) {
+                  window.open(course.sampleVideoUrl, '_blank', 'noopener,noreferrer');
+                } else {
+                  setIsModalOpen(true);
+                }
+              }}
               title="Watch Free Sample Lesson"
             >
               <span className="play-icon">▶</span>
