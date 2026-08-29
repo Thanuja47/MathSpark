@@ -84,9 +84,10 @@ export default function CourseCard({ course }) {
               </button>
             </div>
           )}
-          {badge && (
-            <div className="course-card-badge">
-              {badge}
+          {(badge || course.month) && (
+            <div className="course-card-badge" style={{ display: 'flex', gap: 6 }}>
+              {badge && <span>{badge}</span>}
+              {course.month && <span style={{ background: '#00C896', color: '#000', padding: '2px 8px', borderRadius: 4, fontWeight: 800 }}>{course.month}</span>}
             </div>
           )}
         </div>

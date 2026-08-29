@@ -27,6 +27,7 @@ export default function AdminPage() {
   const [courseTitle, setCourseTitle]       = useState('');
   const [courseGrade, setCourseGrade]       = useState('10');
   const [courseMedium, setCourseMedium]     = useState('sinhala');
+  const [courseMonth, setCourseMonth]       = useState('');
   const [coursePrice, setCoursePrice]       = useState('');
   const [courseBadge, setCourseBadge]       = useState('');
   const [courseSampleVideo, setCourseSampleVideo] = useState('');
@@ -157,14 +158,14 @@ export default function AdminPage() {
   ════════════════════════════════════════════════════ */
   const resetCourseForm = () => {
     setEditingCourse(null); setCourseTitle(''); setCourseGrade('10');
-    setCourseMedium('sinhala'); setCoursePrice(''); setCourseBadge('');
+    setCourseMedium('sinhala'); setCourseMonth(''); setCoursePrice(''); setCourseBadge('');
     setCourseSampleVideo(''); setCourseDesc(''); setCourseImageFile(null); setCourseImagePreview('');
     setShowCourseForm(false); setCourseMsg('');
   };
 
   const editCourse = (c) => {
     setEditingCourse(c.id); setCourseTitle(c.title); setCourseGrade(String(c.grade));
-    setCourseMedium(c.medium); setCoursePrice(String(c.price)); setCourseBadge(c.badge || '');
+    setCourseMedium(c.medium); setCourseMonth(c.month || ''); setCoursePrice(String(c.price)); setCourseBadge(c.badge || '');
     setCourseSampleVideo(c.sampleVideoUrl || ''); setCourseDesc(c.description || ''); setCourseImagePreview(c.imageUrl || '');
     setCourseImageFile(null); setShowCourseForm(true); setCourseMsg('');
   };
@@ -174,7 +175,7 @@ export default function AdminPage() {
     try {
       let finalImageUrl = courseImagePreview;
       if (courseImageFile) finalImageUrl = await uploadImage(courseImageFile);
-      const payload = { title: courseTitle, grade: courseGrade, medium: courseMedium, price: coursePrice, badge: courseBadge, sampleVideoUrl: courseSampleVideo, description: courseDesc, imageUrl: finalImageUrl || null };
+      const payload = { title: courseTitle, grade: courseGrade, medium: courseMedium, month: courseMonth || null, price: coursePrice, badge: courseBadge, sampleVideoUrl: courseSampleVideo, description: courseDesc, imageUrl: finalImageUrl || null };
       const res = editingCourse
         ? await apiFetch(`/api/admin/courses/${editingCourse}`, { method: 'PUT', body: JSON.stringify(payload) })
         : await apiFetch('/api/admin/courses', { method: 'POST', body: JSON.stringify(payload) });
@@ -793,9 +794,17 @@ export default function AdminPage() {
                               <option value="tamil">Tamil</option>
                             </select>
                           </div>
-                          <div className="form-group"><label className="form-label">Price (LKR)</label>
-                            <input className="form-input" type="number" value={coursePrice} onChange={e => setCoursePrice(e.target.value)} placeholder="2500" required />
+                          <div className="form-group"><label className="form-label">Month (optional)</label>
+                            <select className="form-input" value={courseMonth} onChange={e => setCourseMonth(e.target.value)}>
+                              <option value="">-- Any Month --</option>
+                              {['January','February','March','April','May','June','July','August','September','October','November','December'].map(m => (
+                                <option key={m} value={m}>{m}</option>
+                              ))}
+                            </select>
                           </div>
+                        </div>
+                        <div className="form-group"><label className="form-label">Price (LKR)</label>
+                          <input className="form-input" type="number" value={coursePrice} onChange={e => setCoursePrice(e.target.value)} placeholder="2500" required />
                         </div>
                         <div className="form-group"><label className="form-label">Badge (optional)</label>
                           <input className="form-input" value={courseBadge} onChange={e => setCourseBadge(e.target.value)} placeholder="e.g. NEW · POPULAR" />
@@ -817,15 +826,16 @@ export default function AdminPage() {
                     )}
                     <div className="admin-table-wrap">
                       <table className="admin-table">
-                        <thead><tr><th>Image</th><th>Title</th><th>Grade</th><th>Medium</th><th>Price</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>Image</th><th>Title</th><th>Grade</th><th>Medium</th><th>Month</th><th>Price</th><th>Actions</th></tr></thead>
                         <tbody>
-                          {coursesList.length === 0 && <tr><td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No courses yet. Add one above.</td></tr>}
+                          {coursesList.length === 0 && <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No courses yet. Add one above.</td></tr>}
                           {coursesList.map(c => (
                             <tr key={c.id}>
                               <td>{c.imageUrl ? <img src={c.imageUrl} alt={c.title} style={{ width: 50, height: 40, objectFit: 'cover', borderRadius: 6 }} /> : '—'}</td>
                               <td><strong>{c.title}</strong>{c.badge && <span className="badge badge-sm" style={{ marginLeft: 6 }}>{c.badge}</span>}</td>
                               <td>Grade {c.grade}</td>
                               <td style={{ textTransform: 'capitalize' }}>{c.medium}</td>
+                              <td>{c.month ? <span className="badge badge-green" style={{ fontSize: '0.75rem' }}>{c.month}</span> : '—'}</td>
                               <td>LKR {Number(c.price).toLocaleString()}</td>
                               <td>
                                 <button className="btn btn-sm btn-outline" style={{ marginRight: 6 }} onClick={() => openCourseLessonsModal(c)}>Manage Lessons</button>

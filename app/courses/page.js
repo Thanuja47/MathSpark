@@ -13,6 +13,7 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
   const [selectedGrade, setSelectedGrade] = useState('all');
   const [selectedMedium, setSelectedMedium] = useState('all');
+  const [selectedMonth, setSelectedMonth] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -34,6 +35,7 @@ export default function CoursesPage() {
             instructor: 'Ishan Maduranga',
             imageUrl: c.imageUrl,
             sampleVideoUrl: c.sampleVideoUrl,
+            month: c.month || null,
           }));
           setCoursesList(formatted);
         }
@@ -45,9 +47,10 @@ export default function CoursesPage() {
   const filteredCourses = coursesList.filter((course) => {
     const matchesGrade = selectedGrade === 'all' || course.grade.toString() === selectedGrade;
     const matchesMedium = selectedMedium === 'all' || course.medium === selectedMedium;
+    const matchesMonth = selectedMonth === 'all' || (course.month || '').toLowerCase() === selectedMonth.toLowerCase();
     const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           course.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesGrade && matchesMedium && matchesSearch;
+    return matchesGrade && matchesMedium && matchesMonth && matchesSearch;
   });
 
   return (
@@ -109,17 +112,32 @@ export default function CoursesPage() {
                 ))}
               </div>
 
-              {/* Medium Filter */}
-              <div className="medium-select-wrap">
-                <select
-                  value={selectedMedium}
-                  onChange={(e) => setSelectedMedium(e.target.value)}
-                  className="form-input"
-                >
-                  <option value="all">All Mediums</option>
-                  <option value="sinhala">Sinhala Medium</option>
-                  <option value="english">English Medium</option>
-                </select>
+              {/* Medium & Month Filters */}
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <div className="medium-select-wrap">
+                  <select
+                    value={selectedMedium}
+                    onChange={(e) => setSelectedMedium(e.target.value)}
+                    className="form-input"
+                  >
+                    <option value="all">All Mediums</option>
+                    <option value="sinhala">Sinhala Medium</option>
+                    <option value="english">English Medium</option>
+                  </select>
+                </div>
+
+                <div className="medium-select-wrap">
+                  <select
+                    value={selectedMonth}
+                    onChange={(e) => setSelectedMonth(e.target.value)}
+                    className="form-input"
+                  >
+                    <option value="all">All Months</option>
+                    {['January','February','March','April','May','June','July','August','September','October','November','December'].map(m => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 

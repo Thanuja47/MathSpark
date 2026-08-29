@@ -61,6 +61,7 @@ model Course {
   title          String
   grade          Int
   medium         String
+  month          String?
   price          Float
   badge          String?
   description    String
