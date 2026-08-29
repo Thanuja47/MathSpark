@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
-import LiveScheduleWidget, { SCHEDULE, DAYS, parseTime, getCountdown, CountdownDisplay } from '@/components/tracking/LiveScheduleWidget';
+import LiveScheduleWidget, { SCHEDULE, DAYS, parseTime, getCountdown, getSriLankaNow, CountdownDisplay } from '@/components/tracking/LiveScheduleWidget';
 import AccessLockedModal from '@/components/AccessLockedModal';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -12,11 +12,11 @@ export default function TimetablePage() {
   const [user, setUser] = useState(null);
   const [lockedGrade, setLockedGrade] = useState(null);
   const [timetableList, setTimetableList] = useState([]);
-  const [now, setNow] = useState(new Date());
+  const [slNow, setSlNow] = useState(getSriLankaNow());
 
-  // Ticker for live per-class countdowns
+  // Ticker for live per-class countdowns using Sri Lanka timezone
   useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000);
+    const timer = setInterval(() => setSlNow(getSriLankaNow()), 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -77,8 +77,8 @@ export default function TimetablePage() {
     : SCHEDULE;
 
   // ── 1. Dynamic Day Reordering ──────────────────────────────────────────
-  // Get today's day index (0 = Sunday ... 6 = Saturday)
-  const todayIndex = now.getDay();
+  // Get today's day index in Sri Lanka time (0 = Sunday ... 6 = Saturday)
+  const todayIndex = slNow.getDay();
   // Reorder days starting from today and wrapping around
   const reorderedDayIndices = Array.from({ length: 7 }, (_, i) => (todayIndex + i) % 7);
 

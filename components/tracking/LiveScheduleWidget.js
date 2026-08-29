@@ -15,13 +15,64 @@ const SCHEDULE = [
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+// Helper: Get current time in Sri Lanka (Asia/Colombo, UTC+5:30)
+export function getSriLankaNow() {
+  const now = new Date();
+  // Format current UTC time into Asia/Colombo parts
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Asia/Colombo',
+    year: 'numeric', month: 'numeric', day: 'numeric',
+    hour: 'numeric', minute: 'numeric', second: 'numeric',
+    hour12: false
+  });
+  const parts = formatter.formatToParts(now);
+  const getPart = name => Number(parts.find(p => p.type === name).value);
+  
+  // Reconstruct Date object representing SL local wall-clock time in local timestamp context
+  const year = getPart('year');
+  const month = getPart('month') - 1;
+  const day = getPart('day');
+  let hour = getPart('hour');
+  if (hour === 24) hour = 0;
+  const minute = getPart('minute');
+  const second = getPart('second');
+
+  const slDate = new Date();
+  slDate.setFullYear(year, month, day);
+  slDate.setHours(hour, minute, second, 0);
+  return slDate;
+}
+
 export function parseTime(timeStr) {
-  if (!timeStr) return { h: 18, m: 0 };
+  if (!timeStr) return { h: 18, m: 0, duration: 90 };
   const str = timeStr.trim().toLowerCase();
+  
+  // Extract duration if in range format like "7.00 pm - 10.00pm" or "8:00 AM - 11:00 AM"
+  let durationMinutes = 90;
+  let startPart = str;
+
+  if (str.includes('-')) {
+    const rangeParts = str.split('-');
+    startPart = rangeParts[0].trim();
+    const endPart = rangeParts[1].trim();
+
+    const startH = parseTimeSingle(startPart);
+    const endH = parseTimeSingle(endPart);
+    const diffMins = (endH.h * 60 + endH.m) - (startH.h * 60 + startH.m);
+    if (diffMins > 0) durationMinutes = diffMins;
+  }
+
+  const { h, m } = parseTimeSingle(startPart);
+  return { h, m, duration: durationMinutes };
+}
+
+function parseTimeSingle(timeStr) {
+  let str = timeStr.trim().toLowerCase();
   const isPM = str.includes('pm');
   const isAM = str.includes('am');
-  const clean = str.replace(/(am|pm)/g, '').trim();
-  const parts = clean.split(':').map(Number);
+  str = str.replace(/(am|pm)/g, '').trim();
+  // Handle dots like 7.00 or colons like 7:00
+  const parts = str.split(/[:\.]/).map(Number);
   let h = parts[0] || 0;
   const m = parts[1] || 0;
   if (isPM && h < 12) h += 12;
@@ -29,20 +80,23 @@ export function parseTime(timeStr) {
   return { h, m };
 }
 
-export function getCountdown(dayIndex, timeStr, durationMinutes = 90) {
-  const now = new Date();
-  const { h, m } = parseTime(timeStr);
+export function getCountdown(dayIndex, timeStr, customDuration = null) {
+  const slNow = getSriLankaNow();
+  const parsed = parseTime(timeStr);
+  const h = parsed.h;
+  const m = parsed.m;
+  const durationMinutes = customDuration || parsed.duration || 90;
 
-  const target = new Date();
+  const target = new Date(slNow.getTime());
   target.setHours(h, m, 0, 0);
 
-  let daysUntil = ((dayIndex - now.getDay()) + 7) % 7;
+  let daysUntil = ((dayIndex - slNow.getDay()) + 7) % 7;
 
-  // If the target day is today
+  // If the class day matches Sri Lanka's today
   if (daysUntil === 0) {
     const endTarget = new Date(target.getTime() + durationMinutes * 60000);
-    // If the class has already completed today, the next occurrence is 7 days away
-    if (now > endTarget) {
+    // If class ended earlier today, next occurrence is 7 days away
+    if (slNow > endTarget) {
       daysUntil = 7;
     }
   }
@@ -50,13 +104,13 @@ export function getCountdown(dayIndex, timeStr, durationMinutes = 90) {
   target.setDate(target.getDate() + daysUntil);
 
   const targetMs = target.getTime();
-  const nowMs = now.getTime();
+  const nowMs = slNow.getTime();
   const diff = targetMs - nowMs;
   const endTargetMs = targetMs + durationMinutes * 60000;
   const isLive = nowMs >= targetMs && nowMs <= endTargetMs;
 
   if (isLive) {
-    return { targetTime: targetMs, diff: 0, dh: 0, dm: 0, ds: 0, isToday: true, isLive: true, isPast: false };
+    return { targetTime: targetMs, diff: 0, dh: 0, dm: 0, ds: 0, isToday: daysUntil === 0 || daysUntil === 7, isLive: true, isPast: false };
   }
 
   const isPast = diff < 0;
@@ -68,11 +122,11 @@ export function getCountdown(dayIndex, timeStr, durationMinutes = 90) {
 }
 
 export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom = null }) {
-  const [now, setNow] = useState(new Date());
+  const [slNow, setSlNow] = useState(getSriLankaNow());
   const [dbSchedule, setDbSchedule] = useState([]);
 
   useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000);
+    const t = setInterval(() => setSlNow(getSriLankaNow()), 1000);
     return () => clearInterval(t);
   }, []);
 
@@ -104,14 +158,30 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
   }, [customSchedule]);
 
   const activeSchedule = customSchedule || (dbSchedule.length > 0 ? dbSchedule : SCHEDULE);
-  // ── Hero card: select the absolute nearest upcoming class (chronological order) ──
-  const nextClass = activeSchedule
-    .map(c => ({ ...c, ...getCountdown(c.day, c.time, c.duration || 90) }))
+  const todayDay = slNow.getDay();
+
+  // Calculate countdowns for ALL active schedule items using SL time
+  const allWithCountdown = activeSchedule.map(c => ({ ...c, ...getCountdown(c.day, c.time, c.duration) }));
+
+  // Get ALL today's classes, sorted chronologically by start time
+  const todayClasses = allWithCountdown
+    .filter(c => c.day === todayDay)
     .sort((a, b) => {
-      if (a.isLive) return -1;
-      if (b.isLive) return 1;
-      return a.targetTime - b.targetTime;
-    })[0];
+      const { h: ha, m: ma } = parseTime(a.time);
+      const { h: hb, m: mb } = parseTime(b.time);
+      return (ha * 60 + ma) - (hb * 60 + mb);
+    });
+
+  // If no classes today, show the next upcoming class across the week
+  const nextClassesToShow = todayClasses.length > 0
+    ? todayClasses
+    : allWithCountdown
+        .sort((a, b) => {
+          if (a.isLive) return -1;
+          if (b.isLive) return 1;
+          return a.targetTime - b.targetTime;
+        })
+        .slice(0, 1);
 
   const handleJoin = (e, cls) => {
     if (onJoinZoom) {
@@ -127,45 +197,58 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
 
   return (
     <div className="live-schedule-widget">
-      {/* Next Class Countdown Banner */}
-      {nextClass && (
-        <div className="next-class-banner" style={{ borderColor: nextClass.color }}>
-          <div className="next-class-left">
-            <div className="live-badge" style={{ color: nextClass.isLive ? '#00C896' : nextClass.isToday ? '#00C896' : nextClass.color }}>
-              <span className="live-dot" style={{ background: nextClass.isLive ? '#00C896' : nextClass.isToday ? '#00C896' : nextClass.color }} />
-              {nextClass.isLive ? 'LIVE NOW' : nextClass.isToday ? 'TODAY' : DAYS[nextClass.day]}
-            </div>
-            <div className="next-class-title">{nextClass.title}</div>
-            <div className="next-class-meta" style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                <Clock size={14} />
-                <span>{nextClass.time} ({nextClass.duration || 90} min)</span>
-              </span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                <Globe size={14} />
-                <span>{nextClass.medium}</span>
-              </span>
-            </div>
-          </div>
-          <div className="next-class-right">
-            {nextClass.isLive ? (
-              <div className="live-now-text" style={{ fontSize: '1.4rem', fontWeight: 900, color: '#00C896', marginBottom: 6 }}>
-                🔴 CLASS IS LIVE!
+      {/* Show ALL Today's Classes in the Hero Section Stack */}
+      <div className="hero-classes-stack" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {nextClassesToShow.map((item, idx) => (
+          <div
+            key={item.id || idx}
+            className={`next-class-banner ${item.isLive ? 'next-class-banner--live' : ''}`}
+            style={{ borderColor: item.isLive ? '#00C896' : item.color }}
+          >
+            <div className="next-class-left">
+              <div
+                className="live-badge"
+                style={{ color: item.isLive ? '#00C896' : item.day === todayDay ? '#00C896' : item.color }}
+              >
+                <span
+                  className="live-dot"
+                  style={{ background: item.isLive ? '#00C896' : item.day === todayDay ? '#00C896' : item.color }}
+                />
+                {item.isLive ? 'LIVE NOW' : item.day === todayDay ? 'TODAY' : DAYS[item.day]}
               </div>
-            ) : (
-              <CountdownDisplay countdown={nextClass} />
-            )}
-            <button
-              onClick={(e) => handleJoin(e, nextClass)}
-              className="btn btn-primary btn-sm"
-              style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}
-            >
-              <Video size={16} />
-              <span>Join Zoom Class</span>
-            </button>
+              <div className="next-class-title">{item.title}</div>
+              <div className="next-class-meta" style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                  <Clock size={14} />
+                  <span>{item.time} ({item.duration} min)</span>
+                </span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                  <Globe size={14} />
+                  <span>{item.medium}</span>
+                </span>
+              </div>
+            </div>
+
+            <div className="next-class-right">
+              {item.isLive ? (
+                <div className="live-now-text" style={{ fontSize: '1.4rem', fontWeight: 900, color: '#00C896', marginBottom: 6 }}>
+                  🔴 CLASS IS LIVE!
+                </div>
+              ) : (
+                <CountdownDisplay countdown={item} />
+              )}
+              <button
+                onClick={(e) => handleJoin(e, item)}
+                className={`btn ${item.isLive ? 'btn-primary' : 'btn-primary'} btn-sm`}
+                style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Video size={16} />
+                <span>{item.isLive ? '🔴 Join Live Class' : '📹 Join Zoom Class'}</span>
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
 
       {/* Practice MCQ Tests Link */}
       <Link href="/exams" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 20, fontSize: '0.85rem', color: 'var(--primary-light)', fontWeight: 500 }}>
