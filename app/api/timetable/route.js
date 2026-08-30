@@ -8,7 +8,7 @@ export async function GET(request) {
     const items = await db.timetable.all();
     const tokenUser = getUserFromRequest(request);
 
-    let approvedGrades = [];
+    let gradeAccessRecords = []; // [{gradeId, month}]
     let isAdmin = false;
 
     if (tokenUser) {
@@ -17,18 +17,18 @@ export async function GET(request) {
       } else {
         const student = await db.students.findByIdWithGrades(tokenUser.id);
         if (student) {
-          approvedGrades = (student.gradeAccess || []).map(g => Number(g.gradeId));
-          if (student.grade) approvedGrades.push(Number(student.grade));
+          gradeAccessRecords = student.gradeAccess || [];
         }
       }
     }
 
-    // Sanitize liveLink: only include it if user is admin OR student approved for that item's grade
+    // Sanitize liveLink: only include it if user is admin OR student has grade+month access
     const sanitized = items.map(item => {
-      const hasAccess = isAdmin || approvedGrades.includes(Number(item.grade));
+      const hasAccess = isAdmin || db.students.hasGradeMonthAccess(gradeAccessRecords, item.grade, item.month);
       return {
         ...item,
-        liveLink: hasAccess ? (item.liveLink || null) : null
+        liveLink: hasAccess ? (item.liveLink || null) : null,
+        _locked: !hasAccess,
       };
     });
 

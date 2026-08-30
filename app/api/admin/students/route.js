@@ -22,7 +22,9 @@ export async function GET(request) {
       createdAt: s.createdAt,
       approvedGrades: (s.gradeAccess || []).map(g => g.gradeId),
       gradeAccess: (s.gradeAccess || []).map(g => ({
+        id: g.id,
         gradeId: g.gradeId,
+        month: g.month || null,
         grantedAt: g.grantedAt,
         expiresAt: g.expiresAt || null,
       })),

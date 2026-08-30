@@ -28,10 +28,11 @@ model StudentGradeAccess {
   studentId String
   student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
   gradeId   Int
+  month     String?   // e.g. "2026-08" — null = legacy all-months access for that grade
   grantedAt DateTime  @default(now())
   expiresAt DateTime?
 
-  @@unique([studentId, gradeId])
+  @@unique([studentId, gradeId, month])
 }
 
 model CourseLesson {
@@ -41,6 +42,7 @@ model CourseLesson {
   order       Int      @default(0)
   title       String
   description String?
+  month       String?  // e.g. "2026-08"
   pdfUrl      String?
   videoUrl    String?
   createdAt   DateTime @default(now())
@@ -77,6 +79,7 @@ model Timetable {
   time      String
   subject   String
   grade     Int
+  month     String?  // e.g. "2026-08"
   liveLink  String?
   createdAt DateTime @default(now())
 }
@@ -85,6 +88,7 @@ model Exam {
   id        String   @id @default(uuid())
   title     String
   grade     Int
+  month     String?  // e.g. "2026-08"
   duration  Int
   questions String
   createdAt DateTime @default(now())

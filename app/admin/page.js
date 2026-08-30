@@ -47,6 +47,7 @@ export default function AdminPage() {
   const [ttTime, setTtTime]           = useState('');
   const [ttSubject, setTtSubject]     = useState('');
   const [ttGrade, setTtGrade]         = useState('10');
+  const [ttMonth, setTtMonth]         = useState('');
   const [ttLink, setTtLink]           = useState('');
   const [ttMsg, setTtMsg]             = useState('');
 
@@ -58,6 +59,7 @@ export default function AdminPage() {
   const [editingExam, setEditingExam]   = useState(null);
   const [examTitle, setExamTitle]       = useState('');
   const [examGrade, setExamGrade]       = useState('10');
+  const [examMonth, setExamMonth]       = useState('');
   const [examDuration, setExamDuration] = useState('60');
   const [examQuestions, setExamQuestions] = useState('[]');
   const [examMsg, setExamMsg]           = useState('');
@@ -115,8 +117,11 @@ export default function AdminPage() {
   const [studentsList, setStudentsList]     = useState([]);
   const [studentSearch, setStudentSearch]   = useState('');
   const [managingStudent, setManagingStudent] = useState(null);
-  const [selectedGrades, setSelectedGrades] = useState([]);
-  const [gradeExpiries, setGradeExpiries]   = useState({}); // { gradeNum: 'YYYY-MM-DD' }
+  // New grade+month access grant state
+  const [newAccessGrade, setNewAccessGrade] = useState('6');
+  const [newAccessYear, setNewAccessYear]   = useState(String(new Date().getFullYear()));
+  const [selectedMonths, setSelectedMonths] = useState([]); // array of 'YYYY-MM' strings or 'ALL'
+  const [newAccessExpiry, setNewAccessExpiry] = useState('');
   const [studentMsg, setStudentMsg]         = useState('');
   const [savingGrades, setSavingGrades]     = useState(false);
   const [studentStats, setStudentStats]     = useState(null);
@@ -131,6 +136,7 @@ export default function AdminPage() {
   const [cLessonTitle, setCLessonTitle]                   = useState('');
   const [cLessonOrder, setCLessonOrder]                   = useState('1');
   const [cLessonDesc, setCLessonDesc]                     = useState('');
+  const [cLessonMonth, setCLessonMonth]                   = useState('');
   const [cLessonPdfFile, setCLessonPdfFile]               = useState(null);
   const [cLessonPdfUrl, setCLessonPdfUrl]                 = useState('');
   const [cLessonVideoUrl, setCLessonVideoUrl]             = useState('');
@@ -200,19 +206,19 @@ export default function AdminPage() {
   ════════════════════════════════════════════════════ */
   const resetTtForm = () => {
     setEditingTt(null); setTtDay('Monday'); setTtTime(''); setTtSubject('');
-    setTtGrade('10'); setTtLink(''); setShowTtForm(false); setTtMsg('');
+    setTtGrade('10'); setTtMonth(''); setTtLink(''); setShowTtForm(false); setTtMsg('');
   };
 
   const editTt = (t) => {
     setEditingTt(t.id); setTtDay(t.day); setTtTime(t.time);
-    setTtSubject(t.subject); setTtGrade(String(t.grade)); setTtLink(t.liveLink || '');
+    setTtSubject(t.subject); setTtGrade(String(t.grade)); setTtMonth(t.month || ''); setTtLink(t.liveLink || '');
     setShowTtForm(true); setTtMsg('');
   };
 
   const submitTt = async (e) => {
     e.preventDefault();
     try {
-      const payload = { day: ttDay, time: ttTime, subject: ttSubject, grade: ttGrade, liveLink: ttLink || null };
+      const payload = { day: ttDay, time: ttTime, subject: ttSubject, grade: ttGrade, month: ttMonth || null, liveLink: ttLink || null };
       const res = editingTt
         ? await apiFetch(`/api/admin/timetable/${editingTt}`, { method: 'PUT', body: JSON.stringify(payload) })
         : await apiFetch('/api/admin/timetable', { method: 'POST', body: JSON.stringify(payload) });
@@ -235,12 +241,12 @@ export default function AdminPage() {
      EXAMS CRUD
   ════════════════════════════════════════════════════ */
   const resetExamForm = () => {
-    setEditingExam(null); setExamTitle(''); setExamGrade('10');
+    setEditingExam(null); setExamTitle(''); setExamGrade('10'); setExamMonth('');
     setExamDuration('60'); setExamQuestions('[]'); setShowExamForm(false); setExamMsg('');
   };
 
   const editExam = (ex) => {
-    setEditingExam(ex.id); setExamTitle(ex.title); setExamGrade(String(ex.grade));
+    setEditingExam(ex.id); setExamTitle(ex.title); setExamGrade(String(ex.grade)); setExamMonth(ex.month || '');
     setExamDuration(String(ex.duration)); setExamQuestions(ex.questions || '[]');
     setShowExamForm(true); setExamMsg('');
   };
@@ -251,7 +257,7 @@ export default function AdminPage() {
       JSON.parse(examQuestions); // validate JSON
     } catch { setExamMsg('❌ Questions must be valid JSON'); return; }
     try {
-      const payload = { title: examTitle, grade: examGrade, duration: examDuration, questions: examQuestions };
+      const payload = { title: examTitle, grade: examGrade, month: examMonth || null, duration: examDuration, questions: examQuestions };
       const res = editingExam
         ? await apiFetch(`/api/admin/exams/${editingExam}`, { method: 'PUT', body: JSON.stringify(payload) })
         : await apiFetch('/api/admin/exams', { method: 'POST', body: JSON.stringify(payload) });
@@ -416,59 +422,87 @@ export default function AdminPage() {
   ════════════════════════════════════════════════════ */
   const openStudentModal = (student) => {
     setManagingStudent(student);
-    setSelectedGrades(student.approvedGrades || []);
-    // Populate existing expiry dates from gradeAccess if present
-    const expiries = {};
-    if (student.gradeAccess) {
-      student.gradeAccess.forEach(ga => {
-        if (ga.expiresAt) {
-          expiries[ga.gradeId] = new Date(ga.expiresAt).toISOString().split('T')[0];
-        }
-      });
-    }
-    setGradeExpiries(expiries);
+    setNewAccessGrade('6');
+    setNewAccessYear(String(new Date().getFullYear()));
+    setSelectedMonths([]);
+    setNewAccessExpiry('');
     setStudentMsg('');
   };
 
-  const toggleGradeSelection = (g) => {
-    const numG = Number(g);
-    setSelectedGrades(prev =>
-      prev.includes(numG) ? prev.filter(x => x !== numG) : [...prev, numG]
+  const toggleMonthSelection = (monthStr) => {
+    setSelectedMonths(prev =>
+      prev.includes(monthStr) ? prev.filter(m => m !== monthStr) : [...prev, monthStr]
     );
   };
 
-  const setGradeExpiry = (gradeNum, dateStr) => {
-    setGradeExpiries(prev => ({ ...prev, [gradeNum]: dateStr }));
-  };
-
-  const saveStudentGrades = async () => {
+  /** Add selected grade+month grants (supports multiple non-consecutive months) */
+  const addGradeMonthGrant = async () => {
     if (!managingStudent) return;
+    if (selectedMonths.length === 0) {
+      setStudentMsg('❌ Please select at least one month (or All Months).');
+      return;
+    }
     setSavingGrades(true);
     setStudentMsg('');
     try {
-      const gradeItems = selectedGrades.map(g => ({
-        gradeId: Number(g),
-        expiresAt: gradeExpiries[g] ? new Date(gradeExpiries[g] + 'T23:59:59').toISOString() : null
-      }));
+      let lastStudentData = null;
+      for (const mVal of selectedMonths) {
+        const monthParam = mVal === 'ALL' ? null : mVal;
+        const res = await apiFetch(`/api/admin/students/${managingStudent.id}/grades`, {
+          method: 'POST',
+          body: JSON.stringify({
+            gradeId: Number(newAccessGrade),
+            month: monthParam,
+            expiresAt: newAccessExpiry ? new Date(newAccessExpiry + 'T23:59:59').toISOString() : null,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to add access');
+        lastStudentData = data;
+      }
+
+      if (lastStudentData) {
+        const updatedStudent = {
+          ...managingStudent,
+          gradeAccess: lastStudentData.gradeAccess,
+          approvedGrades: lastStudentData.gradeAccess.map(g => g.gradeId)
+        };
+        setManagingStudent(updatedStudent);
+        setStudentsList(prev => prev.map(s => s.id === managingStudent.id ? updatedStudent : s));
+        fetch('/api/admin/students/stats').then(r => r.json()).then(d => d?.totalStudents !== undefined && setStudentStats(d)).catch(() => {});
+      }
+
+      setStudentMsg(`✅ Granted access for Grade ${newAccessGrade} (${selectedMonths.length} month${selectedMonths.length > 1 ? 's' : ''})!`);
+      setSelectedMonths([]);
+      setNewAccessExpiry('');
+      setTimeout(() => setStudentMsg(''), 2500);
+    } catch (err) {
+      setStudentMsg(`❌ ${err.message}`);
+    } finally {
+      setSavingGrades(false);
+    }
+  };
+
+  /** Remove a specific access grant by its ID */
+  const removeGradeMonthGrant = async (accessId) => {
+    if (!managingStudent) return;
+    if (!confirm('Remove this access grant?')) return;
+    setSavingGrades(true);
+    setStudentMsg('');
+    try {
       const res = await apiFetch(`/api/admin/students/${managingStudent.id}/grades`, {
-        method: 'PUT',
-        body: JSON.stringify({ gradeItems }),
+        method: 'DELETE',
+        body: JSON.stringify({ accessId }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to update access');
+      if (!res.ok) throw new Error(data.error || 'Failed to remove access');
 
-      setStudentsList(prev => prev.map(s =>
-        s.id === managingStudent.id
-          ? { ...s, approvedGrades: data.approvedGrades, gradeAccess: data.gradeAccess }
-          : s
-      ));
-      // Refresh stats
+      const updatedStudent = { ...managingStudent, gradeAccess: data.gradeAccess, approvedGrades: data.gradeAccess.map(g => g.gradeId) };
+      setManagingStudent(updatedStudent);
+      setStudentsList(prev => prev.map(s => s.id === managingStudent.id ? updatedStudent : s));
       fetch('/api/admin/students/stats').then(r => r.json()).then(d => d?.totalStudents !== undefined && setStudentStats(d)).catch(() => {});
-      setStudentMsg('✅ Grade access updated successfully!');
-      setTimeout(() => {
-        setManagingStudent(null);
-        setStudentMsg('');
-      }, 1000);
+      setStudentMsg('✅ Access grant removed!');
+      setTimeout(() => setStudentMsg(''), 2000);
     } catch (err) {
       setStudentMsg(`❌ ${err.message}`);
     } finally {
@@ -505,6 +539,7 @@ export default function AdminPage() {
     setCLessonTitle('');
     setCLessonOrder('1');
     setCLessonDesc('');
+    setCLessonMonth('');
     setCLessonPdfFile(null);
     setCLessonPdfUrl('');
     setCLessonVideoUrl('');
@@ -517,6 +552,7 @@ export default function AdminPage() {
     setCLessonTitle(les.title);
     setCLessonOrder(String(les.order || 1));
     setCLessonDesc(les.description || '');
+    setCLessonMonth(les.month || '');
     setCLessonPdfUrl(les.pdfUrl || '');
     setCLessonVideoUrl(les.videoUrl || '');
     setCLessonPdfFile(null);
@@ -537,6 +573,7 @@ export default function AdminPage() {
         title: cLessonTitle,
         order: Number(cLessonOrder || 0),
         description: cLessonDesc || null,
+        month: cLessonMonth || null,
         pdfUrl: finalPdfUrl || null,
         videoUrl: cLessonVideoUrl || null,
       };
@@ -569,6 +606,20 @@ export default function AdminPage() {
     } catch (err) {
       alert(`Failed to delete lesson: ${err.message}`);
     }
+  };
+
+  /* Month display helpers */
+  const MONTHS_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const formatMonth = (yyyyMM) => {
+    if (!yyyyMM) return '';
+    const [year, month] = yyyyMM.split('-');
+    return `${MONTHS_FULL[parseInt(month, 10) - 1] || month} ${year}`;
+  };
+  const formatMonthShort = (yyyyMM) => {
+    if (!yyyyMM) return '';
+    const [year, month] = yyyyMM.split('-');
+    const m = MONTHS_FULL[parseInt(month, 10) - 1];
+    return m ? `${m.slice(0,3)} ${year.slice(2)}` : yyyyMM;
   };
 
   /* ════════════════════════════════════════════════════
@@ -732,7 +783,7 @@ export default function AdminPage() {
                                                 color: expiring ? '#fbbf24' : '#4ade80',
                                                 border: `1px solid ${expiring ? 'rgba(245,158,11,0.3)' : 'rgba(34,197,94,0.25)'}`,
                                               }}>
-                                              Gr {ga.gradeId}
+                                              Gr {ga.gradeId}{ga.month ? ` · ${formatMonthShort(ga.month)}` : ' · All'}
                                               {ga.expiresAt && (
                                                 <span style={{ opacity: 0.75 }}>· {new Date(ga.expiresAt).toLocaleDateString('en-GB', { day:'2-digit', month:'short' })}</span>
                                               )}
@@ -877,8 +928,13 @@ export default function AdminPage() {
                             </select>
                           </div>
                         </div>
-                        <div className="form-group"><label className="form-label">Subject</label>
-                          <input className="form-input" value={ttSubject} onChange={e => setTtSubject(e.target.value)} placeholder="e.g. Mathematics" required />
+                        <div className="form-row-3">
+                          <div className="form-group" style={{ gridColumn: '1 / 3' }}><label className="form-label">Subject</label>
+                            <input className="form-input" value={ttSubject} onChange={e => setTtSubject(e.target.value)} placeholder="e.g. Mathematics" required />
+                          </div>
+                          <div className="form-group"><label className="form-label">Month (YYYY-MM) <span style={{color:'var(--text-muted)',fontWeight:400}}>optional</span></label>
+                            <input className="form-input" value={ttMonth} onChange={e => setTtMonth(e.target.value)} placeholder="e.g. 2026-08" />
+                          </div>
                         </div>
                         <div className="form-group"><label className="form-label">Live Link (optional)</label>
                           <input className="form-input" value={ttLink} onChange={e => setTtLink(e.target.value)} placeholder="https://zoom.us/..." />
@@ -888,12 +944,13 @@ export default function AdminPage() {
                     )}
                     <div className="admin-table-scroll">
                       <table className="admin-table">
-                        <thead><tr><th>Day</th><th>Time</th><th>Subject</th><th>Grade</th><th>Live Link</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>Day</th><th>Time</th><th>Subject</th><th>Grade</th><th>Month</th><th>Live Link</th><th>Actions</th></tr></thead>
                         <tbody>
-                          {ttList.length === 0 && <tr><td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No timetable entries yet.</td></tr>}
+                          {ttList.length === 0 && <tr><td colSpan={7} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No timetable entries yet.</td></tr>}
                           {ttList.map(t => (
                             <tr key={t.id}>
                               <td>{t.day}</td><td>{t.time}</td><td>{t.subject}</td><td>Grade {t.grade}</td>
+                              <td>{t.month ? <span className="badge badge-green" style={{fontSize:'0.72rem'}}>{t.month}</span> : '—'}</td>
                               <td>{t.liveLink ? <a href={t.liveLink} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>Join</a> : '—'}</td>
                               <td>
                                 <button className="btn btn-sm btn-outline" style={{ marginRight: 6 }} onClick={() => editTt(t)}>Edit</button>
@@ -929,6 +986,9 @@ export default function AdminPage() {
                               {[6,7,8,9,10,11,12,13].map(g => <option key={g}>{g}</option>)}
                             </select>
                           </div>
+                          <div className="form-group"><label className="form-label">Month (YYYY-MM) <span style={{color:'var(--text-muted)',fontWeight:400}}>optional</span></label>
+                            <input className="form-input" value={examMonth} onChange={e => setExamMonth(e.target.value)} placeholder="e.g. 2026-08" />
+                          </div>
                           <div className="form-group"><label className="form-label">Duration (min)</label>
                             <input className="form-input" type="number" value={examDuration} onChange={e => setExamDuration(e.target.value)} required />
                           </div>
@@ -944,9 +1004,9 @@ export default function AdminPage() {
                     )}
                     <div className="admin-table-scroll">
                       <table className="admin-table">
-                        <thead><tr><th>Title</th><th>Grade</th><th>Duration</th><th>Questions</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>Title</th><th>Grade</th><th>Month</th><th>Duration</th><th>Questions</th><th>Actions</th></tr></thead>
                         <tbody>
-                          {examList.length === 0 && <tr><td colSpan={5} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No MCQ tests yet.</td></tr>}
+                          {examList.length === 0 && <tr><td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No MCQ tests yet.</td></tr>}
                           {examList.map(ex => {
                             let qCount = 0;
                             try { qCount = JSON.parse(ex.questions || '[]').length; } catch {}
@@ -954,6 +1014,7 @@ export default function AdminPage() {
                               <tr key={ex.id}>
                                 <td><strong>{ex.title}</strong></td>
                                 <td>Grade {ex.grade}</td>
+                                <td>{ex.month ? <span className="badge badge-green" style={{fontSize:'0.72rem'}}>{ex.month}</span> : '—'}</td>
                                 <td>{ex.duration} min</td>
                                 <td>{qCount} questions</td>
                                 <td>
@@ -1184,43 +1245,28 @@ export default function AdminPage() {
       <Footer />
       <FloatingWidgets />
 
-      {/* ── Manage Student Grade Access Modal ── */}
+      {/* ── Manage Student Grade+Month Access Modal ── */}
       {managingStudent && (
         <div
           style={{
-            position: 'fixed',
-            inset: 0,
+            position: 'fixed', inset: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.75)',
             backdropFilter: 'blur(6px)',
-            zIndex: 9999,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 20,
+            zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20,
           }}
           onClick={() => setManagingStudent(null)}
         >
           <div
             style={{
-              background: '#181a20',
-              border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: 16,
-              padding: '28px 24px',
-              maxWidth: 480,
-              width: '100%',
-              boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
-              position: 'relative',
+              background: '#181a20', border: '1px solid rgba(255,255,255,0.12)',
+              borderRadius: 16, padding: '28px 24px', maxWidth: 520, width: '100%',
+              boxShadow: '0 20px 50px rgba(0,0,0,0.6)', position: 'relative', maxHeight: '90vh', overflowY: 'auto',
             }}
             onClick={e => e.stopPropagation()}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#fff' }}>Manage Grade Access</h3>
-              <button
-                onClick={() => setManagingStudent(null)}
-                style={{ background: 'none', border: 'none', color: '#aaa', fontSize: '1.2rem', cursor: 'pointer' }}
-              >
-                ✕
-              </button>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#fff' }}>Manage Grade + Month Access</h3>
+              <button onClick={() => setManagingStudent(null)} style={{ background: 'none', border: 'none', color: '#aaa', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             </div>
 
             <div style={{ marginBottom: 20, padding: 12, borderRadius: 8, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -1228,90 +1274,165 @@ export default function AdminPage() {
               <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Phone: {managingStudent.phone}</div>
             </div>
 
-            <p style={{ fontSize: '0.88rem', color: 'rgba(255,255,255,0.8)', marginBottom: 14 }}>
-              Select which grades this student is approved to access:
-            </p>
-
             {studentMsg && (
               <div style={{ marginBottom: 16, padding: '8px 12px', borderRadius: 6, fontSize: '0.85rem', background: studentMsg.startsWith('✅') ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)', color: studentMsg.startsWith('✅') ? '#4ade80' : '#f87171' }}>
                 {studentMsg}
               </div>
             )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
-              {[6, 7, 8, 9, 10, 11].map(gradeNum => {
-                const checked = selectedGrades.includes(gradeNum);
-                const expiryVal = gradeExpiries[gradeNum] || '';
-                return (
-                  <div
-                    key={gradeNum}
-                    style={{
-                      borderRadius: 10,
-                      border: checked ? '1px solid var(--cobalt)' : '1px solid rgba(255,255,255,0.08)',
-                      background: checked ? 'rgba(37, 99, 235, 0.12)' : 'rgba(255,255,255,0.02)',
-                      transition: 'all 0.15s',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleGradeSelection(gradeNum)}
-                        style={{ width: 16, height: 16, accentColor: 'var(--cobalt)', cursor: 'pointer', flexShrink: 0 }}
-                      />
-                      <span style={{ fontWeight: 600, color: '#fff', fontSize: '0.9rem', flex: 1 }}>Grade {gradeNum}</span>
-                      {checked && expiryVal && (
-                        <span style={{ fontSize: '0.72rem', color: '#fbbf24', background: 'rgba(245,158,11,0.15)', padding: '2px 8px', borderRadius: 20, border: '1px solid rgba(245,158,11,0.25)' }}>
-                          Expires {new Date(expiryVal).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })}
+            {/* Existing access grants list */}
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 10 }}>Current Access Grants</div>
+              {(!managingStudent.gradeAccess || managingStudent.gradeAccess.length === 0) ? (
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', padding: '10px 0' }}>No access grants yet.</div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {managingStudent.gradeAccess.map(ga => (
+                    <div key={ga.id} style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '10px 14px', borderRadius: 10,
+                      background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)',
+                    }}>
+                      <div>
+                        <span style={{ fontWeight: 700, color: '#4ade80', fontSize: '0.95rem' }}>Grade {ga.gradeId}</span>
+                        <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.88rem', marginLeft: 8 }}>
+                          {ga.month ? `— ${formatMonth(ga.month)}` : '— All Months (Legacy)'}
                         </span>
-                      )}
-                      {checked && !expiryVal && (
-                        <span style={{ fontSize: '0.72rem', color: '#4ade80', opacity: 0.7 }}>Permanent</span>
-                      )}
-                    </label>
-                    {checked && (
-                      <div style={{ padding: '0 14px 12px 40px', display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <label style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>Expiry date (optional):</label>
-                        <input
-                          type="date"
-                          value={expiryVal}
-                          onChange={e => setGradeExpiry(gradeNum, e.target.value)}
-                          min={new Date().toISOString().split('T')[0]}
-                          style={{
-                            background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)',
-                            borderRadius: 6, color: '#fff', padding: '4px 10px', fontSize: '0.82rem', cursor: 'pointer',
-                          }}
-                        />
-                        {expiryVal && (
-                          <button
-                            type="button"
-                            onClick={() => setGradeExpiry(gradeNum, '')}
-                            style={{ background: 'none', border: 'none', color: '#f87171', fontSize: '0.8rem', cursor: 'pointer', padding: 0 }}
-                          >✕ Clear</button>
+                        {ga.expiresAt && (
+                          <div style={{ fontSize: '0.75rem', color: '#fbbf24', marginTop: 2 }}>Expires: {new Date(ga.expiresAt).toLocaleDateString()}</div>
                         )}
                       </div>
-                    )}
-                  </div>
-                );
-              })}
+                      <button
+                        onClick={() => removeGradeMonthGrant(ga.id)}
+                        disabled={savingGrades}
+                        style={{ background: 'none', border: 'none', color: '#f87171', fontSize: '1rem', cursor: 'pointer', padding: '4px 8px', borderRadius: 6, transition: 'background 0.15s' }}
+                        title="Remove this grant"
+                      >✕</button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-              <button
-                className="btn btn-outline"
-                onClick={() => setManagingStudent(null)}
-                disabled={savingGrades}
-              >
-                Cancel
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={saveStudentGrades}
-                disabled={savingGrades}
-              >
-                {savingGrades ? 'Saving...' : '💾 Save Access'}
-              </button>
+            {/* Add new access grant */}
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 20 }}>
+              <div style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Add New Access Grant</div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Grade</label>
+                  <select className="form-input" value={newAccessGrade} onChange={e => setNewAccessGrade(e.target.value)}>
+                    {[6,7,8,9,10,11].map(g => <option key={g} value={String(g)}>Grade {g}</option>)}
+                  </select>
+                </div>
+                <div className="form-group" style={{ margin: 0 }}>
+                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Year</label>
+                  <select className="form-input" value={newAccessYear} onChange={e => setNewAccessYear(e.target.value)}>
+                    {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 1 + i).map(y => (
+                      <option key={y} value={String(y)}>{y}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Multi-Select Month Grid */}
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                  <label className="form-label" style={{ fontSize: '0.8rem', margin: 0 }}>
+                    Select Months (Toggle any combination freely)
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (selectedMonths.length === 12) setSelectedMonths([]);
+                      else setSelectedMonths(Array.from({ length: 12 }, (_, i) => `${newAccessYear}-${String(i + 1).padStart(2, '0')}`));
+                    }}
+                    style={{ background: 'none', border: 'none', color: '#60a5fa', fontSize: '0.75rem', cursor: 'pointer', padding: 0 }}
+                  >
+                    {selectedMonths.length === 12 ? 'Deselect All' : 'Select All 12 Months'}
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+                  {['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map((mName, idx) => {
+                    const monthNum = String(idx + 1).padStart(2, '0');
+                    const monthStr = `${newAccessYear}-${monthNum}`;
+                    const isSelected = selectedMonths.includes(monthStr);
+
+                    return (
+                      <button
+                        key={monthStr}
+                        type="button"
+                        onClick={() => toggleMonthSelection(monthStr)}
+                        style={{
+                          padding: '8px 4px',
+                          borderRadius: 8,
+                          fontSize: '0.82rem',
+                          fontWeight: 600,
+                          textAlign: 'center',
+                          border: isSelected ? '1px solid #3b82f6' : '1px solid rgba(255,255,255,0.1)',
+                          background: isSelected ? 'rgba(37, 99, 235, 0.25)' : 'rgba(255,255,255,0.03)',
+                          color: isSelected ? '#60a5fa' : 'rgba(255,255,255,0.7)',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 4
+                        }}
+                      >
+                        <span>{mName}</span>
+                        {isSelected && <span style={{ fontSize: '0.7rem' }}>✓</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div style={{ marginTop: 8 }}>
+                  <button
+                    type="button"
+                    onClick={() => toggleMonthSelection('ALL')}
+                    style={{
+                      width: '100%',
+                      padding: '6px 10px',
+                      borderRadius: 8,
+                      fontSize: '0.78rem',
+                      fontWeight: 600,
+                      border: selectedMonths.includes('ALL') ? '1px solid #eab308' : '1px dotted rgba(255,255,255,0.15)',
+                      background: selectedMonths.includes('ALL') ? 'rgba(234, 179, 8, 0.15)' : 'transparent',
+                      color: selectedMonths.includes('ALL') ? '#fde047' : 'rgba(255,255,255,0.5)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    ⭐ Grant Full Access to All Months (Legacy All-Access)
+                  </button>
+                </div>
+              </div>
+
+              <div className="form-group" style={{ marginBottom: 16 }}>
+                <label className="form-label" style={{ fontSize: '0.8rem' }}>Expiry Date (optional for all selected)</label>
+                <input
+                  type="date"
+                  value={newAccessExpiry}
+                  onChange={e => setNewAccessExpiry(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 6, color: '#fff', padding: '8px 10px', fontSize: '0.85rem', width: '100%' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button
+                  className="btn btn-primary"
+                  onClick={addGradeMonthGrant}
+                  disabled={savingGrades || selectedMonths.length === 0}
+                  style={{ flex: 1 }}
+                >
+                  {savingGrades ? 'Adding Grants...' : `+ Add Grants (${selectedMonths.length})`}
+                </button>
+                <button className="btn btn-outline" onClick={() => setManagingStudent(null)} disabled={savingGrades}>
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1427,6 +1548,16 @@ export default function AdminPage() {
                 </div>
 
                 <div className="form-group">
+                  <label className="form-label">Month (YYYY-MM) <span style={{color:'var(--text-muted)',fontWeight:400}}>optional</span></label>
+                  <input
+                    className="form-input"
+                    value={cLessonMonth}
+                    onChange={e => setCLessonMonth(e.target.value)}
+                    placeholder="e.g. 2026-08 (leave blank to inherit from course)"
+                  />
+                </div>
+
+                <div className="form-group">
                   <label className="form-label">Video URL (optional — YouTube/Vimeo/Recording link)</label>
                   <input
                     className="form-input"
@@ -1456,6 +1587,7 @@ export default function AdminPage() {
                     <tr>
                       <th>#</th>
                       <th>Lesson Title</th>
+                      <th>Month</th>
                       <th>PDF</th>
                       <th>Video</th>
                       <th>Actions</th>
@@ -1475,6 +1607,7 @@ export default function AdminPage() {
                             </div>
                           )}
                         </td>
+                        <td>{les.month ? <span className="badge badge-green" style={{fontSize:'0.7rem'}}>{les.month}</span> : '—'}</td>
                         <td>
                           {les.pdfUrl ? (
                             <a href={les.pdfUrl} target="_blank" rel="noreferrer" style={{ color: '#60a5fa', textDecoration: 'underline', fontSize: '0.8rem' }}>📄 PDF</a>
