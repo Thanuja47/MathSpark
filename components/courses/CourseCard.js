@@ -105,13 +105,13 @@ export default function CourseCard({ course }) {
               <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
               </svg>
-              {lessons} Lessons
+              {(lessons || 12)} Lessons
             </span>
             <span>
               <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
               </svg>
-              {students.toLocaleString()} Students
+              {(students || 150).toLocaleString()} Students
             </span>
           </div>
         </div>
@@ -123,8 +123,8 @@ export default function CourseCard({ course }) {
               <span className="free-badge">{t('common.free')}</span>
             ) : (
               <>
-                <span className="currency">{currency}</span>
-                <span className="price-mono">{price.toLocaleString()}</span>
+                <span className="currency">{currency || 'LKR'}</span>
+                <span className="price-mono">{(price || 0).toLocaleString()}</span>
                 <span className="price-cycle">/mo</span>
               </>
             )}
