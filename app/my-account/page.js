@@ -165,6 +165,22 @@ export default function MyAccountPage() {
     return acc;
   }, {});
 
+  // 2. Lesson Recordings Archive: courses with sampleVideoUrl matching student access
+  const accessibleRecordings = dbCourses.filter(c => {
+    const cGrade = Number(c.grade);
+    if (!allAccessGrades.includes(cGrade)) return false;
+    if (!c.sampleVideoUrl) return false;
+    if (c.month) return hasAccess4GradeMonth(cGrade, c.month);
+    return true;
+  });
+
+  // Group recordings by grade
+  const recordingsByGrade = allAccessGrades.reduce((acc, grade) => {
+    const recs = accessibleRecordings.filter(c => Number(c.grade) === grade);
+    if (recs.length > 0) acc[grade] = recs;
+    return acc;
+  }, {});
+
   const totalEnrolledCount = Object.values(enrolledByGrade).reduce((sum, list) => sum + list.length, 0);
 
   return (
@@ -183,7 +199,7 @@ export default function MyAccountPage() {
                 <div style={{ marginTop: 8 }}>
                   {hasAccess ? (
                     <span className="badge badge-green" style={{ fontSize: '0.8rem', padding: '4px 12px' }}>
-                      Approved Access: {approvedGrades.sort((a,b)=>a-b).map(g => `Grade ${g}`).join(', ')}
+                      Approved Access: {[...approvedGrades].sort((a,b)=>a-b).map(g => `Grade ${g}`).join(', ')}
                     </span>
                   ) : (
                     <span className="badge badge-accent" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444', fontSize: '0.8rem', padding: '4px 12px' }}>
