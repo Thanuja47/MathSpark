@@ -6,6 +6,7 @@ import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import { COURSES, SITE } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 
+import CourseCard from '@/components/courses/CourseCard';
 import { BookOpen, Video, Package, Settings, LogOut, MessageCircle, Lock, Play, ExternalLink } from 'lucide-react';
 
 export default function MyAccountPage() {
@@ -331,38 +332,16 @@ export default function MyAccountPage() {
                     ) : (
                       <div className="recordings-list">
                         {Object.entries(recordingsByGrade).map(([grade, recs]) => (
-                          <div key={grade}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '24px 0 12px', borderBottom: '1px solid rgba(99,102,241,0.25)', paddingBottom: 8 }}>
-                              <span style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', fontWeight: 700, fontSize: '0.8rem', padding: '3px 12px', borderRadius: 20 }}>GRADE {grade}</span>
-                              <span style={{ color: '#94a3b8', fontSize: '0.82rem' }}>{recs.length} recording{recs.length !== 1 ? 's' : ''}</span>
+                          <div key={grade} style={{ marginBottom: 36 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '24px 0 16px', borderBottom: '1px solid rgba(99,102,241,0.25)', paddingBottom: 8 }}>
+                              <span style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', fontWeight: 700, fontSize: '0.85rem', padding: '4px 14px', borderRadius: 20 }}>GRADE {grade}</span>
+                              <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{recs.length} course{recs.length !== 1 ? 's' : ''} available</span>
                             </div>
-                            {recs.map((course, i) => {
-                              const videoLink = extractZoomUrl(course.sampleVideoUrl || course.videoUrl);
-                              return (
-                                <div key={i} className="recording-card">
-                                  <div className="rec-icon">▶</div>
-                                  <div style={{ flex: 1 }}>
-                                    <h4 style={{ fontSize: '0.95rem', fontWeight: 600 }}>{course.title}</h4>
-                                    <div className="text-muted text-xs" style={{ display: 'flex', gap: 16, marginTop: 4 }}>
-                                      {course.month && <span>📅 Month: {course.month}</span>}
-                                      <span>🌐 {(course.medium || 'Sinhala').toUpperCase()}</span>
-                                    </div>
-                                  </div>
-                                  {videoLink ? (
-                                    <button
-                                      className="btn btn-secondary btn-sm"
-                                      onClick={() => setActiveVideo({ title: course.title, videoUrl: videoLink })}
-                                    >
-                                      Watch Video 🎬
-                                    </button>
-                                  ) : (
-                                    <button className="btn btn-secondary btn-sm" style={{ opacity: 0.5, cursor: 'not-allowed' }} title="Video recording processing or pending upload">
-                                      Recording Pending ⏳
-                                    </button>
-                                  )}
-                                </div>
-                              );
-                            })}
+                            <div className="courses-page-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 20 }}>
+                              {recs.map((course) => (
+                                <CourseCard key={course.id} course={course} />
+                              ))}
+                            </div>
                           </div>
                         ))}
                       </div>
