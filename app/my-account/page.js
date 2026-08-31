@@ -77,14 +77,34 @@ export default function MyAccountPage() {
 
   const currentMonthStr = new Date().toISOString().slice(0, 7); // e.g. "2026-08"
 
+  // Helper: normalize month to compare "August" == "2026-08" == "aug" etc.
+  const MONTH_NAMES = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+  const monthsMatch = (a, b) => {
+    if (!a || !b) return false;
+    const normalize = (m) => {
+      const s = String(m).toLowerCase().trim();
+      // Check if it's YYYY-MM format like "2026-08"
+      const ym = s.match(/^\d{4}-(\d{2})$/);
+      if (ym) return parseInt(ym[1], 10); // returns 1-12
+      // Check if it's a month name like "august"
+      const idx = MONTH_NAMES.findIndex(mn => s.startsWith(mn.slice(0,3)));
+      if (idx >= 0) return idx + 1; // returns 1-12
+      // Try plain number
+      const n = parseInt(s, 10);
+      if (!isNaN(n)) return n;
+      return s; // fallback: raw string compare
+    };
+    return normalize(a) === normalize(b);
+  };
+
   // Helper: mirrors db.students.hasGradeMonthAccess server-side logic
-  // CRITICAL: g.month === null means "ALL months access" — must not require month match
+  // CRITICAL: g.month === null means "ALL months access"
   const hasAccess4GradeMonth = (gradeId, contentMonth) => {
     return gradeAccessList.some(g => {
       if (Number(g.gradeId) !== Number(gradeId)) return false;
       if (g.month === null || g.month === undefined || g.month === '') return true; // null = all months
       if (!contentMonth) return true; // course has no month restriction
-      return g.month === contentMonth;
+      return monthsMatch(g.month, contentMonth); // normalize before comparing
     });
   };
 
