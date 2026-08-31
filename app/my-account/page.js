@@ -77,14 +77,24 @@ export default function MyAccountPage() {
 
   const currentMonthStr = new Date().toISOString().slice(0, 7); // e.g. "2026-08"
 
-  // 1. My Enrolled Classes: Only show active courses/classes for ALL APPROVED GRADES & CURRENT MONTH (or all-month grant)
+  // Helper: mirrors db.students.hasGradeMonthAccess server-side logic
+  // CRITICAL: g.month === null means "ALL months access" — must not require month match
+  const hasAccess4GradeMonth = (gradeId, contentMonth) => {
+    return gradeAccessList.some(g => {
+      if (Number(g.gradeId) !== Number(gradeId)) return false;
+      if (g.month === null || g.month === undefined || g.month === '') return true; // null = all months
+      if (!contentMonth) return true; // course has no month restriction
+      return g.month === contentMonth;
+    });
+  };
+
+  // 1. My Enrolled Classes: courses for ALL APPROVED GRADES that match student's access grants
   const enrolledCourses = dbCourses.filter(c => {
     const cGrade = Number(c.grade);
     if (!allAccessGrades.includes(cGrade)) return false;
-    // If course has a specific month tag, check if student has grant for that month OR all-months grant
-    if (c.month) {
-      return gradeAccessList.some(g => Number(g.gradeId) === cGrade && (!g.month || g.month === c.month || g.month === currentMonthStr));
-    }
+    // Course with a month field: check student has grant for that grade+month (or all-months grant)
+    if (c.month) return hasAccess4GradeMonth(cGrade, c.month);
+    // Course with no month: show to any student with access to that grade
     return true;
   });
 
@@ -95,14 +105,12 @@ export default function MyAccountPage() {
     return acc;
   }, {});
 
-  // 2. Lesson Recordings Archive: Shows past/all courses that the student has APPROVED access for (matching approved grades + granted months)
+  // 2. Lesson Recordings Archive: only courses with sampleVideoUrl + valid access
   const accessibleRecordings = dbCourses.filter(c => {
     const cGrade = Number(c.grade);
     if (!allAccessGrades.includes(cGrade)) return false;
     if (!c.sampleVideoUrl) return false;
-    if (c.month) {
-      return gradeAccessList.some(g => Number(g.gradeId) === cGrade && (!g.month || g.month === c.month));
-    }
+    if (c.month) return hasAccess4GradeMonth(cGrade, c.month);
     return true;
   });
 
