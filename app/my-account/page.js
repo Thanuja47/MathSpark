@@ -15,6 +15,8 @@ export default function MyAccountPage() {
   const [loading, setLoading] = useState(true);
   const [myTracking, setMyTracking] = useState([]);
   const [myOrders, setMyOrders] = useState([]);
+  const [dbCourses, setDbCourses] = useState([]);
+  const [courseLessons, setCourseLessons] = useState({});
   const [activeVideo, setActiveVideo] = useState(null);
 
   useEffect(() => {
@@ -27,6 +29,13 @@ export default function MyAccountPage() {
       })
       .catch(() => {})
       .finally(() => setLoading(false));
+
+    fetch('/api/courses')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setDbCourses(data);
+      })
+      .catch(() => {});
 
     fetch('/api/orders/my-orders')
       .then(res => res.json())
@@ -58,7 +67,11 @@ export default function MyAccountPage() {
 
   const approvedGrades = user?.approvedGrades || [];
   const hasAccess = approvedGrades.length > 0;
-  const enrolledCourses = COURSES.filter(c => approvedGrades.includes(c.grade));
+
+  // Real DB courses matching student's approved grades + static COURSES fallback if DB is empty
+  const enrolledCourses = dbCourses.length > 0
+    ? dbCourses.filter(c => approvedGrades.includes(Number(c.grade)))
+    : COURSES.filter(c => approvedGrades.includes(Number(c.grade)));
 
   return (
     <>
@@ -201,24 +214,27 @@ export default function MyAccountPage() {
                           Request Access on WhatsApp
                         </a>
                       </div>
+                    ) : enrolledCourses.filter(c => c.sampleVideoUrl).length === 0 ? (
+                      <div className="admin-empty-box" style={{ background: 'rgba(15,23,42,0.4)', padding: '36px', borderRadius: '16px', textAlign: 'center' }}>
+                        <div style={{ fontSize: '2rem', marginBottom: 8 }}>🎥</div>
+                        <h4 style={{ color: '#fff', fontSize: '1.1rem', marginBottom: 4 }}>No Lesson Recordings Uploaded Yet</h4>
+                        <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Recorded video lessons for your approved grade will appear here as soon as Ishan Sir uploads them in the Admin Panel.</p>
+                      </div>
                     ) : (
                       <div className="recordings-list">
-                        {enrolledCourses.flatMap((course) => [
-                          { title: `${course.title} — Month 01 Special Revision`, date: 'July 18, 2026', duration: '1h 45m', views: 'Active', videoUrl: course.sampleVideoUrl || 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
-                          { title: `${course.title} — Theory & Theorem Breakdown`, date: 'July 11, 2026', duration: '2h 00m', views: 'Active', videoUrl: course.sampleVideoUrl || 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
-                        ]).map((rec, i) => (
+                        {enrolledCourses.filter(c => c.sampleVideoUrl).map((course, i) => (
                           <div key={i} className="recording-card">
                             <div className="rec-icon">▶</div>
                             <div style={{ flex: 1 }}>
-                              <h4 style={{ fontSize: '0.95rem', fontWeight: 600 }}>{rec.title}</h4>
+                              <h4 style={{ fontSize: '0.95rem', fontWeight: 600 }}>{course.title} — Recorded Live Class</h4>
                               <div className="text-muted text-xs" style={{ display: 'flex', gap: 16, marginTop: 4 }}>
-                                <span>📅 {rec.date}</span>
-                                <span>⏱ {rec.duration}</span>
+                                <span>📚 Grade {course.grade}</span>
+                                <span>🌐 {(course.medium || 'Sinhala').toUpperCase()}</span>
                               </div>
                             </div>
                             <button
                               className="btn btn-secondary btn-sm"
-                              onClick={() => setActiveVideo(rec)}
+                              onClick={() => setActiveVideo({ title: course.title, videoUrl: course.sampleVideoUrl })}
                             >
                               Watch Video 🎬
                             </button>
