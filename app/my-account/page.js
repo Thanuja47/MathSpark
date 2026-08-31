@@ -116,39 +116,6 @@ export default function MyAccountPage() {
     });
   };
 
-  // 1. My Enrolled Classes: courses for ALL APPROVED GRADES that match student's access grants
-  const enrolledCourses = dbCourses.filter(c => {
-    const cGrade = Number(c.grade);
-    if (!allAccessGrades.includes(cGrade)) return false;
-    // Course with a month field: check student has grant for that grade+month (or all-months grant)
-    if (c.month) return hasAccess4GradeMonth(cGrade, c.month);
-    // Course with no month: show to any student with access to that grade
-    return true;
-  });
-
-  // Group enrolled courses by grade
-  const enrolledByGrade = allAccessGrades.reduce((acc, grade) => {
-    const courses = enrolledCourses.filter(c => Number(c.grade) === grade);
-    if (courses.length > 0) acc[grade] = courses;
-    return acc;
-  }, {});
-
-  // 2. Lesson Recordings Archive: only courses with sampleVideoUrl + valid access
-  const accessibleRecordings = dbCourses.filter(c => {
-    const cGrade = Number(c.grade);
-    if (!allAccessGrades.includes(cGrade)) return false;
-    if (!c.sampleVideoUrl) return false;
-    if (c.month) return hasAccess4GradeMonth(cGrade, c.month);
-    return true;
-  });
-
-  // Group recordings by grade
-  const recordingsByGrade = allAccessGrades.reduce((acc, grade) => {
-    const recs = accessibleRecordings.filter(c => Number(c.grade) === grade);
-    if (recs.length > 0) acc[grade] = recs;
-    return acc;
-  }, {});
-
   // Timetable entries accessible for this student (matching approved grades + month access)
   const accessibleTimetable = dbTimetable.filter(t => {
     const tGrade = Number(t.grade);
@@ -158,19 +125,47 @@ export default function MyAccountPage() {
     return true;
   });
 
-  // Group timetable by grade for Zoom link lookup
-  const timetableByGrade = allAccessGrades.reduce((acc, grade) => {
-    const entries = accessibleTimetable.filter(t => Number(t.grade) === grade);
-    if (entries.length > 0) acc[grade] = entries;
-    return acc;
-  }, {});
-
   // Extract direct Zoom URL from raw invitation text (Admin may paste full Zoom invite)
   const extractZoomUrl = (raw) => {
     if (!raw) return null;
     const m = raw.match(/https?:\/\/[^\s<"'>]+/i);
     return m ? m[0] : raw;
   };
+
+  // 1. My Enrolled Classes: Build dynamic class items per approved grade by combining DB courses & active Timetable entries
+  const enrolledByGrade = allAccessGrades.reduce((acc, grade) => {
+    const courses = dbCourses.filter(c => Number(c.grade) === grade && (!c.month || hasAccess4GradeMonth(grade, c.month)));
+    const timetables = accessibleTimetable.filter(t => Number(t.grade) === grade);
+
+    if (courses.length > 0 || timetables.length > 0) {
+      // If admin created specific courses for this grade, use courses
+      if (courses.length > 0) {
+        acc[grade] = courses.map(course => {
+          const matchedTt = timetables.filter(t => !t.month || monthsMatch(t.month, course.month));
+          const zoomLink = matchedTt.find(t => t.liveLink)?.liveLink || timetables.find(t => t.liveLink)?.liveLink || null;
+          return {
+            id: course.id,
+            title: course.title,
+            medium: course.medium || 'Sinhala',
+            schedule: matchedTt.length > 0 ? matchedTt.map(t => `${t.day} ${t.time}`).join(' • ') : (timetables.length > 0 ? timetables.map(t => `${t.day} ${t.time}`).join(' • ') : 'Scheduled Live Class'),
+            zoomUrl: extractZoomUrl(zoomLink)
+          };
+        });
+      } else {
+        // Fallback: If no course card created in DB yet, generate class cards directly from Timetable entries for this grade
+        acc[grade] = [{
+          id: `tt-grade-${grade}`,
+          title: `Grade ${grade} Live Theory & Revision Class`,
+          medium: user?.medium || 'Sinhala',
+          schedule: timetables.map(t => `${t.day} (${t.time})`).join(' • '),
+          zoomUrl: extractZoomUrl(timetables.find(t => t.liveLink)?.liveLink)
+        }];
+      }
+    }
+    return acc;
+  }, {});
+
+  const totalEnrolledCount = Object.values(enrolledByGrade).reduce((sum, list) => sum + list.length, 0);
 
   return (
     <>
@@ -211,7 +206,7 @@ export default function MyAccountPage() {
                   style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                 >
                   <BookOpen size={18} />
-                  <span>My Enrolled Classes ({enrolledCourses.length})</span>
+                  <span>My Enrolled Classes ({totalEnrolledCount})</span>
                 </button>
                 <button
                   className={`dashboard-nav-item ${activeTab === 'recordings' ? 'active' : ''}`}
@@ -267,45 +262,35 @@ export default function MyAccountPage() {
                           <span>Request Grade Approval on WhatsApp</span>
                         </a>
                       </div>
-                    ) : enrolledCourses.length === 0 ? (
+                    ) : totalEnrolledCount === 0 ? (
                       <div className="admin-empty-box">No approved classes scheduled for this month yet. Classes will appear here once Ishan Sir adds them in the Admin Panel.</div>
                     ) : (
                       <div className="enrolled-list">
-                        {Object.entries(enrolledByGrade).map(([grade, courses]) => (
+                        {Object.entries(enrolledByGrade).map(([grade, classes]) => (
                           <div key={grade}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '24px 0 12px', borderBottom: '1px solid rgba(99,102,241,0.25)', paddingBottom: 8 }}>
                               <span style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', fontWeight: 700, fontSize: '0.8rem', padding: '3px 12px', borderRadius: 20 }}>GRADE {grade}</span>
-                              <span style={{ color: '#94a3b8', fontSize: '0.82rem' }}>{courses.length} class{courses.length !== 1 ? 'es' : ''} this month</span>
+                              <span style={{ color: '#94a3b8', fontSize: '0.82rem' }}>{classes.length} class{classes.length !== 1 ? 'es' : ''} this month</span>
                             </div>
-                            {courses.map((course) => {
-                              // Find matching timetable entries for this grade+course month for Zoom link
-                              const ttEntries = (timetableByGrade[grade] || []).filter(t =>
-                                !t.month || monthsMatch(t.month, course.month)
-                              );
-                              const zoomLink = ttEntries.find(t => t.liveLink)?.liveLink || null;
-                              const zoomUrl = extractZoomUrl(zoomLink);
-                              return (
-                                <div key={course.id} className="enrolled-card">
-                                  <div className="enrolled-info">
-                                    <div className="badge badge-primary">{(course.medium || 'Sinhala').toUpperCase()} MEDIUM</div>
-                                    <h4 style={{ marginTop: 8, fontSize: '1.1rem' }}>{course.title}</h4>
-                                    {ttEntries.length > 0 && (
-                                      <p className="text-muted text-xs" style={{ marginTop: 4 }}>
-                                        📅 {ttEntries.map(t => `${t.day} ${t.time}`).join(' • ')}
-                                      </p>
-                                    )}
-                                  </div>
-                                  <div className="enrolled-actions">
-                                    {zoomUrl ? (
-                                      <a href={zoomUrl} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm">🔴 Join Live Room</a>
-                                    ) : (
-                                      <button className="btn btn-primary btn-sm" style={{ opacity: 0.5, cursor: 'not-allowed' }} title="Zoom link not set yet">🔴 Join Live Room</button>
-                                    )}
-                                    <button className="btn btn-outline btn-sm" onClick={() => setActiveTab('recordings')}>View Recordings</button>
-                                  </div>
+                            {classes.map((cls) => (
+                              <div key={cls.id} className="enrolled-card">
+                                <div className="enrolled-info">
+                                  <div className="badge badge-primary">{(cls.medium || 'Sinhala').toUpperCase()} MEDIUM</div>
+                                  <h4 style={{ marginTop: 8, fontSize: '1.1rem' }}>{cls.title}</h4>
+                                  <p className="text-muted text-xs" style={{ marginTop: 4 }}>
+                                    📅 {cls.schedule}
+                                  </p>
                                 </div>
-                              );
-                            })}
+                                <div className="enrolled-actions">
+                                  {cls.zoomUrl ? (
+                                    <a href={cls.zoomUrl} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm">🔴 Join Live Room</a>
+                                  ) : (
+                                    <button className="btn btn-primary btn-sm" style={{ opacity: 0.5, cursor: 'not-allowed' }} title="Zoom link not set yet">🔴 Join Live Room</button>
+                                  )}
+                                  <button className="btn btn-outline btn-sm" onClick={() => setActiveTab('recordings')}>View Recordings</button>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         ))}
                       </div>
