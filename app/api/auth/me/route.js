@@ -25,6 +25,8 @@ export async function GET(request) {
       role:            student.role,
       enrolledCourses: student.enrolledCourses,
       approvedGrades,
+      // Full gradeAccess records so client can check grade+month combos
+      gradeAccess:     student.gradeAccess || [],
     },
   });
 }

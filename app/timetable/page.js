@@ -41,7 +41,7 @@ export default function TimetablePage() {
       .catch(() => {});
   }, []);
 
-  const handleJoinZoom = (e, grade, zoomUrl) => {
+  const handleJoinZoom = (e, grade, zoomUrl, month) => {
     if (e && e.preventDefault) e.preventDefault();
     const targetGrade = Number(grade);
 
@@ -50,29 +50,41 @@ export default function TimetablePage() {
       return;
     }
 
-    const approved = (user.approvedGrades || []).map(Number);
-    if (user.grade) approved.push(Number(user.grade));
-
     const userRole = user.role;
-    const isUserApproved = userRole === 'admin' || approved.includes(targetGrade);
+    if (userRole === 'admin') {
+      // Admin always has access
+    } else {
+      // Check if student has access to THIS specific grade + month
+      const userGrades = user.gradeAccess || [];
+      
+      const hasAccess = userGrades.some(g => {
+        if (Number(g.gradeId) !== targetGrade) return false;
+        // Legacy all-months grant (month is null/undefined) => access to all months
+        if (!g.month) return true;
+        // If live class entry has no month tag => accessible to anyone with that grade
+        if (!month) return true;
+        // Otherwise exact month match required
+        return g.month === month;
+      }) || (user.approvedGrades || []).map(Number).includes(targetGrade);
 
-    if (!isUserApproved) {
-      setLockedGrade(targetGrade);
+      if (!hasAccess) {
+        setLockedGrade({ grade: targetGrade, month: month || null });
+        return;
+      }
+    }
+
+    if (!zoomUrl || zoomUrl === '#' || !zoomUrl.trim()) {
+      alert('Zoom link not set for this class yet. Please contact the admin.');
       return;
     }
 
-    if (!zoomUrl || zoomUrl === '#') {
-      alert('Zoom link not configured for this class yet.');
-      return;
-    }
-
-    // Fix relative URL / missing protocol 404 issue:
+    // Fix relative URL / missing protocol:
     let finalUrl = zoomUrl.trim();
     if (!/^https?:\/\//i.test(finalUrl)) {
       finalUrl = 'https://' + finalUrl;
     }
 
-    window.open(finalUrl, '_blank');
+    window.open(finalUrl, '_blank', 'noopener,noreferrer');
   };
 
   // Build combined schedule from DB or fallback SCHEDULE
@@ -83,6 +95,7 @@ export default function TimetablePage() {
           id: item.id,
           day: dayIdx !== -1 ? dayIdx : 0,
           grade: item.grade,
+          month: item.month || null,
           title: `${item.subject} (Grade ${item.grade})`,
           time: item.time,
           duration: 90,
@@ -199,7 +212,7 @@ export default function TimetablePage() {
                             {/* Join button */}
                             {!countdown.isEnded ? (
                               <button
-                                onClick={(e) => handleJoinZoom(e, cls.grade, cls.zoom)}
+                                onClick={(e) => handleJoinZoom(e, cls.grade, cls.zoom, cls.month)}
                                 className={`btn ${isLive ? 'btn-primary' : 'btn-primary'} btn-sm grid-join-btn`}
                                 style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
                               >
@@ -230,7 +243,11 @@ export default function TimetablePage() {
       <FloatingWidgets />
 
       {lockedGrade && (
-        <AccessLockedModal grade={lockedGrade} onClose={() => setLockedGrade(null)} />
+        <AccessLockedModal
+          grade={typeof lockedGrade === 'object' ? lockedGrade.grade : lockedGrade}
+          month={typeof lockedGrade === 'object' ? lockedGrade.month : null}
+          onClose={() => setLockedGrade(null)}
+        />
       )}
 
       <style jsx>{`

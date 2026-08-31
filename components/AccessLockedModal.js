@@ -2,7 +2,7 @@ import { Lock, MessageCircle } from 'lucide-react';
 import { SITE } from '@/lib/data';
 import { useLanguage } from '@/context/LanguageContext';
 
-export default function AccessLockedModal({ grade, onClose }) {
+export default function AccessLockedModal({ grade, month, onClose }) {
   const { t } = useLanguage();
 
   return (
@@ -38,15 +38,17 @@ export default function AccessLockedModal({ grade, onClose }) {
           <Lock size={36} />
         </div>
         <h3 style={{ color: '#fff', fontSize: '1.25rem', fontWeight: 700, marginBottom: '12px' }}>
-          {t('common.accessRequired')} (Grade {grade})
+          {t('common.accessRequired')} — Grade {grade}{month ? ` (${month})` : ''}
         </h3>
         <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem', lineHeight: '1.5', marginBottom: '24px' }}>
-          {t('common.requiredGradeAccess')}
+          {month 
+            ? `You do not have approved access for Grade ${grade} (${month}). Please contact Ishan Sir to complete payment and unlock this month.`
+            : t('common.requiredGradeAccess')}
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <a
-            href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(`Hi Ishan Sir, I am requesting access to Grade ${grade} content on MathSpark.`)}`}
+            href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(`Hi Ishan Sir, I need access for Grade ${grade}${month ? ` (${month})` : ''} on MathSpark.`)}`}
             target="_blank"
             rel="noreferrer"
             className="btn btn-accent btn-lg"

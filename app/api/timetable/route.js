@@ -22,13 +22,22 @@ export async function GET(request) {
       }
     }
 
-    // Sanitize liveLink: only include it if user is admin OR student has grade+month access
+    // For LIVE LINKS: grant access if the student has ANY valid gradeAccess record
+    // for that grade (any month). Live classes are real-time events — we should not
+    // block a student who has paid for ANY month of that grade from joining live.
+    // Month-filtering applies only to recorded lessons / exams / PDFs (static content).
     const sanitized = items.map(item => {
-      const hasAccess = isAdmin || db.students.hasGradeMonthAccess(gradeAccessRecords, item.grade, item.month);
+      const gradeNum = Number(item.grade);
+
+      // Check if student has any valid (non-expired) grant for this grade
+      const hasGradeAccess = isAdmin || (gradeAccessRecords || []).some(g => {
+        return Number(g.gradeId) === gradeNum;
+      });
+
       return {
         ...item,
-        liveLink: hasAccess ? (item.liveLink || null) : null,
-        _locked: !hasAccess,
+        liveLink: hasGradeAccess ? (item.liveLink || null) : null,
+        _locked: !hasGradeAccess,
       };
     });
 
