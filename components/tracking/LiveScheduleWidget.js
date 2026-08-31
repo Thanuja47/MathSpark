@@ -191,7 +191,7 @@ export default function LiveScheduleWidget({ customSchedule = null, onJoinZoom =
 
   const handleJoin = (e, cls) => {
     if (onJoinZoom) {
-      onJoinZoom(e, cls.grade, cls.zoom);
+      onJoinZoom(e, cls.grade, cls.zoom, cls.month);
     } else {
       if (cls.zoom && cls.zoom !== '#') {
         window.open(cls.zoom, '_blank');

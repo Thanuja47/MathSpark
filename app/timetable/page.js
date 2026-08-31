@@ -54,18 +54,17 @@ export default function TimetablePage() {
     if (userRole === 'admin') {
       // Admin always has access
     } else {
-      // Check if student has access to THIS specific grade + month
+      // Check if student has access to THIS grade (or specific month if tagged)
       const userGrades = user.gradeAccess || [];
+      const approvedGrades = (user.approvedGrades || []).map(Number);
       
-      const hasAccess = userGrades.some(g => {
+      const hasAccess = approvedGrades.includes(targetGrade) || userGrades.some(g => {
         if (Number(g.gradeId) !== targetGrade) return false;
-        // Legacy all-months grant (month is null/undefined) => access to all months
-        if (!g.month) return true;
-        // If live class entry has no month tag => accessible to anyone with that grade
-        if (!month) return true;
-        // Otherwise exact month match required
+        // If grant has no specific month restriction OR class entry has no month tag => full access
+        if (!g.month || !month) return true;
+        // Exact month match
         return g.month === month;
-      }) || (user.approvedGrades || []).map(Number).includes(targetGrade);
+      });
 
       if (!hasAccess) {
         setLockedGrade({ grade: targetGrade, month: month || null });
