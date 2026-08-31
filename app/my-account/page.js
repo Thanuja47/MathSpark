@@ -159,10 +159,18 @@ export default function MyAccountPage() {
     return true;
   });
 
-  // Group recordings by grade
+  // Group recordings by grade and sort courses by month
   const recordingsByGrade = allAccessGrades.reduce((acc, grade) => {
     const recs = accessibleRecordings.filter(c => Number(c.grade) === grade);
-    if (recs.length > 0) acc[grade] = recs;
+    if (recs.length > 0) {
+      // Sort chronologically by month if available
+      const sortedRecs = [...recs].sort((a, b) => {
+        const mA = MONTH_NAMES.findIndex(mn => (a.month || '').toLowerCase().startsWith(mn.slice(0, 3)));
+        const mB = MONTH_NAMES.findIndex(mn => (b.month || '').toLowerCase().startsWith(mn.slice(0, 3)));
+        return (mA >= 0 ? mA : 99) - (mB >= 0 ? mB : 99);
+      });
+      acc[grade] = sortedRecs;
+    }
     return acc;
   }, {});
 
