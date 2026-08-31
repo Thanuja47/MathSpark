@@ -90,7 +90,24 @@ export default function CourseDetailPage({ params }) {
     videoUrl: s.videoUrl,
   }));
 
-  const handleAccessAttachment = (e, type, url) => {
+  // Month matching helper for grade+month verification
+  const MONTH_NAMES = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+  const monthsMatch = (a, b) => {
+    if (!a || !b) return false;
+    const normalize = (m) => {
+      const s = String(m).toLowerCase().trim();
+      const ym = s.match(/^\d{4}-(\d{2})$/);
+      if (ym) return parseInt(ym[1], 10);
+      const idx = MONTH_NAMES.findIndex(mn => s.startsWith(mn.slice(0,3)));
+      if (idx >= 0) return idx + 1;
+      const n = parseInt(s, 10);
+      if (!isNaN(n)) return n;
+      return s;
+    };
+    return normalize(a) === normalize(b);
+  };
+
+  const handleAccessAttachment = (e, type, url, itemMonth) => {
     e.preventDefault();
     if (!url) return;
 
@@ -100,17 +117,38 @@ export default function CourseDetailPage({ params }) {
     }
 
     if (user.role === ROLES.ADMIN) {
-      window.open(url, '_blank');
+      window.open(url, '_blank', 'noopener,noreferrer');
       return;
     }
 
-    const approved = user.approvedGrades || [];
-    if (!approved.includes(Number(course.grade))) {
+    const gradeAccessList = user.gradeAccess || [];
+    const approvedGrades = user.approvedGrades || [];
+    const cGrade = Number(course.grade);
+    const contentMonth = itemMonth || course.month || null;
+
+    // Strict access check: Must have grade access AND month access (if month is specified)
+    const hasGradeAccess = approvedGrades.includes(cGrade) || gradeAccessList.some(g => Number(g.gradeId) === cGrade);
+    
+    if (!hasGradeAccess) {
       setLockedGrade(course.grade);
       return;
     }
 
-    window.open(url, '_blank');
+    // Check specific month access if content has a month tag
+    if (contentMonth && gradeAccessList.length > 0) {
+      const hasMonthAccess = gradeAccessList.some(g => {
+        if (Number(g.gradeId) !== cGrade) return false;
+        if (g.month === null || g.month === undefined || g.month === '') return true; // null = all months access
+        return monthsMatch(g.month, contentMonth);
+      });
+
+      if (!hasMonthAccess) {
+        setLockedGrade(course.grade);
+        return;
+      }
+    }
+
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const courseSchema = {
@@ -316,7 +354,7 @@ export default function CourseDetailPage({ params }) {
                           {hasVideo && (
                             <button
                               className="btn btn-primary btn-sm"
-                              onClick={(e) => handleAccessAttachment(e, 'video', les.videoUrl)}
+                              onClick={(e) => handleAccessAttachment(e, 'video', les.videoUrl, les.month)}
                               style={{ fontSize: '0.78rem', padding: '5px 12px' }}
                             >
                               📹 Watch Lesson Video
@@ -325,7 +363,7 @@ export default function CourseDetailPage({ params }) {
                           {hasPdf && (
                             <button
                               className="btn btn-outline btn-sm"
-                              onClick={(e) => handleAccessAttachment(e, 'pdf', les.pdfUrl)}
+                              onClick={(e) => handleAccessAttachment(e, 'pdf', les.pdfUrl, les.month)}
                               style={{ fontSize: '0.78rem', padding: '5px 12px' }}
                             >
                               📄 Download PDF Notes
