@@ -154,8 +154,6 @@ export default function MyAccountPage() {
   const accessibleRecordings = dbCourses.filter(c => {
     const cGrade = Number(c.grade);
     if (!allAccessGrades.includes(cGrade)) return false;
-    // Must have a recorded video URL
-    if (!c.sampleVideoUrl) return false;
     // Check if student has access grant for this grade + month (or all-months access)
     if (c.month) return hasAccess4GradeMonth(cGrade, c.month);
     return true;
@@ -330,24 +328,33 @@ export default function MyAccountPage() {
                               <span style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', fontWeight: 700, fontSize: '0.8rem', padding: '3px 12px', borderRadius: 20 }}>GRADE {grade}</span>
                               <span style={{ color: '#94a3b8', fontSize: '0.82rem' }}>{recs.length} recording{recs.length !== 1 ? 's' : ''}</span>
                             </div>
-                            {recs.map((course, i) => (
-                              <div key={i} className="recording-card">
-                                <div className="rec-icon">▶</div>
-                                <div style={{ flex: 1 }}>
-                                  <h4 style={{ fontSize: '0.95rem', fontWeight: 600 }}>{course.title} — Recorded Live Class</h4>
-                                  <div className="text-muted text-xs" style={{ display: 'flex', gap: 16, marginTop: 4 }}>
-                                    {course.month && <span>📅 Month: {course.month}</span>}
-                                    <span>🌐 {(course.medium || 'Sinhala').toUpperCase()}</span>
+                            {recs.map((course, i) => {
+                              const videoLink = extractZoomUrl(course.sampleVideoUrl || course.videoUrl);
+                              return (
+                                <div key={i} className="recording-card">
+                                  <div className="rec-icon">▶</div>
+                                  <div style={{ flex: 1 }}>
+                                    <h4 style={{ fontSize: '0.95rem', fontWeight: 600 }}>{course.title}</h4>
+                                    <div className="text-muted text-xs" style={{ display: 'flex', gap: 16, marginTop: 4 }}>
+                                      {course.month && <span>📅 Month: {course.month}</span>}
+                                      <span>🌐 {(course.medium || 'Sinhala').toUpperCase()}</span>
+                                    </div>
                                   </div>
+                                  {videoLink ? (
+                                    <button
+                                      className="btn btn-secondary btn-sm"
+                                      onClick={() => setActiveVideo({ title: course.title, videoUrl: videoLink })}
+                                    >
+                                      Watch Video 🎬
+                                    </button>
+                                  ) : (
+                                    <button className="btn btn-secondary btn-sm" style={{ opacity: 0.5, cursor: 'not-allowed' }} title="Video recording processing or pending upload">
+                                      Recording Pending ⏳
+                                    </button>
+                                  )}
                                 </div>
-                                <button
-                                  className="btn btn-secondary btn-sm"
-                                  onClick={() => setActiveVideo({ title: course.title, videoUrl: course.sampleVideoUrl })}
-                                >
-                                  Watch Video 🎬
-                                </button>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         ))}
                       </div>
