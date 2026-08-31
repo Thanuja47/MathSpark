@@ -69,12 +69,18 @@ export default function MyAccountPage() {
   const gradeAccessList = user?.gradeAccess || [];
   const hasAccess = approvedGrades.length > 0 || gradeAccessList.length > 0;
 
+  // All unique grades this student has access to (sorted)
+  const allAccessGrades = [...new Set([
+    ...approvedGrades,
+    ...gradeAccessList.map(g => Number(g.gradeId))
+  ])].sort((a, b) => a - b);
+
   const currentMonthStr = new Date().toISOString().slice(0, 7); // e.g. "2026-08"
 
-  // 1. My Enrolled Classes: Only show active courses/classes for the APPROVED GRADE & CURRENT MONTH (or all-month grant)
+  // 1. My Enrolled Classes: Only show active courses/classes for ALL APPROVED GRADES & CURRENT MONTH (or all-month grant)
   const enrolledCourses = dbCourses.filter(c => {
     const cGrade = Number(c.grade);
-    if (!approvedGrades.includes(cGrade)) return false;
+    if (!allAccessGrades.includes(cGrade)) return false;
     // If course has a specific month tag, check if student has grant for that month OR all-months grant
     if (c.month) {
       return gradeAccessList.some(g => Number(g.gradeId) === cGrade && (!g.month || g.month === c.month || g.month === currentMonthStr));
@@ -82,16 +88,30 @@ export default function MyAccountPage() {
     return true;
   });
 
-  // 2. Lesson Recordings Archive: Shows past/all courses that the student has APPROVED access for (matching approved grade + granted months)
+  // Group enrolled courses by grade
+  const enrolledByGrade = allAccessGrades.reduce((acc, grade) => {
+    const courses = enrolledCourses.filter(c => Number(c.grade) === grade);
+    if (courses.length > 0) acc[grade] = courses;
+    return acc;
+  }, {});
+
+  // 2. Lesson Recordings Archive: Shows past/all courses that the student has APPROVED access for (matching approved grades + granted months)
   const accessibleRecordings = dbCourses.filter(c => {
     const cGrade = Number(c.grade);
-    if (!approvedGrades.includes(cGrade)) return false;
+    if (!allAccessGrades.includes(cGrade)) return false;
     if (!c.sampleVideoUrl) return false;
     if (c.month) {
       return gradeAccessList.some(g => Number(g.gradeId) === cGrade && (!g.month || g.month === c.month));
     }
     return true;
   });
+
+  // Group recordings by grade
+  const recordingsByGrade = allAccessGrades.reduce((acc, grade) => {
+    const recs = accessibleRecordings.filter(c => Number(c.grade) === grade);
+    if (recs.length > 0) acc[grade] = recs;
+    return acc;
+  }, {});
 
   return (
     <>
@@ -189,29 +209,28 @@ export default function MyAccountPage() {
                         </a>
                       </div>
                     ) : enrolledCourses.length === 0 ? (
-                      <div className="admin-empty-box">No approved classes available for your grade yet.</div>
+                      <div className="admin-empty-box">No approved classes scheduled for this month yet. Classes will appear here once Ishan Sir adds them in the Admin Panel.</div>
                     ) : (
                       <div className="enrolled-list">
-                        {enrolledCourses.map((course) => (
-                          <div key={course.id} className="enrolled-card">
-                            <div className="enrolled-info">
-                              <div className="badge badge-primary">{course.medium.toUpperCase()} MEDIUM</div>
-                              <h4 style={{ marginTop: 8, fontSize: '1.1rem' }}>{course.title}</h4>
-                              <p className="text-muted text-xs" style={{ marginTop: 4 }}>Schedule: {course.schedule}</p>
+                        {Object.entries(enrolledByGrade).map(([grade, courses]) => (
+                          <div key={grade}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '24px 0 12px', borderBottom: '1px solid rgba(99,102,241,0.25)', paddingBottom: 8 }}>
+                              <span style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', fontWeight: 700, fontSize: '0.8rem', padding: '3px 12px', borderRadius: 20 }}>GRADE {grade}</span>
+                              <span style={{ color: '#94a3b8', fontSize: '0.82rem' }}>{courses.length} class{courses.length !== 1 ? 'es' : ''} this month</span>
                             </div>
-                            <div className="enrolled-actions">
-                              <a
-                                href="https://zoom.us"
-                                target="_blank"
-                                rel="noreferrer"
-                                className="btn btn-primary btn-sm"
-                              >
-                                🔴 Join Live Room
-                              </a>
-                              <button className="btn btn-outline btn-sm" onClick={() => setActiveTab('recordings')}>
-                                View Recordings
-                              </button>
-                            </div>
+                            {courses.map((course) => (
+                              <div key={course.id} className="enrolled-card">
+                                <div className="enrolled-info">
+                                  <div className="badge badge-primary">{(course.medium || 'Sinhala').toUpperCase()} MEDIUM</div>
+                                  <h4 style={{ marginTop: 8, fontSize: '1.1rem' }}>{course.title}</h4>
+                                  <p className="text-muted text-xs" style={{ marginTop: 4 }}>Schedule: {course.schedule}</p>
+                                </div>
+                                <div className="enrolled-actions">
+                                  <a href="https://zoom.us" target="_blank" rel="noreferrer" className="btn btn-primary btn-sm">🔴 Join Live Room</a>
+                                  <button className="btn btn-outline btn-sm" onClick={() => setActiveTab('recordings')}>View Recordings</button>
+                                </div>
+                              </div>
+                            ))}
                           </div>
                         ))}
                       </div>
@@ -238,27 +257,34 @@ export default function MyAccountPage() {
                       <div className="admin-empty-box" style={{ background: 'rgba(15,23,42,0.4)', padding: '36px', borderRadius: '16px', textAlign: 'center' }}>
                         <div style={{ fontSize: '2rem', marginBottom: 8 }}>🎥</div>
                         <h4 style={{ color: '#fff', fontSize: '1.1rem', marginBottom: 4 }}>No Lesson Recordings Uploaded Yet</h4>
-                        <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Recorded video lessons for your approved grade and month access will appear here as soon as Ishan Sir uploads them in the Admin Panel.</p>
+                        <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Recorded video lessons for your approved grades and month access will appear here as soon as Ishan Sir uploads them in the Admin Panel.</p>
                       </div>
                     ) : (
                       <div className="recordings-list">
-                        {accessibleRecordings.map((course, i) => (
-                          <div key={i} className="recording-card">
-                            <div className="rec-icon">▶</div>
-                            <div style={{ flex: 1 }}>
-                              <h4 style={{ fontSize: '0.95rem', fontWeight: 600 }}>{course.title} — Recorded Live Class</h4>
-                              <div className="text-muted text-xs" style={{ display: 'flex', gap: 16, marginTop: 4 }}>
-                                <span>📚 Grade {course.grade}</span>
-                                {course.month && <span>📅 Month: {course.month}</span>}
-                                <span>🌐 {(course.medium || 'Sinhala').toUpperCase()}</span>
-                              </div>
+                        {Object.entries(recordingsByGrade).map(([grade, recs]) => (
+                          <div key={grade}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '24px 0 12px', borderBottom: '1px solid rgba(99,102,241,0.25)', paddingBottom: 8 }}>
+                              <span style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', fontWeight: 700, fontSize: '0.8rem', padding: '3px 12px', borderRadius: 20 }}>GRADE {grade}</span>
+                              <span style={{ color: '#94a3b8', fontSize: '0.82rem' }}>{recs.length} recording{recs.length !== 1 ? 's' : ''}</span>
                             </div>
-                            <button
-                              className="btn btn-secondary btn-sm"
-                              onClick={() => setActiveVideo({ title: course.title, videoUrl: course.sampleVideoUrl })}
-                            >
-                              Watch Video 🎬
-                            </button>
+                            {recs.map((course, i) => (
+                              <div key={i} className="recording-card">
+                                <div className="rec-icon">▶</div>
+                                <div style={{ flex: 1 }}>
+                                  <h4 style={{ fontSize: '0.95rem', fontWeight: 600 }}>{course.title} — Recorded Live Class</h4>
+                                  <div className="text-muted text-xs" style={{ display: 'flex', gap: 16, marginTop: 4 }}>
+                                    {course.month && <span>📅 Month: {course.month}</span>}
+                                    <span>🌐 {(course.medium || 'Sinhala').toUpperCase()}</span>
+                                  </div>
+                                </div>
+                                <button
+                                  className="btn btn-secondary btn-sm"
+                                  onClick={() => setActiveVideo({ title: course.title, videoUrl: course.sampleVideoUrl })}
+                                >
+                                  Watch Video 🎬
+                                </button>
+                              </div>
+                            ))}
                           </div>
                         ))}
                       </div>
