@@ -77,13 +77,17 @@ export default function TimetablePage() {
       return;
     }
 
-    // Fix relative URL / missing protocol:
-    let finalUrl = zoomUrl.trim();
-    if (!/^https?:\/\//i.test(finalUrl)) {
-      finalUrl = 'https://' + finalUrl;
+    // Extract actual URL if full Zoom invitation text block was pasted by Admin
+    let rawText = zoomUrl.trim();
+    let extractedUrl = rawText;
+    const urlMatch = rawText.match(/https?:\/\/[^\s<">]+/i);
+    if (urlMatch) {
+      extractedUrl = urlMatch[0];
+    } else if (!/^https?:\/\//i.test(extractedUrl)) {
+      extractedUrl = 'https://' + extractedUrl;
     }
 
-    window.open(finalUrl, '_blank', 'noopener,noreferrer');
+    window.open(extractedUrl, '_blank', 'noopener,noreferrer');
   };
 
   // Build combined schedule from DB or fallback SCHEDULE
