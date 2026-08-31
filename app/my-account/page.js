@@ -16,6 +16,7 @@ export default function MyAccountPage() {
   const [myTracking, setMyTracking] = useState([]);
   const [myOrders, setMyOrders] = useState([]);
   const [dbCourses, setDbCourses] = useState([]);
+  const [dbTimetable, setDbTimetable] = useState([]);
   const [courseLessons, setCourseLessons] = useState({});
   const [activeVideo, setActiveVideo] = useState(null);
 
@@ -34,6 +35,13 @@ export default function MyAccountPage() {
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) setDbCourses(data);
+      })
+      .catch(() => {});
+
+    fetch('/api/timetable')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setDbTimetable(data);
       })
       .catch(() => {});
 
@@ -141,6 +149,29 @@ export default function MyAccountPage() {
     return acc;
   }, {});
 
+  // Timetable entries accessible for this student (matching approved grades + month access)
+  const accessibleTimetable = dbTimetable.filter(t => {
+    const tGrade = Number(t.grade);
+    if (!allAccessGrades.includes(tGrade)) return false;
+    if (t._locked) return false; // server already marked as locked
+    if (t.month) return hasAccess4GradeMonth(tGrade, t.month);
+    return true;
+  });
+
+  // Group timetable by grade for Zoom link lookup
+  const timetableByGrade = allAccessGrades.reduce((acc, grade) => {
+    const entries = accessibleTimetable.filter(t => Number(t.grade) === grade);
+    if (entries.length > 0) acc[grade] = entries;
+    return acc;
+  }, {});
+
+  // Extract direct Zoom URL from raw invitation text (Admin may paste full Zoom invite)
+  const extractZoomUrl = (raw) => {
+    if (!raw) return null;
+    const m = raw.match(/https?:\/\/[^\s<"'>]+/i);
+    return m ? m[0] : raw;
+  };
+
   return (
     <>
       <Header />
@@ -246,19 +277,35 @@ export default function MyAccountPage() {
                               <span style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', fontWeight: 700, fontSize: '0.8rem', padding: '3px 12px', borderRadius: 20 }}>GRADE {grade}</span>
                               <span style={{ color: '#94a3b8', fontSize: '0.82rem' }}>{courses.length} class{courses.length !== 1 ? 'es' : ''} this month</span>
                             </div>
-                            {courses.map((course) => (
-                              <div key={course.id} className="enrolled-card">
-                                <div className="enrolled-info">
-                                  <div className="badge badge-primary">{(course.medium || 'Sinhala').toUpperCase()} MEDIUM</div>
-                                  <h4 style={{ marginTop: 8, fontSize: '1.1rem' }}>{course.title}</h4>
-                                  <p className="text-muted text-xs" style={{ marginTop: 4 }}>Schedule: {course.schedule}</p>
+                            {courses.map((course) => {
+                              // Find matching timetable entries for this grade+course month for Zoom link
+                              const ttEntries = (timetableByGrade[grade] || []).filter(t =>
+                                !t.month || monthsMatch(t.month, course.month)
+                              );
+                              const zoomLink = ttEntries.find(t => t.liveLink)?.liveLink || null;
+                              const zoomUrl = extractZoomUrl(zoomLink);
+                              return (
+                                <div key={course.id} className="enrolled-card">
+                                  <div className="enrolled-info">
+                                    <div className="badge badge-primary">{(course.medium || 'Sinhala').toUpperCase()} MEDIUM</div>
+                                    <h4 style={{ marginTop: 8, fontSize: '1.1rem' }}>{course.title}</h4>
+                                    {ttEntries.length > 0 && (
+                                      <p className="text-muted text-xs" style={{ marginTop: 4 }}>
+                                        📅 {ttEntries.map(t => `${t.day} ${t.time}`).join(' • ')}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div className="enrolled-actions">
+                                    {zoomUrl ? (
+                                      <a href={zoomUrl} target="_blank" rel="noreferrer" className="btn btn-primary btn-sm">🔴 Join Live Room</a>
+                                    ) : (
+                                      <button className="btn btn-primary btn-sm" style={{ opacity: 0.5, cursor: 'not-allowed' }} title="Zoom link not set yet">🔴 Join Live Room</button>
+                                    )}
+                                    <button className="btn btn-outline btn-sm" onClick={() => setActiveTab('recordings')}>View Recordings</button>
+                                  </div>
                                 </div>
-                                <div className="enrolled-actions">
-                                  <a href="https://zoom.us" target="_blank" rel="noreferrer" className="btn btn-primary btn-sm">🔴 Join Live Room</a>
-                                  <button className="btn btn-outline btn-sm" onClick={() => setActiveTab('recordings')}>View Recordings</button>
-                                </div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         ))}
                       </div>
