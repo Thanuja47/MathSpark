@@ -21,6 +21,7 @@ const STATIC_TOPPERS = [
 export default function ResultsPage() {
   const { t } = useLanguage();
   const [liveResults, setLiveResults] = useState([]);
+  const [selectedProof, setSelectedProof] = useState(null);
 
   useEffect(() => {
     fetch('/api/results')
@@ -106,8 +107,51 @@ export default function ResultsPage() {
           </div>
         </section>
 
-        {/* Top Scorers */}
+        {/* WhatsApp Result Proofs Gallery */}
         <section className="section" style={{ background: 'var(--dark-2)', borderTop: '1px solid var(--border)' }}>
+          <div className="container">
+            <div className="text-center" style={{ marginBottom: 40 }}>
+              <div className="section-tag">📱 Verified WhatsApp Proofs</div>
+              <h2 className="section-title">Student <span className="theme-gradient">Result Screenshots</span></h2>
+              <p className="section-subtitle" style={{ margin: '0 auto', maxWidth: 600 }}>
+                Real messages and result slips sent by students & parents directly to Ishan Sir via WhatsApp.
+              </p>
+            </div>
+
+            {liveResults.filter(r => r.imageUrl).length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                💬 Result screenshots uploaded by admin will appear here in real-time.
+              </div>
+            ) : (
+              <div className="proof-gallery-grid">
+                {liveResults.filter(r => r.imageUrl).map((res) => (
+                  <div
+                    key={res.id}
+                    className="proof-card"
+                    onClick={() => setSelectedProof(res)}
+                  >
+                    <div className="proof-img-wrap">
+                      <img src={res.imageUrl} alt={`${res.studentName} result proof`} />
+                      <div className="proof-overlay">
+                        <span>🔍 Click to Zoom</span>
+                      </div>
+                    </div>
+                    <div className="proof-info">
+                      <div className="proof-student-name">{res.studentName}</div>
+                      <div className="proof-meta">
+                        <span>Grade {res.grade} · {res.year}</span>
+                        <span className="badge badge-green">{res.score}%</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Top Scorers */}
+        <section className="section" style={{ background: 'var(--dark)', borderTop: '1px solid var(--border)' }}>
           <div className="container">
             <div className="text-center" style={{ marginBottom: 48 }}>
               <div className="section-tag">Hall of Fame</div>
@@ -131,6 +175,71 @@ export default function ResultsPage() {
             </div>
           </div>
         </section>
+
+        {/* Lightbox Modal for WhatsApp Proof Zoom */}
+        {selectedProof && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.88)',
+              backdropFilter: 'blur(10px)',
+              zIndex: 99999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 20,
+            }}
+            onClick={() => setSelectedProof(null)}
+          >
+            <div
+              style={{
+                position: 'relative',
+                maxWidth: 600,
+                width: '100%',
+                maxHeight: '90vh',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedProof(null)}
+                style={{
+                  position: 'absolute',
+                  top: -40,
+                  right: 0,
+                  background: 'none',
+                  border: 'none',
+                  color: '#fff',
+                  fontSize: '1.8rem',
+                  cursor: 'pointer',
+                }}
+              >
+                ✕
+              </button>
+              <img
+                src={selectedProof.imageUrl}
+                alt={selectedProof.studentName}
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '75vh',
+                  objectFit: 'contain',
+                  borderRadius: 12,
+                  boxShadow: '0 20px 50px rgba(0,0,0,0.8)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                }}
+              />
+              <div style={{ marginTop: 16, textAlign: 'center', color: '#fff' }}>
+                <h4 style={{ margin: '0 0 4px', fontSize: '1.2rem' }}>{selectedProof.studentName}</h4>
+                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                  Grade {selectedProof.grade} · {selectedProof.year} — <span style={{ color: '#4ade80', fontWeight: 700 }}>Score: {selectedProof.score}%</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />
@@ -215,11 +324,74 @@ export default function ResultsPage() {
           color: var(--primary-light);
           margin-bottom: 4px;
         }
-        .topper-school {
-          font-size: 0.78rem;
+        .proof-gallery-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 20px;
+        }
+        .proof-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: 16px;
+          overflow: hidden;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .proof-card:hover {
+          transform: translateY(-4px);
+          border-color: #2563eb;
+          box-shadow: 0 12px 30px rgba(37, 99, 235, 0.2);
+        }
+        .proof-img-wrap {
+          position: relative;
+          width: 100%;
+          height: 280px;
+          background: #000;
+          overflow: hidden;
+        }
+        .proof-img-wrap img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
+        .proof-card:hover .proof-img-wrap img {
+          transform: scale(1.05);
+        }
+        .proof-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.4);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+          color: #fff;
+          font-weight: 700;
+          font-size: 0.88rem;
+        }
+        .proof-card:hover .proof-overlay {
+          opacity: 1;
+        }
+        .proof-info {
+          padding: 16px;
+        }
+        .proof-student-name {
+          font-weight: 700;
+          font-size: 1rem;
+          color: #fff;
+          margin-bottom: 6px;
+        }
+        .proof-meta {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          font-size: 0.8rem;
           color: var(--text-muted);
         }
       `}</style>
     </>
   );
 }
+
