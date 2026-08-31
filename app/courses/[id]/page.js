@@ -23,8 +23,9 @@ const STATIC_SYLLABUS = [
 export default function CourseDetailPage({ params }) {
   const { t } = useLanguage();
   const { id } = params;
-  const course = COURSES.find((c) => c.id.toString() === id) || COURSES[0];
+  const staticFallbackCourse = COURSES.find((c) => c.id.toString() === id) || COURSES[0];
 
+  const [dbCourse, setDbCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [user, setUser] = useState(null);
   const [lockedGrade, setLockedGrade] = useState(null);
@@ -33,6 +34,17 @@ export default function CourseDetailPage({ params }) {
     fetch('/api/auth/me')
       .then((res) => res.json())
       .then((data) => { if (data.user) setUser(data.user); })
+      .catch(() => {});
+
+    // Fetch dynamic course data from API/DB
+    fetch('/api/courses')
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const found = data.find((c) => String(c.id) === String(id));
+          if (found) setDbCourse(found);
+        }
+      })
       .catch(() => {});
 
     fetch(`/api/courses/${id}/lessons`)
@@ -44,6 +56,30 @@ export default function CourseDetailPage({ params }) {
       })
       .catch(() => {});
   }, [id]);
+
+  const course = dbCourse ? {
+    ...staticFallbackCourse,
+    ...dbCourse,
+    price: Number(dbCourse.price || staticFallbackCourse.price),
+    title: dbCourse.title || staticFallbackCourse.title,
+    description: dbCourse.description || staticFallbackCourse.description,
+    sampleVideoUrl: dbCourse.sampleVideoUrl || staticFallbackCourse.sampleVideoUrl,
+    month: dbCourse.month || staticFallbackCourse.month,
+  } : staticFallbackCourse;
+
+  const todayDate = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+
+  // Rich WhatsApp purchase message format:
+  // Includes Student Name, Phone Number, Course Name, Grade, Month, Price, Purchase Date
+  const whatsappMsgText = `Hi Ishan Sir, I want to enroll in this course:
+📚 Course: ${course.title}
+🎓 Grade: Grade ${course.grade}${course.month ? ` (${course.month})` : ''}
+💰 Price: LKR ${Number(course.price).toLocaleString()}
+👤 Student Name: ${user?.name || 'Not logged in'}
+📞 Phone: ${user?.phone || 'Not logged in'}
+📅 Date: ${todayDate}`;
+
+  const whatsappEnrollLink = `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(whatsappMsgText)}`;
 
   const displayedLessons = lessons.length > 0 ? lessons : STATIC_SYLLABUS.map((s, i) => ({
     id: `static-${i}`,
@@ -178,7 +214,18 @@ export default function CourseDetailPage({ params }) {
 
               {/* Right – Enroll Card */}
               <div className="course-enroll-card">
-                <div className="enroll-preview">
+                <div
+                  className="enroll-preview"
+                  onClick={() => {
+                    if (course.sampleVideoUrl) {
+                      window.open(course.sampleVideoUrl, '_blank', 'noopener,noreferrer');
+                    } else {
+                      alert('Sample preview video is not configured for this course yet.');
+                    }
+                  }}
+                  style={{ cursor: 'pointer' }}
+                  title="Click to watch sample video lesson"
+                >
                   <div className="enroll-preview-bg">
                     <div className="preview-play-btn">
                       <svg width="26" height="26" fill="white" viewBox="0 0 24 24">
@@ -186,7 +233,7 @@ export default function CourseDetailPage({ params }) {
                       </svg>
                     </div>
                     <div style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.85rem', marginTop: 12 }}>
-                      Watch Preview Lesson
+                      {course.sampleVideoUrl ? '▶ Watch Sample Video' : 'Watch Preview Lesson'}
                     </div>
                   </div>
                 </div>
@@ -198,14 +245,14 @@ export default function CourseDetailPage({ params }) {
                       <span style={{ color: '#00C896', fontWeight: 800, fontSize: '1.8rem' }}>FREE</span>
                     ) : (
                       <>
-                        <span className="enroll-price-val">LKR {course.price.toLocaleString()}</span>
+                        <span className="enroll-price-val">LKR {Number(course.price).toLocaleString()}</span>
                         <span className="enroll-price-period">/month</span>
                       </>
                     )}
                   </div>
 
                   <a
-                    href={`https://wa.me/${SITE.whatsapp}?text=Hi%2C%20I%20want%20to%20enroll%20in%20${encodeURIComponent(course.title)}`}
+                    href={whatsappEnrollLink}
                     target="_blank"
                     rel="noreferrer"
                     className="btn btn-accent btn-lg"

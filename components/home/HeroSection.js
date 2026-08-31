@@ -97,7 +97,7 @@ export default function HeroSection() {
             {/* Credibility stats */}
             <div className="hero-proof hero-load-in">
               <span style={{ fontWeight: 600, fontSize: '0.8125rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Proven Success:</span>
-              <span className="proof-text font-semi text-sm">98% A-Pass Rate O/L &amp; A/L Classrooms</span>
+              <span className="proof-text font-semi text-sm">98% A-Pass Rate O/L Classrooms</span>
             </div>
           </div>
 
@@ -155,7 +155,7 @@ export default function HeroSection() {
               </div>
               <div className="feature-badge badge-bottom-left">
                 <span className="badge-icon">✅</span>
-                <span className="badge-text">O/L · A/L Syllabus</span>
+                <span className="badge-text">O/L Syllabus</span>
               </div>
 
             </div>

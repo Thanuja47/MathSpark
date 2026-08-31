@@ -73,7 +73,7 @@ export default function RedesignedHomepage() {
             <div className="hero-text-side">
 
               <h1 className="hero-headline">
-                <span className="accent-tag">A/L &amp; O/L MATHEMATICS</span>
+                <span className="accent-tag">O/L MATHEMATICS (GRADES 6–11)</span>
                 {t('hero.title')}{' '}
                 <span className="highlight-blue">{t('hero.titleGradient')}</span>
               </h1>

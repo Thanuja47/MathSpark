@@ -63,7 +63,7 @@ export default function AboutPage() {
               <p style={{ fontSize: '0.9rem', color: '#3b82f6', fontWeight: '600', margin: '0 0 16px' }}>Lead Maths Educator (Online)</p>
               
               <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px', textAlign: 'left', fontSize: '0.88rem', color: '#cbd5e1' }}>
-                <p style={{ margin: '8px 0' }}>🎓 <strong>Background:</strong> B.Sc. Mathematics & Education</p>
+                <p style={{ margin: '8px 0' }}>🎓 <strong>Background:</strong> B.Sc (UG) OUSL</p>
                 <p style={{ margin: '8px 0' }}>⏱ <strong>Experience:</strong> 8+ Years Teaching</p>
                 <p style={{ margin: '8px 0' }}>🗣 <strong>Medium:</strong> Sinhala & English</p>
                 <p style={{ margin: '8px 0' }}>📍 <strong>Format:</strong> 100% Online (Sri Lanka)</p>

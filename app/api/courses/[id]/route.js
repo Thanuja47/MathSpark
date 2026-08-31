@@ -2,6 +2,19 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+export async function GET(req, { params }) {
+  try {
+    const course = await db.courses.findById(params.id);
+    if (!course) {
+      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+    }
+    return NextResponse.json(course);
+  } catch (e) {
+    console.error('[GET /api/courses/[id]]', e);
+    return NextResponse.json({ error: 'Failed to fetch course' }, { status: 500 });
+  }
+}
+
 export async function PUT(req, { params }) {
   try {
     const data = await req.json();
