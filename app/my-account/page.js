@@ -140,7 +140,7 @@ export default function MyAccountPage() {
                   style={{ display: 'flex', alignItems: 'center', gap: 10 }}
                 >
                   <Video size={18} />
-                  <span>Lesson Recordings ({hasAccess ? enrolledCourses.length * 3 : 0})</span>
+                  <span>Lesson Recordings ({accessibleRecordings.length})</span>
                 </button>
                 <button
                   className={`dashboard-nav-item ${activeTab === 'tutes' ? 'active' : ''}`}
