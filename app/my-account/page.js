@@ -66,12 +66,32 @@ export default function MyAccountPage() {
   }
 
   const approvedGrades = user?.approvedGrades || [];
-  const hasAccess = approvedGrades.length > 0;
+  const gradeAccessList = user?.gradeAccess || [];
+  const hasAccess = approvedGrades.length > 0 || gradeAccessList.length > 0;
 
-  // Real DB courses matching student's approved grades + static COURSES fallback if DB is empty
-  const enrolledCourses = dbCourses.length > 0
-    ? dbCourses.filter(c => approvedGrades.includes(Number(c.grade)))
-    : COURSES.filter(c => approvedGrades.includes(Number(c.grade)));
+  const currentMonthStr = new Date().toISOString().slice(0, 7); // e.g. "2026-08"
+
+  // 1. My Enrolled Classes: Only show active courses/classes for the APPROVED GRADE & CURRENT MONTH (or all-month grant)
+  const enrolledCourses = dbCourses.filter(c => {
+    const cGrade = Number(c.grade);
+    if (!approvedGrades.includes(cGrade)) return false;
+    // If course has a specific month tag, check if student has grant for that month OR all-months grant
+    if (c.month) {
+      return gradeAccessList.some(g => Number(g.gradeId) === cGrade && (!g.month || g.month === c.month || g.month === currentMonthStr));
+    }
+    return true;
+  });
+
+  // 2. Lesson Recordings Archive: Shows past/all courses that the student has APPROVED access for (matching approved grade + granted months)
+  const accessibleRecordings = dbCourses.filter(c => {
+    const cGrade = Number(c.grade);
+    if (!approvedGrades.includes(cGrade)) return false;
+    if (!c.sampleVideoUrl) return false;
+    if (c.month) {
+      return gradeAccessList.some(g => Number(g.gradeId) === cGrade && (!g.month || g.month === c.month));
+    }
+    return true;
+  });
 
   return (
     <>
@@ -214,21 +234,22 @@ export default function MyAccountPage() {
                           Request Access on WhatsApp
                         </a>
                       </div>
-                    ) : enrolledCourses.filter(c => c.sampleVideoUrl).length === 0 ? (
+                    ) : accessibleRecordings.length === 0 ? (
                       <div className="admin-empty-box" style={{ background: 'rgba(15,23,42,0.4)', padding: '36px', borderRadius: '16px', textAlign: 'center' }}>
                         <div style={{ fontSize: '2rem', marginBottom: 8 }}>🎥</div>
                         <h4 style={{ color: '#fff', fontSize: '1.1rem', marginBottom: 4 }}>No Lesson Recordings Uploaded Yet</h4>
-                        <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Recorded video lessons for your approved grade will appear here as soon as Ishan Sir uploads them in the Admin Panel.</p>
+                        <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>Recorded video lessons for your approved grade and month access will appear here as soon as Ishan Sir uploads them in the Admin Panel.</p>
                       </div>
                     ) : (
                       <div className="recordings-list">
-                        {enrolledCourses.filter(c => c.sampleVideoUrl).map((course, i) => (
+                        {accessibleRecordings.map((course, i) => (
                           <div key={i} className="recording-card">
                             <div className="rec-icon">▶</div>
                             <div style={{ flex: 1 }}>
                               <h4 style={{ fontSize: '0.95rem', fontWeight: 600 }}>{course.title} — Recorded Live Class</h4>
                               <div className="text-muted text-xs" style={{ display: 'flex', gap: 16, marginTop: 4 }}>
                                 <span>📚 Grade {course.grade}</span>
+                                {course.month && <span>📅 Month: {course.month}</span>}
                                 <span>🌐 {(course.medium || 'Sinhala').toUpperCase()}</span>
                               </div>
                             </div>
