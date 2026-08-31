@@ -8,7 +8,7 @@ import { useLanguage } from '@/context/LanguageContext';
 
 export default function StorePage() {
   const { t } = useLanguage();
-  const [storeItems, setStoreItems] = useState(STATIC_STORE_ITEMS);
+  const [storeItems, setStoreItems] = useState([]);
   const [orderingItem, setOrderingItem] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [orderSuccess, setOrderSuccess] = useState(null);
@@ -29,7 +29,7 @@ export default function StorePage() {
     fetch('/api/store')
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           const liveFormatted = data.map(item => ({
             id: item.id,
             title: item.name,
@@ -41,7 +41,7 @@ export default function StorePage() {
             description: item.description || 'Official MathSpark print edition tute pack.',
             imageUrl: item.imageUrl,
           }));
-          setStoreItems([...liveFormatted, ...STATIC_STORE_ITEMS]);
+          setStoreItems(liveFormatted);
         }
       })
       .catch(err => console.error('Error fetching store items:', err));
@@ -130,9 +130,14 @@ export default function StorePage() {
 
         <section className="section" style={{ background: 'var(--dark)' }}>
           <div className="container">
-            <div className="store-grid">
-              {storeItems.map((item) => (
-                <div key={item.id} className="store-card">
+            {storeItems.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '60px 20px', background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                📖 No store items uploaded yet. Admin will add official tute packs and publications soon.
+              </div>
+            ) : (
+              <div className="store-grid">
+                {storeItems.map((item) => (
+                  <div key={item.id} className="store-card">
                   <div className="store-card-image">
                     {item.imageUrl ? (
                       <img src={item.imageUrl} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -167,8 +172,9 @@ export default function StorePage() {
                     </button>
                   </div>
                 </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

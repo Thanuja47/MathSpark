@@ -11,13 +11,6 @@ const STATIC_RESULTS = [
   { year: '2024', grade: 'O/L (Grade 11)', aPass: 2910, total: 3200, percentage: '91%', topScorer: 'Sithmi F. — 99/100', medium: 'Sinhala & English' },
 ];
 
-const STATIC_TOPPERS = [
-  { name: 'Kavindi Perera', grade: 'Grade 11 · O/L 2025', score: '100/100', school: 'Visakha Vidyalaya, Colombo', medium: 'Sinhala', color: '#0052FF' },
-  { name: 'Tharindu Silva', grade: 'Grade 10 · Term 2025', score: '98/100', school: 'Mahinda College, Galle', medium: 'Sinhala', color: '#7B2FFF' },
-  { name: 'Sithmi Fernando', grade: 'Grade 11 · O/L 2024', score: '99/100', school: "S. Thomas' Girls, Colombo", medium: 'English', color: '#FF6B00' },
-  { name: 'Dinesh Bandara', grade: 'Grade 10 · Term 2024', score: '97/100', school: 'Ananda College, Colombo', medium: 'Sinhala', color: '#00C896' },
-];
-
 export default function ResultsPage() {
   const { t } = useLanguage();
   const [liveResults, setLiveResults] = useState([]);
@@ -27,24 +20,21 @@ export default function ResultsPage() {
     fetch('/api/results')
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           setLiveResults(data);
         }
       })
       .catch(err => console.error('Error fetching results:', err));
   }, []);
 
-  const allToppers = [
-    ...liveResults.map(r => ({
-      name: r.studentName,
-      grade: `Grade ${r.grade} · ${r.year}`,
-      score: `${r.score}/100`,
-      school: 'MathSpark Student',
-      medium: r.subject || 'Sinhala',
-      color: '#0052FF',
-    })),
-    ...STATIC_TOPPERS
-  ];
+  const allToppers = liveResults.map((r, i) => ({
+    name: r.studentName,
+    grade: `Grade ${r.grade} · ${r.year}`,
+    score: `${r.score}/100`,
+    school: 'MathSpark Student',
+    medium: r.subject || 'Sinhala',
+    color: ['#0052FF', '#7B2FFF', '#FF6B00', '#00C896'][i % 4],
+  }));
 
   return (
     <>
