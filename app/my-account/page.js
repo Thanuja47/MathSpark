@@ -132,44 +132,31 @@ export default function MyAccountPage() {
     return m ? m[0] : raw;
   };
 
-  // 1. My Enrolled Classes: Build dynamic class items per approved grade by combining DB courses & active Timetable entries
+  // 1. My Enrolled Classes: Driven 100% by Timetable (Real Live Classes & Zoom Links for student's approved grades)
   const enrolledByGrade = allAccessGrades.reduce((acc, grade) => {
-    const courses = dbCourses.filter(c => Number(c.grade) === grade && (!c.month || hasAccess4GradeMonth(grade, c.month)));
     const timetables = accessibleTimetable.filter(t => Number(t.grade) === grade);
-
-    if (courses.length > 0 || timetables.length > 0) {
-      // If admin created specific courses for this grade, use courses
-      if (courses.length > 0) {
-        acc[grade] = courses.map(course => {
-          const matchedTt = timetables.filter(t => !t.month || monthsMatch(t.month, course.month));
-          const zoomLink = matchedTt.find(t => t.liveLink)?.liveLink || timetables.find(t => t.liveLink)?.liveLink || null;
-          return {
-            id: course.id,
-            title: course.title,
-            medium: course.medium || 'Sinhala',
-            schedule: matchedTt.length > 0 ? matchedTt.map(t => `${t.day} ${t.time}`).join(' • ') : (timetables.length > 0 ? timetables.map(t => `${t.day} ${t.time}`).join(' • ') : 'Scheduled Live Class'),
-            zoomUrl: extractZoomUrl(zoomLink)
-          };
-        });
-      } else {
-        // Fallback: If no course card created in DB yet, generate class cards directly from Timetable entries for this grade
-        acc[grade] = [{
-          id: `tt-grade-${grade}`,
-          title: `Grade ${grade} Live Theory & Revision Class`,
-          medium: user?.medium || 'Sinhala',
-          schedule: timetables.map(t => `${t.day} (${t.time})`).join(' • '),
-          zoomUrl: extractZoomUrl(timetables.find(t => t.liveLink)?.liveLink)
-        }];
-      }
+    if (timetables.length > 0) {
+      acc[grade] = timetables.map(t => ({
+        id: t.id,
+        title: t.subject || `Grade ${grade} Live Mathematics Class`,
+        medium: user?.medium || 'Sinhala',
+        day: t.day,
+        time: t.time,
+        month: t.month,
+        schedule: `${t.day} (${t.time})`,
+        zoomUrl: extractZoomUrl(t.liveLink)
+      }));
     }
     return acc;
   }, {});
 
-  // 2. Lesson Recordings Archive: courses with sampleVideoUrl matching student access
+  // 2. Lesson Recordings Archive: Driven 100% by Courses (Past & August Recorded Video Lessons for student's approved grades & months)
   const accessibleRecordings = dbCourses.filter(c => {
     const cGrade = Number(c.grade);
     if (!allAccessGrades.includes(cGrade)) return false;
+    // Must have a recorded video URL
     if (!c.sampleVideoUrl) return false;
+    // Check if student has access grant for this grade + month (or all-months access)
     if (c.month) return hasAccess4GradeMonth(cGrade, c.month);
     return true;
   });
