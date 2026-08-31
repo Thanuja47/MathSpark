@@ -41,7 +41,11 @@ export async function GET(request) {
       };
     });
 
-    return NextResponse.json(sanitized);
+    const res = NextResponse.json(sanitized);
+    res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.headers.set('Pragma', 'no-cache');
+    res.headers.set('Expires', '0');
+    return res;
   } catch (e) {
     return NextResponse.json({ error: 'Failed to fetch timetable' }, { status: 500 });
   }

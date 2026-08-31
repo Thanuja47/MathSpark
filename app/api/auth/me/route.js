@@ -15,7 +15,7 @@ export async function GET(request) {
   }
   const approvedGrades = (student.gradeAccess || []).map(g => g.gradeId);
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     user: {
       id:              student.id,
       name:            student.name,
@@ -29,6 +29,10 @@ export async function GET(request) {
       gradeAccess:     student.gradeAccess || [],
     },
   });
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  response.headers.set('Pragma', 'no-cache');
+  response.headers.set('Expires', '0');
+  return response;
 }
 
 // POST /api/auth/me — logout (clear cookie)

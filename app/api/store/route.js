@@ -5,7 +5,11 @@ import { db } from '@/lib/db';
 export async function GET() {
   try {
     const items = await db.store.all();
-    return NextResponse.json(items);
+    const res = NextResponse.json(items);
+    res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.headers.set('Pragma', 'no-cache');
+    res.headers.set('Expires', '0');
+    return res;
   } catch (e) {
     return NextResponse.json({ error: 'Failed to fetch store items' }, { status: 500 });
   }
