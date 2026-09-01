@@ -130,8 +130,14 @@ export default function Footer() {
                 © {currentYear} <span className="footer-brand-accent">MathSpark</span>. All rights reserved.
               </p>
               <p className="footer-powered-by">
-                Designed &amp; Developed by
-                <span className="fillex-badge">
+                Designed &amp; Developed by{' '}
+                <a
+                  href="https://fillex360-website.vercel.app/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="fillex-badge"
+                  style={{ textDecoration: 'none', color: 'inherit' }}
+                >
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <polygon points="6,1 11,4 11,8 6,11 1,8 1,4" fill="url(#fx-grad)" opacity="0.9"/>
                     <defs>
@@ -142,7 +148,7 @@ export default function Footer() {
                     </defs>
                   </svg>
                   FILLEX360 Solutions
-                </span>
+                </a>
               </p>
             </div>
             <ul className="footer-policy-links">
