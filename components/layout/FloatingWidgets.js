@@ -34,7 +34,7 @@ export default function FloatingWidgets() {
         href={`https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent('Hi Ishan Sir, I would like to inquire about MathSpark online classes.')}`}
         target="_blank"
         rel="noreferrer"
-        className="floating-widget whatsapp-widget"
+        className="whatsapp-float"
         aria-label="Contact on WhatsApp"
       >
         <svg width="26" height="26" fill="currentColor" viewBox="0 0 24 24">
