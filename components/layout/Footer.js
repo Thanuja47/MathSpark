@@ -132,7 +132,7 @@ export default function Footer() {
               <p className="footer-powered-by">
                 Designed &amp; Developed by{' '}
                 <a
-                  href="https://fillex360-website.vercel.app/"
+                  href="https://fillex360.com"
                   target="_blank"
                   rel="noreferrer"
                   className="fillex-badge"
