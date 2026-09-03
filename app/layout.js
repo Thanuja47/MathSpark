@@ -109,6 +109,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en-LK" className={`${inter.variable} ${dmSerif.variable} ${jetbrainsMono.variable}`}>
       <head>
+        <style dangerouslySetInnerHTML={{ __html: `
+          html, body { background-color: #0D0F14; color: #C8CDD8; }
+          body { opacity: 1; }
+        ` }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrg) }}
