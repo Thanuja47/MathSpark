@@ -12,8 +12,7 @@ export default function TimetablePage() {
   const { t } = useLanguage();
   const [user, setUser] = useState(null);
   const [lockedGrade, setLockedGrade] = useState(null);
-  const [timetableList, setTimetableList] = useState([]);
-  const [slNow, setSlNow] = useState(getSriLankaNow());
+  const [timetableList, setTimetableList] = useState(null); // null = loading state
 
   // Ticker for live per-class countdowns using Sri Lanka timezone
   useEffect(() => {
@@ -34,11 +33,9 @@ export default function TimetablePage() {
     fetch('/api/timetable')
       .then(r => r.json())
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setTimetableList(data);
-        }
+        setTimetableList(Array.isArray(data) ? data : []);
       })
-      .catch(() => {});
+      .catch(() => setTimetableList([]));
   }, []);
 
   const handleJoinZoom = (e, grade, zoomUrl, month) => {
@@ -91,7 +88,7 @@ export default function TimetablePage() {
   };
 
   // Build combined schedule from DB or fallback SCHEDULE
-  const activeSchedule = timetableList.length > 0
+  const activeSchedule = (Array.isArray(timetableList) && timetableList.length > 0)
     ? timetableList.map((item, idx) => {
         const dayIdx = DAYS.findIndex(d => d.toLowerCase() === (item.day || '').toLowerCase());
         return {
@@ -107,7 +104,7 @@ export default function TimetablePage() {
           color: ['#0052FF', '#7B2FFF', '#FF6B00', '#00C896', '#FF3D9A'][idx % 5]
         };
       })
-    : SCHEDULE;
+    : (timetableList === null ? [] : SCHEDULE);
 
   // ── 1. Dynamic Day Reordering ──────────────────────────────────────────
   // Get today's day index in Sri Lanka time (0 = Sunday ... 6 = Saturday)
