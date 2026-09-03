@@ -109,7 +109,7 @@ export default function TimetablePage() {
 
   // ── 1. Dynamic Day Reordering ──────────────────────────────────────────
   // Get today's day index in Sri Lanka time (0 = Sunday ... 6 = Saturday)
-  const todayIndex = slNow.getDay();
+  const todayIndex = slNow ? slNow.getDay() : new Date().getDay();
   // Reorder days starting from today and wrapping around
   const reorderedDayIndices = Array.from({ length: 7 }, (_, i) => (todayIndex + i) % 7);
 
