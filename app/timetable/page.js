@@ -13,6 +13,7 @@ export default function TimetablePage() {
   const [user, setUser] = useState(null);
   const [lockedGrade, setLockedGrade] = useState(null);
   const [timetableList, setTimetableList] = useState(null); // null = loading state
+  const [slNow, setSlNow] = useState(getSriLankaNow());
 
   // Ticker for live per-class countdowns using Sri Lanka timezone
   useEffect(() => {
