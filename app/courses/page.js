@@ -143,8 +143,18 @@ export default function CoursesPage() {
 
             {/* Results Grid */}
             {loading ? (
-              <div style={{ textCenter: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
-                Loading live classes from database...
+              <div className="courses-page-grid">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="course-card-skeleton">
+                    <div className="skeleton-img"></div>
+                    <div className="skeleton-content">
+                      <div className="skeleton-line short"></div>
+                      <div className="skeleton-line title"></div>
+                      <div className="skeleton-line subtitle"></div>
+                      <div className="skeleton-line footer"></div>
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : filteredCourses.length > 0 ? (
               <div className="courses-page-grid">
@@ -235,6 +245,45 @@ export default function CoursesPage() {
           border: 1px dashed var(--border);
           border-radius: var(--radius-lg);
         }
+        .course-card-skeleton {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius-lg);
+          overflow: hidden;
+          height: 380px;
+          display: flex;
+          flex-direction: column;
+        }
+        .skeleton-img {
+          height: 180px;
+          background: linear-gradient(90deg, var(--surface-2) 25%, var(--rule) 50%, var(--surface-2) 75%);
+          background-size: 200% 100%;
+          animation: skeleton-shimmer 1.5s infinite;
+        }
+        .skeleton-content {
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+          flex: 1;
+        }
+        .skeleton-line {
+          height: 14px;
+          border-radius: 6px;
+          background: linear-gradient(90deg, var(--surface-2) 25%, var(--rule) 50%, var(--surface-2) 75%);
+          background-size: 200% 100%;
+          animation: skeleton-shimmer 1.5s infinite;
+        }
+        .skeleton-line.short { width: 30%; }
+        .skeleton-line.title { width: 85%; height: 20px; }
+        .skeleton-line.subtitle { width: 60%; }
+        .skeleton-line.footer { width: 100%; height: 36px; margin-top: auto; border-radius: 10px; }
+
+        @keyframes skeleton-shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+
         @media (max-width: 768px) {
           .courses-filter-bar {
             flex-direction: column;
