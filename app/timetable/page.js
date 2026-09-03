@@ -88,7 +88,7 @@ export default function TimetablePage() {
   };
 
   // Build combined schedule from DB or fallback SCHEDULE
-  const activeSchedule = (Array.isArray(timetableList) && timetableList.length > 0)
+  const activeSchedule = (timetableList && timetableList.length > 0)
     ? timetableList.map((item, idx) => {
         const dayIdx = DAYS.findIndex(d => d.toLowerCase() === (item.day || '').toLowerCase());
         return {
@@ -104,7 +104,7 @@ export default function TimetablePage() {
           color: ['#0052FF', '#7B2FFF', '#FF6B00', '#00C896', '#FF3D9A'][idx % 5]
         };
       })
-    : (timetableList === null ? [] : SCHEDULE);
+    : SCHEDULE;
 
   // ── 1. Dynamic Day Reordering ──────────────────────────────────────────
   // Get today's day index in Sri Lanka time (0 = Sunday ... 6 = Saturday)
