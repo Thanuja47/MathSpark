@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Phone, MessageCircle, Mail, MapPin } from 'lucide-react';
+import { Phone, Mail, MapPin } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
@@ -59,20 +59,6 @@ export default function ContactPage() {
                     <div className="contact-info-label">{t('common.contactUs')}</div>
                     <div className="contact-info-value">
                       <a href={`tel:${SITE.phone}`}>{SITE.phone}</a>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="contact-info-item">
-                  <div className="contact-icon" style={{ color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <MessageCircle size={22} />
-                  </div>
-                  <div>
-                    <div className="contact-info-label">WhatsApp Support</div>
-                    <div className="contact-info-value">
-                      <a href={`https://wa.me/${SITE.whatsapp}`} target="_blank" rel="noreferrer">
-                        {SITE.whatsappDisplay || '+94 70 241 6592'}
-                      </a>
                     </div>
                   </div>
                 </div>
