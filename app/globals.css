@@ -1479,9 +1479,11 @@ p { color: var(--text); line-height: 1.75; }
 }
 
 /* ── Prevent FOUC: Hide unhydrated header drawers & modals on initial render ── */
-.mobile-menu-drawer,
-.mobile-overlay,
-.login-modal-overlay {
-  display: none;
+.mobile-menu:not(.open),
+.overlay:not(.active),
+.login-modal:not(.open),
+.sidebar-drawer:not(.open) {
+  display: none !important;
 }
+
 
