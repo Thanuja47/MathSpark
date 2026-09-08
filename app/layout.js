@@ -110,8 +110,37 @@ export default function RootLayout({ children }) {
     <html lang="en-LK" className={`${inter.variable} ${dmSerif.variable} ${jetbrainsMono.variable}`}>
       <head>
         <style dangerouslySetInnerHTML={{ __html: `
-          html, body { background-color: #0D0F14; color: #C8CDD8; }
-          body { opacity: 1; }
+          html, body { background-color: #0D0F14; color: #C8CDD8; margin: 0; padding: 0; }
+          #app-preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #0D0F14;
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+          }
+          #app-preloader.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+          }
+          .preloader-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid rgba(37, 99, 235, 0.15);
+            border-top-color: #2563EB;
+            border-radius: 50%;
+            animation: preloader-spin 0.8s linear infinite;
+          }
+          @keyframes preloader-spin {
+            to { transform: rotate(360deg); }
+          }
         ` }} />
         <script
           type="application/ld+json"
@@ -123,6 +152,26 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
+        <div id="app-preloader">
+          <div className="preloader-spinner"></div>
+        </div>
+        <script dangerouslySetInnerHTML={{ __html: `
+          (function() {
+            function hidePreloader() {
+              var p = document.getElementById('app-preloader');
+              if (p) {
+                p.classList.add('fade-out');
+                setTimeout(function() { if (p && p.parentNode) p.parentNode.removeChild(p); }, 350);
+              }
+            }
+            if (document.readyState === 'complete') {
+              hidePreloader();
+            } else {
+              window.addEventListener('load', hidePreloader);
+              setTimeout(hidePreloader, 1500); // Fallback maximum 1.5s
+            }
+          })();
+        ` }} />
         <LanguageProvider>
           {children}
         </LanguageProvider>
