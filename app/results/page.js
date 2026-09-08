@@ -5,12 +5,6 @@ import Footer from '@/components/layout/Footer';
 import FloatingWidgets from '@/components/layout/FloatingWidgets';
 import { useLanguage } from '@/context/LanguageContext';
 
-const STATIC_RESULTS = [
-  { year: '2025', grade: 'O/L (Grade 11)', aPass: 3682, total: 3950, percentage: '93%', topScorer: 'Kavindi P. — 100/100', medium: 'Sinhala & English' },
-  { year: '2025', grade: 'Grade 10 Term Exam', aPass: 1840, total: 2100, percentage: '87%', topScorer: 'Tharindu S. — 98/100', medium: 'Sinhala' },
-  { year: '2024', grade: 'O/L (Grade 11)', aPass: 2910, total: 3200, percentage: '91%', topScorer: 'Sithmi F. — 99/100', medium: 'Sinhala & English' },
-];
-
 export default function ResultsPage() {
   const { t } = useLanguage();
   const [liveResults, setLiveResults] = useState([]);
@@ -61,39 +55,36 @@ export default function ResultsPage() {
               <h2 className="section-title">Exam <span className="theme-gradient">Performance</span></h2>
             </div>
 
-            <div className="results-table-wrap">
-              <table className="results-table">
-                <thead>
-                  <tr>
-                    <th>Year</th>
-                    <th>Exam</th>
-                    <th>Students</th>
-                    <th>A Passes</th>
-                    <th>A Pass Rate</th>
-                    <th>Top Scorer</th>
-                    <th>Medium</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {STATIC_RESULTS.map((r, i) => (
-                    <tr key={i}>
-                      <td><strong style={{ color: 'var(--primary-light)' }}>{r.year}</strong></td>
-                      <td>{r.grade}</td>
-                      <td>{r.total.toLocaleString()}</td>
-                      <td><strong style={{ color: '#00C896' }}>{r.aPass.toLocaleString()}</strong></td>
-                      <td>
-                        <div className="result-bar-wrap">
-                          <div className="result-bar" style={{ width: r.percentage }} />
-                          <span>{r.percentage}</span>
-                        </div>
-                      </td>
-                      <td style={{ fontSize: '0.85rem' }}>{r.topScorer}</td>
-                      <td><span className="badge badge-primary">{r.medium}</span></td>
+            {liveResults.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                📊 Exam performance summary records added by admin will appear here in real-time.
+              </div>
+            ) : (
+              <div className="results-table-wrap">
+                <table className="results-table">
+                  <thead>
+                    <tr>
+                      <th>Year</th>
+                      <th>Exam / Grade</th>
+                      <th>Student Name</th>
+                      <th>Score</th>
+                      <th>Subject / Medium</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {liveResults.map((r, i) => (
+                      <tr key={r.id || i}>
+                        <td><strong style={{ color: 'var(--primary-light)' }}>{r.year}</strong></td>
+                        <td>Grade {r.grade}</td>
+                        <td><strong>{r.studentName}</strong></td>
+                        <td><strong style={{ color: '#00C896' }}>{r.score}%</strong></td>
+                        <td><span className="badge badge-primary">{r.subject || 'Sinhala'}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </section>
 
@@ -149,20 +140,26 @@ export default function ResultsPage() {
               <p className="section-subtitle" style={{ margin: '0 auto' }}>Students who achieved outstanding results with MathSpark.</p>
             </div>
 
-            <div className="toppers-grid">
-              {allToppers.map((t, i) => (
-                <div key={i} className="topper-card" style={{ '--topper-color': t.color }}>
-                  <div className="topper-avatar" style={{ background: t.color }}>
-                    {t.name.charAt(0)}
+            {allToppers.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--surface)', borderRadius: 16, border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+                🏆 Top scorers added by admin will appear here in real-time.
+              </div>
+            ) : (
+              <div className="toppers-grid">
+                {allToppers.map((t, i) => (
+                  <div key={i} className="topper-card" style={{ '--topper-color': t.color }}>
+                    <div className="topper-avatar" style={{ background: t.color }}>
+                      {t.name.charAt(0)}
+                    </div>
+                    <div className="topper-score">{t.score}</div>
+                    <h4 className="topper-name">{t.name}</h4>
+                    <div className="topper-grade">{t.grade}</div>
+                    <div className="topper-school">{t.school}</div>
+                    <span className="badge badge-primary" style={{ marginTop: 12 }}>{t.medium}</span>
                   </div>
-                  <div className="topper-score">{t.score}</div>
-                  <h4 className="topper-name">{t.name}</h4>
-                  <div className="topper-grade">{t.grade}</div>
-                  <div className="topper-school">{t.school}</div>
-                  <span className="badge badge-primary" style={{ marginTop: 12 }}>{t.medium}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
