@@ -510,6 +510,21 @@ export default function AdminPage() {
     }
   };
 
+  /** Permanently delete a student record and refresh total count */
+  const deleteStudent = async (student) => {
+    if (!confirm(`Are you sure you want to permanently delete '${student.name}' (${student.phone})? This cannot be undone.`)) return;
+    try {
+      const res = await apiFetch(`/api/admin/students/${student.id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete student');
+      setStudentsList(prev => prev.filter(s => s.id !== student.id));
+      fetch('/api/admin/students/stats').then(r => r.json()).then(d => d?.totalStudents !== undefined && setStudentStats(d)).catch(() => {});
+      alert(data.message || 'Student deleted successfully.');
+    } catch (err) {
+      alert(`❌ Error: ${err.message}`);
+    }
+  };
+
   const filteredStudents = studentsList.filter(s => {
     const q = studentSearch.toLowerCase().trim();
     if (!q) return true;
@@ -798,12 +813,23 @@ export default function AdminPage() {
                                     )}
                                   </td>
                                   <td>
-                                    <button
-                                      className="btn btn-outline btn-sm"
-                                      onClick={() => openStudentModal(student)}
-                                    >
-                                      Manage Access
-                                    </button>
+                                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                                      <button
+                                        className="btn btn-outline btn-sm"
+                                        onClick={() => openStudentModal(student)}
+                                      >
+                                        Manage Access
+                                      </button>
+                                      {student.role !== 'admin' && (
+                                        <button
+                                          className="btn btn-sm"
+                                          style={{ background: '#ef4444', color: '#fff' }}
+                                          onClick={() => deleteStudent(student)}
+                                        >
+                                          Delete
+                                        </button>
+                                      )}
+                                    </div>
                                   </td>
                                 </tr>
                               );
