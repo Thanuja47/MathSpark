@@ -25,7 +25,7 @@ export default function CoursesPage() {
             title: c.title,
             grade: c.grade,
             medium: c.medium,
-            lessons: 12,
+            lessons: Array.isArray(c.lessons) ? c.lessons.length : (c.lessonsCount || 0),
             students: 150,
             packs: 2,
             price: c.price,

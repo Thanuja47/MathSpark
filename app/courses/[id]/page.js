@@ -391,7 +391,7 @@ export default function CourseDetailPage({ params }) {
               </div>
               <div style={{ display: 'flex', gap: 12, flexShrink: 0, flexWrap: 'wrap' }}>
                 <a
-                  href={`https://wa.me/${SITE.whatsapp}?text=Enroll%3A%20${encodeURIComponent(course.title)}`}
+                  href={whatsappEnrollLink}
                   target="_blank"
                   rel="noreferrer"
                   className="btn btn-accent btn-lg"
@@ -410,7 +410,7 @@ export default function CourseDetailPage({ params }) {
       <FloatingWidgets />
 
       {lockedGrade && (
-        <AccessLockedModal grade={lockedGrade} onClose={() => setLockedGrade(null)} />
+        <AccessLockedModal grade={lockedGrade} month={course.month || null} onClose={() => setLockedGrade(null)} />
       )}
 
       <style jsx>{`

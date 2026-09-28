@@ -105,7 +105,7 @@ export default function CourseCard({ course }) {
               <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
               </svg>
-              {(lessons || 12)} Lessons
+              {(lessons ?? 0)} Lessons
             </span>
             <span>
               <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
